@@ -1,0 +1,14 @@
+yfinance
+python-telegram-bot
+google-generativeai
+gspread
+google-auth-oauthlib
+pandas
+python-dotenv
+lxml
+html5lib
+matplotlib
+reportlab
+python-pptx
+mplfinance
+aiohttp 
