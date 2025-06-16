@@ -227,3 +227,18 @@
 2025-06-17 05:43:37 - test_optimized_scalping - INFO - [test_optimized_scalping.py:40] - 🧪 스캘핑 시스템 테스터 초기화
 2025-06-17 06:06:45 - root - INFO - [config.py:191] - ✅ 로그 파일 설정 완료: trading_system.log
 2025-06-17 06:11:55 - root - INFO - [config.py:191] - ✅ 로그 파일 설정 완료: trading_system.log
+2025-06-17 07:16:58 - root - INFO - [config.py:191] - ✅ 로그 파일 설정 완료: trading_system.log
+2025-06-17 07:16:59 - core_trader - WARNING - [core_trader.py:469] - ⚠️ Google Sheets 초기화 실패: Expecting value: line 1 column 1 (char 0)
+2025-06-17 07:16:59 - core_trader - INFO - [core_trader.py:421] - 🔧 CoreTrader v6.0 초기화 완료 (모의투자)
+2025-06-17 07:16:59 - core_trader - INFO - [core_trader.py:422] - 📊 API 제한: 주문(1/s), 시세(2/s), 전체(5/s)
+2025-06-17 07:16:59 - core_trader - INFO - [core_trader.py:425] - 📈 일일 한도: 0회 사용, 10000회 남음
+2025-06-17 07:16:59 - scalping_modules.atr_analyzer - INFO - [atr_analyzer.py:44] - 📊 ATR 분석기 초기화: 최적 범위 0.5%-3.0%
+2025-06-17 07:16:59 - scalping_modules.multi_timeframe_analyzer - INFO - [multi_timeframe_analyzer.py:79] - ⏰ 멀티타임프레임 분석기 초기화 완료
+2025-06-17 07:16:59 - scalping_modules.momentum_scorer - INFO - [momentum_scorer.py:55] - ⚡ 모멘텀 스코어러 초기화: 5/20/50
+2025-06-17 07:16:59 - scalping_modules.optimized_scalping_system - INFO - [optimized_scalping_system.py:87] - 🚀 최적화된 스캘핑 시스템 초기화 완료
+2025-06-17 07:16:59 - scalping_modules.atr_analyzer - INFO - [atr_analyzer.py:44] - 📊 ATR 분석기 초기화: 최적 범위 0.5%-3.0%
+2025-06-17 07:16:59 - scalping_modules.multi_timeframe_analyzer - INFO - [multi_timeframe_analyzer.py:79] - ⏰ 멀티타임프레임 분석기 초기화 완료
+2025-06-17 07:16:59 - scalping_modules.momentum_scorer - INFO - [momentum_scorer.py:55] - ⚡ 모멘텀 스코어러 초기화: 5/20/50
+2025-06-17 07:16:59 - advanced_scalping_system - INFO - [advanced_scalping_system.py:64] - 🏆 고급 스캘핑 시스템 초기화 완료
+2025-06-17 07:16:59 - core_trader - INFO - [core_trader.py:437] - ✅ CoreTrader 초기화 성공
+2025-06-17 07:16:59 - core_trader - INFO - [core_trader.py:685] - 💰 잔고 조회 성공: 현금 499,941,454원, 총평가 499,998,654원, 보유종목 1개

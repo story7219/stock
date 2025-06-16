@@ -37,66 +37,13 @@ jobs:
 
       - name: 🔍 API 키 및 민감정보 검사
         run: |
-          echo "=== API 키 및 민감정보 노출 검사 ==="
-          python -c "
-          import os
-          import re
-          import glob
-          
-          # 민감정보 패턴들
-          sensitive_patterns = [
-              (r'[A-Za-z0-9]{20,}', 'API 키 형태'),
-              (r'sk-[a-zA-Z0-9]{20,}', 'OpenAI API 키'),
-              (r'xoxb-[0-9]{11,13}-[0-9]{11,13}-[a-zA-Z0-9]{24}', 'Slack Bot Token'),
-              (r'AKIA[0-9A-Z]{16}', 'AWS Access Key'),
-              (r'[0-9]{10}:[A-Za-z0-9_-]{35}', 'Telegram Bot Token'),
-              (r'AIza[0-9A-Za-z\\-_]{35}', 'Google API Key'),
-              (r'[a-zA-Z0-9]{32}', '32자 토큰'),
-              (r'Bearer [A-Za-z0-9\\-\\._~\\+\\/]+=*', 'Bearer Token')
-          ]
-          
-          # 검사할 파일 확장자
-          file_patterns = ['*.py', '*.yml', '*.yaml', '*.json', '*.md', '*.txt']
-          
-          findings = []
-          excluded_files = ['.git', '__pycache__', '.venv', 'node_modules']
-          
-          for pattern in file_patterns:
-              for filepath in glob.glob(f'**/{pattern}', recursive=True):
-                  # 제외할 디렉토리 건너뛰기
-                  if any(exc in filepath for exc in excluded_files):
-                      continue
-                  
-                  try:
-                      with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
-                          content = f.read()
-                          
-                      for regex, desc in sensitive_patterns:
-                          matches = re.finditer(regex, content)
-                          for match in matches:
-                              # 주석이나 예시는 제외
-                              line = content[:match.start()].count('\n') + 1
-                              matched_text = match.group()
-                              
-                              # 화이트리스트 (예시나 테스트 값들)
-                              whitelist = [
-                                  'test_key', 'test_secret', 'test_token', 'example',
-                                  'YOUR_API_KEY', 'placeholder', 'dummy', 'sample'
-                              ]
-                              
-                              if not any(white in matched_text.lower() for white in whitelist):
-                                  if len(matched_text) > 10:  # 너무 짧은 매치 제외
-                                      findings.append(f'{filepath}:{line} - {desc}: {matched_text[:20]}...')
-          
-          if findings:
-              print('⚠️ 잠재적 민감정보 발견:')
-              for finding in findings[:10]:  # 최대 10개만 표시
-                  print(f'   {finding}')
-              if len(findings) > 10:
-                  print(f'   ... 외 {len(findings)-10}개 더')
-          else:
-              print('✅ 하드코딩된 민감정보 없음')
-          "
+          python security_check.py
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          MOCK_KIS_APP_KEY: ${{ secrets.MOCK_KIS_APP_KEY }}
+          MOCK_KIS_APP_SECRET: ${{ secrets.MOCK_KIS_APP_SECRET }}
+          MOCK_KIS_ACCOUNT_NUMBER: ${{ secrets.MOCK_KIS_ACCOUNT_NUMBER }}
 
       - name: 🛡️ Python 보안 취약점 검사 (Bandit)
         run: |
@@ -166,72 +113,7 @@ jobs:
 
       - name: 🔧 환경 설정 보안 검사
         run: |
-          python -c "
-          import os
-          
-          print('🔧 환경 설정 보안 검사')
-          print('=' * 50)
-          
-          # GitHub Secrets 사용 여부 확인
-          expected_secrets = [
-              'TELEGRAM_BOT_TOKEN',
-              'TELEGRAM_CHAT_ID', 
-              'MOCK_KIS_APP_KEY',
-              'MOCK_KIS_APP_SECRET',
-              'MOCK_KIS_ACCOUNT_NUMBER'
-          ]
-          
-          print('📋 GitHub Secrets 확인:')
-          missing_secrets = []
-          for secret in expected_secrets:
-              if os.environ.get(secret):
-                  if os.environ.get(secret) in ['test_telegram_token', 'test_key', 'test_secret']:
-                      print(f'   ⚠️ {secret}: 테스트 값 사용 중')
-                  else:
-                      print(f'   ✅ {secret}: 설정됨')
-              else:
-                  print(f'   ❌ {secret}: 누락')
-                  missing_secrets.append(secret)
-          
-          # .env 파일 보안 검사
-          print(f'\n📄 .env 파일 보안:')
-          if os.path.exists('.env'):
-              print('   ❌ .env 파일이 저장소에 있습니다! 즉시 제거하세요.')
-          else:
-              print('   ✅ .env 파일이 저장소에 없음')
-          
-          # .gitignore 확인
-          if os.path.exists('.gitignore'):
-              with open('.gitignore', 'r') as f:
-                  gitignore = f.read()
-              
-              required_ignores = ['.env', '*.log', '__pycache__', '.venv']
-              missing_ignores = []
-              for ignore in required_ignores:
-                  if ignore not in gitignore:
-                      missing_ignores.append(ignore)
-              
-              if missing_ignores:
-                  print(f'   ⚠️ .gitignore에 추가 권장: {missing_ignores}')
-              else:
-                  print('   ✅ .gitignore 설정 양호')
-          else:
-              print('   ⚠️ .gitignore 파일 없음')
-          
-          # 보안 등급 계산
-          security_score = 100
-          security_score -= len(missing_secrets) * 10
-          if os.path.exists('.env'):
-              security_score -= 30
-          
-          print(f'\n🎯 보안 점수: {security_score}/100')
-          if security_score >= 80:
-              print('   등급: 우수 🟢')
-          elif security_score >= 60:
-              print('   등급: 양호 🟡')
-          else:
-              print('   등급: 개선 필요 🔴')
-          "
+          echo "✅ 환경 설정 검사는 security_check.py에서 통합 처리됩니다"
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
