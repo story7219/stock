@@ -51,6 +51,7 @@ jobs:
           import psutil
           import platform
           import gc
+          import time
           from datetime import datetime
           
           print('🖥️ 시스템 리소스 통합 분석')
@@ -60,8 +61,6 @@ jobs:
           print(f'🖥️ 운영체제: {platform.system()} {platform.release()}')
           print(f'🔧 CPU 코어: {psutil.cpu_count()}개')
           print(f'⏰ 시스템 가동시간: {(time.time() - psutil.boot_time()) / 3600:.1f}시간')
-          
-          import time
           
           # 메모리 상세 분석
           memory = psutil.virtual_memory()
