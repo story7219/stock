@@ -1,4 +1,6 @@
 # cleanup.ps1 - 프로젝트 자동 정리 스크립트
+# 한글 깨짐 방지를 위해 출력 인코딩을 UTF-8로 설정
+[System.Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 
 # --- 정리 후 남겨둘 필수 파일 및 폴더 목록 ---
 $itemsToKeep = @(
