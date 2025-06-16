@@ -75,7 +75,7 @@ jobs:
                           matches = re.finditer(regex, content)
                           for match in matches:
                               # 주석이나 예시는 제외
-                              line = content[:match.start()].count('\\n') + 1
+                              line = content[:match.start()].count('\n') + 1
                               matched_text = match.group()
                               
                               # 화이트리스트 (예시나 테스트 값들)
@@ -117,10 +117,10 @@ jobs:
               print(f'🟡 중위험 취약점: {len(medium_issues)}개')
               
               if high_issues:
-                  print('\\n⚠️ 고위험 취약점 상세:')
+                  print('\n⚠️ 고위험 취약점 상세:')
                   for issue in high_issues[:5]:
-                      print(f'   {issue[\"filename\"]}:{issue[\"line_number\"]} - {issue[\"test_name\"]}')
-                      print(f'     {issue[\"issue_text\"]}')
+                      print(f'   {issue["filename"]}:{issue["line_number"]} - {issue["test_name"]}')
+                      print(f'     {issue["issue_text"]}')
               
               if len(high_issues) == 0 and len(medium_issues) <= 5:
                   print('✅ 심각한 보안 취약점 없음')
@@ -147,7 +147,7 @@ jobs:
                           print(f'📦 발견된 취약점: {len(vulnerabilities)}개')
                           
                           if vulnerabilities:
-                              print('\\n⚠️ 취약한 패키지:')
+                              print('\n⚠️ 취약한 패키지:')
                               for vuln in vulnerabilities[:5]:
                                   if isinstance(vuln, dict):
                                       pkg = vuln.get('package', 'Unknown')
@@ -194,7 +194,7 @@ jobs:
                   missing_secrets.append(secret)
           
           # .env 파일 보안 검사
-          print(f'\\n📄 .env 파일 보안:')
+          print(f'\n📄 .env 파일 보안:')
           if os.path.exists('.env'):
               print('   ❌ .env 파일이 저장소에 있습니다! 즉시 제거하세요.')
           else:
@@ -224,7 +224,7 @@ jobs:
           if os.path.exists('.env'):
               security_score -= 30
           
-          print(f'\\n🎯 보안 점수: {security_score}/100')
+          print(f'\n🎯 보안 점수: {security_score}/100')
           if security_score >= 80:
               print('   등급: 우수 🟢')
           elif security_score >= 60:
