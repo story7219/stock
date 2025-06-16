@@ -20,9 +20,10 @@ jobs:
       - name: 📦 의존성 설치
         run: |
           pip install --upgrade pip
-          pip install requests pandas numpy python-telegram-bot google-api-python-client google-auth-oauthlib google-auth-httplib2 gspread oauth2client
+          pip install requests pandas numpy python-telegram-bot google-api-python-client google-auth-oauthlib google-auth-httplib2 gspread oauth2client google-generativeai datetime pytz argparse json urllib3 certifi
 
       - name: 📊 AI 코치 일일 리포트 생성
+        id: report_step
         run: python realtime_ai_trader.py --report
         env:
           KIS_APP_KEY: ${{ secrets.KIS_APP_KEY }}
@@ -34,33 +35,46 @@ jobs:
           GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
           GOOGLE_SPREADSHEET_ID: ${{ secrets.GOOGLE_SPREADSHEET_ID }}
 
-      - name: 📱 워크플로우 상태 알림
-        if: always()
+      - name: 📱 성공 시 텔레그램 알림
+        if: success()
         run: |
           python -c "
           import requests
           import os
-          import sys
           
           bot_token = os.environ.get('TELEGRAM_BOT_TOKEN')
           chat_id = os.environ.get('TELEGRAM_CHAT_ID')
           
-          if not bot_token or not chat_id:
-              print('텔레그램 설정이 없습니다.')
-              sys.exit(0)
-          
-          job_status = os.environ.get('JOB_STATUS', 'unknown')
-          
-          if job_status == 'success':
+          if bot_token and chat_id:
               message = '✅ AI 코치 일일 리포트 생성 완료!\n\n오늘의 매매 분석이 성공적으로 완료되었습니다.'
+              url = f'https://api.telegram.org/bot{bot_token}/sendMessage'
+              response = requests.post(url, json={'chat_id': chat_id, 'text': message})
+              print(f'성공 알림 전송: {response.status_code}')
           else:
-              message = '❌ AI 코치 리포트 생성 실패!\n\nGitHub Actions에서 리포트 생성 중 문제가 발생했습니다.'
-          
-          url = f'https://api.telegram.org/bot{bot_token}/sendMessage'
-          response = requests.post(url, json={'chat_id': chat_id, 'text': message})
-          print(f'텔레그램 알림 전송: {response.status_code}')
+              print('텔레그램 설정이 없습니다.')
           "
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-          JOB_STATUS: ${{ job.status }} 
+
+      - name: 📱 실패 시 텔레그램 알림
+        if: failure()
+        run: |
+          python -c "
+          import requests
+          import os
+          
+          bot_token = os.environ.get('TELEGRAM_BOT_TOKEN')
+          chat_id = os.environ.get('TELEGRAM_CHAT_ID')
+          
+          if bot_token and chat_id:
+              message = '❌ AI 코치 리포트 생성 실패!\n\nGitHub Actions에서 리포트 생성 중 문제가 발생했습니다.\n확인이 필요합니다.'
+              url = f'https://api.telegram.org/bot{bot_token}/sendMessage'
+              response = requests.post(url, json={'chat_id': chat_id, 'text': message})
+              print(f'실패 알림 전송: {response.status_code}')
+          else:
+              print('텔레그램 설정이 없습니다.')
+          "
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }} 

@@ -20,7 +20,7 @@ jobs:
       - name: 📦 의존성 설치
         run: |
           pip install --upgrade pip
-          pip install requests pandas numpy python-telegram-bot google-api-python-client google-auth-oauthlib google-auth-httplib2 gspread oauth2client
+          pip install requests pandas numpy python-telegram-bot google-api-python-client google-auth-oauthlib google-auth-httplib2 gspread oauth2client google-generativeai datetime pytz argparse json urllib3 certifi
 
       - name: 🚀 실시간 매매 실행
         run: python realtime_ai_trader.py --run
@@ -41,12 +41,16 @@ jobs:
           import requests
           import os
           
-          bot_token = os.environ['TELEGRAM_BOT_TOKEN']
-          chat_id = os.environ['TELEGRAM_CHAT_ID']
-          message = '🚨 실시간 매매 시스템 오류 발생!\n\nGitHub Actions에서 매매 실행 중 문제가 발생했습니다.\n확인이 필요합니다.'
+          bot_token = os.environ.get('TELEGRAM_BOT_TOKEN')
+          chat_id = os.environ.get('TELEGRAM_CHAT_ID')
           
-          url = f'https://api.telegram.org/bot{bot_token}/sendMessage'
-          requests.post(url, json={'chat_id': chat_id, 'text': message})
+          if bot_token and chat_id:
+              message = '🚨 실시간 매매 시스템 오류 발생!\n\nGitHub Actions에서 매매 실행 중 문제가 발생했습니다.\n확인이 필요합니다.'
+              url = f'https://api.telegram.org/bot{bot_token}/sendMessage'
+              response = requests.post(url, json={'chat_id': chat_id, 'text': message})
+              print(f'실패 알림 전송: {response.status_code}')
+          else:
+              print('텔레그램 설정이 없습니다.')
           "
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
