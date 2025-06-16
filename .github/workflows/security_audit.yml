@@ -16,10 +16,6 @@ on:
           - 'critical_only'
   push:
     branches: [ main, develop ]
-    paths:
-      - '**/*.py'
-      - '.env*'
-      - 'requirements.txt'
 
 jobs:
   security_audit:
