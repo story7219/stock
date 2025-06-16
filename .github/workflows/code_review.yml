@@ -1,35 +1,76 @@
-name: "매일 아침 AI 코드 리뷰"
+name: "AI 코드 리뷰"
 
 on:
-  workflow_dispatch:
   schedule:
-    - cron: '0 22 * * *' # KST 07:00
+    - cron: '0 22 * * 0-4'  # 일-목 07:00 (UTC 기준 22:00)
+  workflow_dispatch:
 
 jobs:
-  review:
+  code_review:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - name: 📥 코드 체크아웃
+        uses: actions/checkout@v4
+
+      - name: 🐍 Python 환경 설정
+        uses: actions/setup-python@v4
         with:
           python-version: '3.11'
-      - run: |
-          python -m pip install --upgrade pip
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-      - name: Run AI Code Review Script
+
+      - name: 📦 의존성 설치
+        run: |
+          pip install --upgrade pip
+          pip install google-generativeai
+          pip install requests pandas numpy python-telegram-bot google-api-python-client google-auth-oauthlib google-auth-httplib2 gspread oauth2client
+
+      - name: 🔍 AI 코드 리뷰 실행
+        run: python code_reviewer.py
         env:
+          KIS_APP_KEY: ${{ secrets.KIS_APP_KEY }}
+          KIS_APP_SECRET: ${{ secrets.KIS_APP_SECRET }}
+          KIS_ACCOUNT_NO: ${{ secrets.KIS_ACCOUNT_NO }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-        run: python code_reviewer.py
-      - name: Send Workflow Status Notification
-        if: always()
-        uses: appleboy/telegram-action@master
-        with:
-          to: ${{ secrets.TELEGRAM_CHAT_ID }}
-          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          message: |
-            **매일 아침 AI 코드 리뷰 결과: ${{ job.status == 'success' && '✅ 성공' || '❌ 실패' }}**
-            - 실행 링크: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-            
-            ${{ job.status == 'success' && '코드 리뷰가 정상적으로 생성 및 발송되었습니다.' || '오류가 발생했습니다. 로그를 확인해주세요.' }} 
+          GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
+          GOOGLE_SPREADSHEET_ID: ${{ secrets.GOOGLE_SPREADSHEET_ID }}
+
+      - name: 📱 성공 시 텔레그램 알림
+        if: success()
+        run: |
+          pip install requests
+          python -c "
+          import requests, os
+          bot_token = os.environ.get('TELEGRAM_BOT_TOKEN')
+          chat_id = os.environ.get('TELEGRAM_CHAT_ID')
+          if bot_token and chat_id:
+              message = '✅ AI 코드 리뷰 완료!\\n\\n매일 아침 코드 검토가 성공적으로 완료되었습니다.'
+              url = f'https://api.telegram.org/bot{bot_token}/sendMessage'
+              response = requests.post(url, json={'chat_id': chat_id, 'text': message})
+              print(f'성공 알림 전송: {response.status_code}')
+          else:
+              print('텔레그램 설정이 없습니다.')
+          "
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+
+      - name: 📱 실패 시 텔레그램 알림
+        if: failure()
+        run: |
+          pip install requests
+          python -c "
+          import requests, os
+          bot_token = os.environ.get('TELEGRAM_BOT_TOKEN')
+          chat_id = os.environ.get('TELEGRAM_CHAT_ID')
+          if bot_token and chat_id:
+              message = '❌ AI 코드 리뷰 실패!\\n\\nGitHub Actions에서 코드 리뷰 중 문제가 발생했습니다.\\n확인이 필요합니다.'
+              url = f'https://api.telegram.org/bot{bot_token}/sendMessage'
+              response = requests.post(url, json={'chat_id': chat_id, 'text': message})
+              print(f'실패 알림 전송: {response.status_code}')
+          else:
+              print('텔레그램 설정이 없습니다.')
+          "
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }} 
