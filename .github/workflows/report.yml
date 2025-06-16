@@ -26,6 +26,27 @@ jobs:
       - name: ✅ google-generativeai import 테스트
         run: python -c "import google.generativeai"
 
+      - name: 🔍 환경변수 디버깅
+        run: |
+          echo "=== GitHub Secrets 로드 상태 ==="
+          echo "KIS_APP_KEY 길이: ${#KIS_APP_KEY}"
+          echo "KIS_APP_SECRET 길이: ${#KIS_APP_SECRET}" 
+          echo "KIS_ACCOUNT_NO 길이: ${#KIS_ACCOUNT_NO}"
+          echo "GEMINI_API_KEY 길이: ${#GEMINI_API_KEY}"
+          echo "TELEGRAM_BOT_TOKEN 길이: ${#TELEGRAM_BOT_TOKEN}"
+          echo "TELEGRAM_CHAT_ID 길이: ${#TELEGRAM_CHAT_ID}"
+          echo "GCP_SA_KEY 길이: ${#GCP_SA_KEY}"
+          echo "GOOGLE_SPREADSHEET_ID 길이: ${#GOOGLE_SPREADSHEET_ID}"
+        env:
+          KIS_APP_KEY: ${{ secrets.KIS_APP_KEY }}
+          KIS_APP_SECRET: ${{ secrets.KIS_APP_SECRET }}
+          KIS_ACCOUNT_NO: ${{ secrets.KIS_ACCOUNT_NO }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
+          GOOGLE_SPREADSHEET_ID: ${{ secrets.GOOGLE_SPREADSHEET_ID }}
+
       - name: 📊 AI 코치 일일 리포트 생성
         id: report_step
         run: python realtime_ai_trader.py report
