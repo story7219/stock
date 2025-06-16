@@ -1,0 +1,201 @@
+{
+  "total_files": 50,
+  "file_categories": {
+    "트레이딩 로직": [
+      "advanced_trader.py",
+      "daytrader_screener.py",
+      "kis_trading_system.py",
+      "scalping_trader.py",
+      "trade.py",
+      "trader.py"
+    ],
+    "실행 스크립트": [
+      "analyze.py",
+      "auto.py",
+      "monday_auto.py",
+      "run.py"
+    ],
+    "테스트": [
+      "auto_backtest.py",
+      "backtest.py",
+      "backtest_mixed.py",
+      "fetch_and_backtest.py",
+      "full_cycle_test.py",
+      "quick_test.py",
+      "run_test_now.py",
+      "simple_test.py",
+      "test.py",
+      "test_buy.py",
+      "test_google_sheets.py",
+      "test_improved.py",
+      "test_sell.py",
+      "test_setup.py",
+      "test_simple.py"
+    ],
+    "트레이딩 클래스": [
+      "auto_file_organizer.py",
+      "buy.py",
+      "oneil_scanner.py",
+      "portfolio.py",
+      "sell.py"
+    ],
+    "코드 품질": [
+      "auto_quality_service.py",
+      "auto_refactoring_system.py",
+      "auto_refactoring_system_fixed.py",
+      "run_quality_check.py"
+    ],
+    "종목 스크리닝": [
+      "buffett_screener.py",
+      "minervini_screener.py"
+    ],
+    "설정": [
+      "config.py",
+      "secure_config.py"
+    ],
+    "사이클 분석": [
+      "cycle.py"
+    ],
+    "디버깅 도구": [
+      "debug_gemini.py"
+    ],
+    "분석 도구": [
+      "file_structure_analyzer.py",
+      "market_analyzer.py",
+      "quality_analyzer.py",
+      "run_analysis.py"
+    ],
+    "시트 연동": [
+      "google_sheets_integration.py"
+    ],
+    "API 연동": [
+      "kis_api.py",
+      "kis_api_client.py",
+      "zapier_mcp_server.py"
+    ],
+    "메인 실행": [
+      "main.py"
+    ],
+    "시스템 관리": [
+      "system_check.py"
+    ]
+  },
+  "duplicate_groups": [],
+  "integration_suggestions": [
+    {
+      "type": "카테고리 통합",
+      "category": "트레이딩 로직",
+      "files": [
+        "advanced_trader.py",
+        "daytrader_screener.py",
+        "kis_trading_system.py",
+        "scalping_trader.py",
+        "trade.py",
+        "trader.py"
+      ],
+      "reason": "트레이딩 로직 관련 파일들을 하나의 모듈로 통합",
+      "suggested_name": "trading_core.py"
+    },
+    {
+      "type": "카테고리 통합",
+      "category": "실행 스크립트",
+      "files": [
+        "analyze.py",
+        "auto.py",
+        "monday_auto.py",
+        "run.py"
+      ],
+      "reason": "실행 스크립트 관련 파일들을 하나의 모듈로 통합",
+      "suggested_name": "실행_스크립트.py"
+    },
+    {
+      "type": "카테고리 통합",
+      "category": "테스트",
+      "files": [
+        "auto_backtest.py",
+        "backtest.py",
+        "backtest_mixed.py",
+        "fetch_and_backtest.py",
+        "full_cycle_test.py",
+        "quick_test.py",
+        "run_test_now.py",
+        "simple_test.py",
+        "test.py",
+        "test_buy.py",
+        "test_google_sheets.py",
+        "test_improved.py",
+        "test_sell.py",
+        "test_setup.py",
+        "test_simple.py"
+      ],
+      "reason": "테스트 관련 파일들을 하나의 모듈로 통합",
+      "suggested_name": "test_suite.py"
+    },
+    {
+      "type": "카테고리 통합",
+      "category": "트레이딩 클래스",
+      "files": [
+        "auto_file_organizer.py",
+        "buy.py",
+        "oneil_scanner.py",
+        "portfolio.py",
+        "sell.py"
+      ],
+      "reason": "트레이딩 클래스 관련 파일들을 하나의 모듈로 통합",
+      "suggested_name": "트레이딩_클래스.py"
+    },
+    {
+      "type": "카테고리 통합",
+      "category": "코드 품질",
+      "files": [
+        "auto_quality_service.py",
+        "auto_refactoring_system.py",
+        "auto_refactoring_system_fixed.py",
+        "run_quality_check.py"
+      ],
+      "reason": "코드 품질 관련 파일들을 하나의 모듈로 통합",
+      "suggested_name": "quality_tools.py"
+    },
+    {
+      "type": "카테고리 통합",
+      "category": "분석 도구",
+      "files": [
+        "file_structure_analyzer.py",
+        "market_analyzer.py",
+        "quality_analyzer.py",
+        "run_analysis.py"
+      ],
+      "reason": "분석 도구 관련 파일들을 하나의 모듈로 통합",
+      "suggested_name": "analyzers.py"
+    },
+    {
+      "type": "카테고리 통합",
+      "category": "API 연동",
+      "files": [
+        "kis_api.py",
+        "kis_api_client.py",
+        "zapier_mcp_server.py"
+      ],
+      "reason": "API 연동 관련 파일들을 하나의 모듈로 통합",
+      "suggested_name": "api_clients.py"
+    },
+    {
+      "type": "소형 파일 통합",
+      "files": [
+        "analyze.py",
+        "auto.py",
+        "monday_auto.py",
+        "run.py",
+        "system_check.py",
+        "test_buy.py",
+        "zapier_mcp_server.py"
+      ],
+      "reason": "50줄 미만의 작은 파일들을 utils 모듈로 통합",
+      "suggested_name": "utils.py"
+    }
+  ],
+  "cleanup_recommendations": [
+    "📄 큰 파일 분할 고려: 7개 (500줄 이상)",
+    "🔧 함수 과다 파일 모듈화: 3개 (20개 이상)"
+  ]
+}

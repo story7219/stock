@@ -1,0 +1,1562 @@
+2025-06-13 09:17:25,605 - INFO - === 환경 변수 로드 상태 확인 ===
+2025-06-13 09:17:25,605 - INFO - 선택된 환경: MOCK(모의투자)
+2025-06-13 09:17:25,606 - INFO - IS_MOCK 설정: True
+2025-06-13 09:17:25,606 - INFO - APP_KEY 존재: 예
+2025-06-13 09:17:25,606 - INFO - APP_SECRET 존재: 예
+2025-06-13 09:17:25,607 - INFO - ACCOUNT_NO 존재: 아니오
+2025-06-13 09:17:25,607 - INFO - APP_KEY 앞 4자리: PSJH****
+2025-06-13 09:17:25,607 - INFO - APP_SECRET 앞 4자리: W5ts****
+2025-06-13 09:17:25,608 - ERROR - MOCK(모의투자) 환경의 필수 환경 변수가 설정되지 않았습니다.
+2025-06-13 09:17:25,608 - ERROR - 다음을 확인해주세요:
+2025-06-13 09:17:25,609 - ERROR - 1. .env 파일이 프로젝트 루트에 있는지 확인
+2025-06-13 09:17:25,609 - ERROR - 2. .env 파일에 MOCK_KIS_APP_KEY, MOCK_KIS_APP_SECRET, MOCK_KIS_ACCOUNT_NO가 설정되어 있는지 확인
+2025-06-13 09:20:41,352 - INFO - === 환경 변수 로드 상태 확인 ===
+2025-06-13 09:20:41,367 - INFO - 선택된 환경: MOCK(모의투자)
+2025-06-13 09:20:41,367 - INFO - IS_MOCK 설정: True
+2025-06-13 09:20:41,368 - INFO - APP_KEY 존재: 예
+2025-06-13 09:20:41,394 - INFO - APP_SECRET 존재: 예
+2025-06-13 09:20:41,418 - INFO - ACCOUNT_NUMBER 존재: 예
+2025-06-13 09:20:41,449 - INFO - APP_KEY 앞 4자리: PSJH****
+2025-06-13 09:20:41,455 - INFO - APP_SECRET 앞 4자리: W5ts****
+2025-06-13 09:20:41,456 - INFO - ACCOUNT_NUMBER: 50128558-01
+2025-06-13 09:20:41,458 - INFO - MOCK(모의투자) 환경 설정 값 로드 완료. AI 통합 시스템을 시작합니다.
+2025-06-13 09:20:41,458 - INFO - AI 통합 시스템을 초기화합니다.
+2025-06-13 09:20:41,462 - INFO - 모의투자 환경으로 API를 초기화합니다.
+2025-06-13 09:20:41,462 - INFO - 토큰 발급을 요청합니다.
+2025-06-13 09:20:41,463 - INFO - 요청 URL: https://openapivts.koreainvestment.com:29443/oauth2/tokenP
+2025-06-13 09:20:41,464 - INFO - APP_KEY 앞 4자리: PSJH****
+2025-06-13 09:20:41,464 - INFO - APP_SECRET 앞 4자리: W5ts****
+2025-06-13 09:20:41,658 - INFO - 접근 토큰 발급이 완료되었습니다.
+2025-06-13 09:20:41,658 - INFO - 제미나이 AI 연동 완료
+2025-06-13 09:20:41,659 - INFO - 시스템 초기화가 완료되었습니다.
+2025-06-13 09:20:41,659 - INFO - === 아르키메데스 프로젝트 AI 자동매매 시스템 가동 ===
+2025-06-13 09:20:41,659 - INFO - 제미나이 AI 분석 기능 통합 완료
+2025-06-13 09:20:41,660 - INFO - --- AI 리밸런싱 사이클 시작 (주기: 5분) ---
+2025-06-13 09:20:41,660 - INFO - 🔄 AI 기반 포트폴리오 리밸런싱 시작
+2025-06-13 09:20:41,660 - INFO - 포트폴리오를 동기화합니다.
+2025-06-13 09:20:41,660 - INFO - 모의투자 환경으로 API를 초기화합니다.
+2025-06-13 09:20:41,661 - INFO - 토큰 발급을 요청합니다.
+2025-06-13 09:20:41,661 - INFO - 요청 URL: https://openapivts.koreainvestment.com:29443/oauth2/tokenP
+2025-06-13 09:20:41,661 - INFO - APP_KEY 앞 4자리: PSJH****
+2025-06-13 09:20:41,661 - INFO - APP_SECRET 앞 4자리: W5ts****
+2025-06-13 09:20:41,687 - ERROR - 토큰 발급 실패 - 상태 코드: 403
+2025-06-13 09:20:41,688 - ERROR - 응답 내용: {"error_description":"접근토큰 발급 잠시 후 다시 시도하세요(1분당 1회)","error_code":"EGW00133"}
+2025-06-13 09:20:41,688 - ERROR - === 403 Forbidden 오류 해결 방법 ===
+2025-06-13 09:20:41,688 - ERROR - 1. 한국투자증권 홈페이지에서 모의투자 신청 상태 확인
+2025-06-13 09:20:41,689 - ERROR - 2. APP_KEY와 APP_SECRET이 모의투자용인지 확인
+2025-06-13 09:20:41,689 - ERROR - 3. 계좌번호가 모의투자 계좌번호인지 확인
+2025-06-13 09:20:41,689 - ERROR - 4. API 서비스 이용약관 동의 여부 확인
+2025-06-13 09:20:41,690 - ERROR - 5. 잠시 후 다시 시도해보세요
+2025-06-13 09:20:41,690 - ERROR - 접근 토큰 발급에 실패했습니다 - 403 Client Error: Forbidden for url: https://openapivts.koreainvestment.com:29443/oauth2/tokenP
+2025-06-13 09:20:41,690 - ERROR - 포트폴리오 동기화 중 오류: 403 Client Error: Forbidden for url: https://openapivts.koreainvestment.com:29443/oauth2/tokenP
+2025-06-13 09:20:41,691 - INFO - --- 사이클 종료, 5분 대기 ---
+2025-06-13 09:25:41,691 - INFO - --- AI 리밸런싱 사이클 시작 (주기: 5분) ---
+2025-06-13 09:25:41,691 - INFO - 🔄 AI 기반 포트폴리오 리밸런싱 시작
+2025-06-13 09:25:41,692 - INFO - 포트폴리오를 동기화합니다.
+2025-06-13 09:25:41,692 - INFO - 모의투자 환경으로 API를 초기화합니다.
+2025-06-13 09:25:41,693 - INFO - 토큰 발급을 요청합니다.
+2025-06-13 09:25:41,693 - INFO - 요청 URL: https://openapivts.koreainvestment.com:29443/oauth2/tokenP
+2025-06-13 09:25:41,693 - INFO - APP_KEY 앞 4자리: PSJH****
+2025-06-13 09:25:41,693 - INFO - APP_SECRET 앞 4자리: W5ts****
+2025-06-13 09:25:41,856 - INFO - 접근 토큰 발급이 완료되었습니다.
+2025-06-13 09:25:41,933 - INFO - 포트폴리오 동기화 완료 - 총 자산: 0원, 현금: 0원
+2025-06-13 09:25:41,933 - INFO - 보유 종목 수: 0개
+2025-06-13 09:25:41,933 - INFO - 🤖 제미나이 AI 시장 분석을 시작합니다...
+2025-06-13 09:25:41,934 - INFO - 거래량 상위 종목 조회 중...
+2025-06-13 09:25:41,934 - INFO - 모의투자 환경으로 API를 초기화합니다.
+2025-06-13 09:25:41,935 - INFO - 토큰 발급을 요청합니다.
+2025-06-13 09:25:41,935 - INFO - 요청 URL: https://openapivts.koreainvestment.com:29443/oauth2/tokenP
+2025-06-13 09:25:41,935 - INFO - APP_KEY 앞 4자리: PSJH****
+2025-06-13 09:25:41,936 - INFO - APP_SECRET 앞 4자리: W5ts****
+2025-06-13 09:25:41,966 - ERROR - 토큰 발급 실패 - 상태 코드: 403
+2025-06-13 09:25:41,967 - ERROR - 응답 내용: {"error_description":"접근토큰 발급 잠시 후 다시 시도하세요(1분당 1회)","error_code":"EGW00133"}
+2025-06-13 09:25:41,967 - ERROR - === 403 Forbidden 오류 해결 방법 ===
+2025-06-13 09:25:41,967 - ERROR - 1. 한국투자증권 홈페이지에서 모의투자 신청 상태 확인
+2025-06-13 09:25:41,967 - ERROR - 2. APP_KEY와 APP_SECRET이 모의투자용인지 확인
+2025-06-13 09:25:41,968 - ERROR - 3. 계좌번호가 모의투자 계좌번호인지 확인
+2025-06-13 09:25:41,968 - ERROR - 4. API 서비스 이용약관 동의 여부 확인
+2025-06-13 09:25:41,968 - ERROR - 5. 잠시 후 다시 시도해보세요
+2025-06-13 09:25:41,968 - ERROR - 접근 토큰 발급에 실패했습니다 - 403 Client Error: Forbidden for url: https://openapivts.koreainvestment.com:29443/oauth2/tokenP
+2025-06-13 09:25:41,969 - WARNING - 종목 005930 정보 조회 실패: 403 Client Error: Forbidden for url: https://openapivts.koreainvestment.com:29443/oauth2/tokenP
+2025-06-13 09:25:42,693 - INFO - 모의투자 환경으로 API를 초기화합니다.
+2025-06-13 09:25:42,693 - INFO - 토큰 발급을 요청합니다.
+2025-06-13 09:25:42,694 - INFO - 요청 URL: https://openapivts.koreainvestment.com:29443/oauth2/tokenP
+2025-06-13 09:25:42,694 - INFO - APP_KEY 앞 4자리: PSJH****
+2025-06-13 09:25:42,694 - INFO - APP_SECRET 앞 4자리: W5ts****
+2025-06-13 09:25:42,721 - ERROR - 토큰 발급 실패 - 상태 코드: 403
+2025-06-13 09:25:42,721 - ERROR - 응답 내용: {"error_description":"접근토큰 발급 잠시 후 다시 시도하세요(1분당 1회)","error_code":"EGW00133"}
+2025-06-13 09:25:42,722 - ERROR - === 403 Forbidden 오류 해결 방법 ===
+2025-06-13 09:25:42,722 - ERROR - 1. 한국투자증권 홈페이지에서 모의투자 신청 상태 확인
+2025-06-13 09:25:42,723 - ERROR - 2. APP_KEY와 APP_SECRET이 모의투자용인지 확인
+2025-06-13 09:25:42,724 - ERROR - 3. 계좌번호가 모의투자 계좌번호인지 확인
+2025-06-13 09:25:42,724 - ERROR - 4. API 서비스 이용약관 동의 여부 확인
+2025-06-13 09:25:42,724 - ERROR - 5. 잠시 후 다시 시도해보세요
+2025-06-13 09:25:42,725 - ERROR - 접근 토큰 발급에 실패했습니다 - 403 Client Error: Forbidden for url: https://openapivts.koreainvestment.com:29443/oauth2/tokenP
+2025-06-13 09:25:42,725 - WARNING - 종목 000660 정보 조회 실패: 403 Client Error: Forbidden for url: https://openapivts.koreainvestment.com:29443/oauth2/tokenP
+2025-06-13 09:25:42,959 - INFO - 모의투자 환경으로 API를 초기화합니다.
+2025-06-13 09:25:42,964 - INFO - 토큰 발급을 요청합니다.
+2025-06-13 09:25:42,971 - INFO - 요청 URL: https://openapivts.koreainvestment.com:29443/oauth2/tokenP
+2025-06-13 09:25:43,054 - INFO - APP_KEY 앞 4자리: PSJH****
+2025-06-13 09:25:43,072 - INFO - APP_SECRET 앞 4자리: W5ts****
+2025-06-13 09:25:43,127 - ERROR - 토큰 발급 실패 - 상태 코드: 403
+2025-06-13 09:25:43,128 - ERROR - 응답 내용: {"error_description":"접근토큰 발급 잠시 후 다시 시도하세요(1분당 1회)","error_code":"EGW00133"}
+2025-06-13 09:25:43,128 - ERROR - === 403 Forbidden 오류 해결 방법 ===
+2025-06-13 09:25:43,129 - ERROR - 1. 한국투자증권 홈페이지에서 모의투자 신청 상태 확인
+2025-06-13 09:25:43,129 - ERROR - 2. APP_KEY와 APP_SECRET이 모의투자용인지 확인
+2025-06-13 09:25:43,129 - ERROR - 3. 계좌번호가 모의투자 계좌번호인지 확인
+2025-06-13 09:25:43,129 - ERROR - 4. API 서비스 이용약관 동의 여부 확인
+2025-06-13 09:25:43,130 - ERROR - 5. 잠시 후 다시 시도해보세요
+2025-06-13 09:25:43,130 - ERROR - 접근 토큰 발급에 실패했습니다 - 403 Client Error: Forbidden for url: https://openapivts.koreainvestment.com:29443/oauth2/tokenP
+2025-06-13 09:25:43,130 - WARNING - 종목 035420 정보 조회 실패: 403 Client Error: Forbidden for url: https://openapivts.koreainvestment.com:29443/oauth2/tokenP
+2025-06-13 09:25:43,693 - INFO - 모의투자 환경으로 API를 초기화합니다.
+2025-06-13 09:25:43,694 - INFO - 토큰 발급을 요청합니다.
+2025-06-13 09:25:43,694 - INFO - 요청 URL: https://openapivts.koreainvestment.com:29443/oauth2/tokenP
+2025-06-13 09:25:43,694 - INFO - APP_KEY 앞 4자리: PSJH****
+2025-06-13 09:25:43,695 - INFO - APP_SECRET 앞 4자리: W5ts****
+2025-06-13 09:25:43,733 - ERROR - 토큰 발급 실패 - 상태 코드: 403
+2025-06-13 09:25:43,734 - ERROR - 응답 내용: {"error_description":"접근토큰 발급 잠시 후 다시 시도하세요(1분당 1회)","error_code":"EGW00133"}
+2025-06-13 09:25:43,734 - ERROR - === 403 Forbidden 오류 해결 방법 ===
+2025-06-13 09:25:43,734 - ERROR - 1. 한국투자증권 홈페이지에서 모의투자 신청 상태 확인
+2025-06-13 09:25:43,734 - ERROR - 2. APP_KEY와 APP_SECRET이 모의투자용인지 확인
+2025-06-13 09:25:43,735 - ERROR - 3. 계좌번호가 모의투자 계좌번호인지 확인
+2025-06-13 09:25:43,735 - ERROR - 4. API 서비스 이용약관 동의 여부 확인
+2025-06-13 09:25:43,735 - ERROR - 5. 잠시 후 다시 시도해보세요
+2025-06-13 09:25:43,735 - ERROR - 접근 토큰 발급에 실패했습니다 - 403 Client Error: Forbidden for url: https://openapivts.koreainvestment.com:29443/oauth2/tokenP
+2025-06-13 09:25:43,736 - WARNING - 종목 005490 정보 조회 실패: 403 Client Error: Forbidden for url: https://openapivts.koreainvestment.com:29443/oauth2/tokenP
+2025-06-13 09:25:43,951 - INFO - 모의투자 환경으로 API를 초기화합니다.
+2025-06-13 09:25:43,952 - INFO - 토큰 발급을 요청합니다.
+2025-06-13 09:25:43,952 - INFO - 요청 URL: https://openapivts.koreainvestment.com:29443/oauth2/tokenP
+2025-06-13 09:25:43,953 - INFO - APP_KEY 앞 4자리: PSJH****
+2025-06-13 09:25:43,953 - INFO - APP_SECRET 앞 4자리: W5ts****
+2025-06-13 09:25:43,980 - ERROR - 토큰 발급 실패 - 상태 코드: 403
+2025-06-13 09:25:43,980 - ERROR - 응답 내용: {"error_description":"접근토큰 발급 잠시 후 다시 시도하세요(1분당 1회)","error_code":"EGW00133"}
+2025-06-13 09:25:43,980 - ERROR - === 403 Forbidden 오류 해결 방법 ===
+2025-06-13 09:25:43,980 - ERROR - 1. 한국투자증권 홈페이지에서 모의투자 신청 상태 확인
+2025-06-13 09:25:43,981 - ERROR - 2. APP_KEY와 APP_SECRET이 모의투자용인지 확인
+2025-06-13 09:25:43,981 - ERROR - 3. 계좌번호가 모의투자 계좌번호인지 확인
+2025-06-13 09:25:43,981 - ERROR - 4. API 서비스 이용약관 동의 여부 확인
+2025-06-13 09:25:43,981 - ERROR - 5. 잠시 후 다시 시도해보세요
+2025-06-13 09:25:43,982 - ERROR - 접근 토큰 발급에 실패했습니다 - 403 Client Error: Forbidden for url: https://openapivts.koreainvestment.com:29443/oauth2/tokenP
+2025-06-13 09:25:43,982 - WARNING - 종목 051910 정보 조회 실패: 403 Client Error: Forbidden for url: https://openapivts.koreainvestment.com:29443/oauth2/tokenP
+2025-06-13 09:25:44,695 - INFO - 모의투자 환경으로 API를 초기화합니다.
+2025-06-13 09:25:44,695 - INFO - 토큰 발급을 요청합니다.
+2025-06-13 09:25:44,695 - INFO - 요청 URL: https://openapivts.koreainvestment.com:29443/oauth2/tokenP
+2025-06-13 09:25:44,695 - INFO - APP_KEY 앞 4자리: PSJH****
+2025-06-13 09:25:44,696 - INFO - APP_SECRET 앞 4자리: W5ts****
+2025-06-13 09:25:44,717 - ERROR - 토큰 발급 실패 - 상태 코드: 403
+2025-06-13 09:25:44,718 - ERROR - 응답 내용: {"error_description":"접근토큰 발급 잠시 후 다시 시도하세요(1분당 1회)","error_code":"EGW00133"}
+2025-06-13 09:25:44,718 - ERROR - === 403 Forbidden 오류 해결 방법 ===
+2025-06-13 09:25:44,718 - ERROR - 1. 한국투자증권 홈페이지에서 모의투자 신청 상태 확인
+2025-06-13 09:25:44,718 - ERROR - 2. APP_KEY와 APP_SECRET이 모의투자용인지 확인
+2025-06-13 09:25:44,719 - ERROR - 3. 계좌번호가 모의투자 계좌번호인지 확인
+2025-06-13 09:25:44,719 - ERROR - 4. API 서비스 이용약관 동의 여부 확인
+2025-06-13 09:25:44,719 - ERROR - 5. 잠시 후 다시 시도해보세요
+2025-06-13 09:25:44,719 - ERROR - 접근 토큰 발급에 실패했습니다 - 403 Client Error: Forbidden for url: https://openapivts.koreainvestment.com:29443/oauth2/tokenP
+2025-06-13 09:25:44,720 - WARNING - 종목 035720 정보 조회 실패: 403 Client Error: Forbidden for url: https://openapivts.koreainvestment.com:29443/oauth2/tokenP
+2025-06-13 09:25:44,955 - INFO - 모의투자 환경으로 API를 초기화합니다.
+2025-06-13 09:25:44,957 - INFO - 토큰 발급을 요청합니다.
+2025-06-13 09:25:44,958 - INFO - 요청 URL: https://openapivts.koreainvestment.com:29443/oauth2/tokenP
+2025-06-13 09:25:44,959 - INFO - APP_KEY 앞 4자리: PSJH****
+2025-06-13 09:25:44,970 - INFO - APP_SECRET 앞 4자리: W5ts****
+2025-06-13 09:25:45,013 - ERROR - 토큰 발급 실패 - 상태 코드: 403
+2025-06-13 09:25:45,013 - ERROR - 응답 내용: {"error_description":"접근토큰 발급 잠시 후 다시 시도하세요(1분당 1회)","error_code":"EGW00133"}
+2025-06-13 09:25:45,014 - ERROR - === 403 Forbidden 오류 해결 방법 ===
+2025-06-13 09:25:45,014 - ERROR - 1. 한국투자증권 홈페이지에서 모의투자 신청 상태 확인
+2025-06-13 09:25:45,014 - ERROR - 2. APP_KEY와 APP_SECRET이 모의투자용인지 확인
+2025-06-13 09:25:45,014 - ERROR - 3. 계좌번호가 모의투자 계좌번호인지 확인
+2025-06-13 09:25:45,014 - ERROR - 4. API 서비스 이용약관 동의 여부 확인
+2025-06-13 09:25:45,015 - ERROR - 5. 잠시 후 다시 시도해보세요
+2025-06-13 09:25:45,015 - ERROR - 접근 토큰 발급에 실패했습니다 - 403 Client Error: Forbidden for url: https://openapivts.koreainvestment.com:29443/oauth2/tokenP
+2025-06-13 09:25:45,015 - WARNING - 종목 006400 정보 조회 실패: 403 Client Error: Forbidden for url: https://openapivts.koreainvestment.com:29443/oauth2/tokenP
+2025-06-13 09:25:45,695 - INFO - 모의투자 환경으로 API를 초기화합니다.
+2025-06-13 09:25:45,695 - INFO - 토큰 발급을 요청합니다.
+2025-06-13 09:25:45,696 - INFO - 요청 URL: https://openapivts.koreainvestment.com:29443/oauth2/tokenP
+2025-06-13 09:25:45,697 - INFO - APP_KEY 앞 4자리: PSJH****
+2025-06-13 09:25:45,697 - INFO - APP_SECRET 앞 4자리: W5ts****
+2025-06-13 09:25:45,717 - ERROR - 토큰 발급 실패 - 상태 코드: 403
+2025-06-13 09:25:45,717 - ERROR - 응답 내용: {"error_description":"접근토큰 발급 잠시 후 다시 시도하세요(1분당 1회)","error_code":"EGW00133"}
+2025-06-13 09:25:45,718 - ERROR - === 403 Forbidden 오류 해결 방법 ===
+2025-06-13 09:25:45,718 - ERROR - 1. 한국투자증권 홈페이지에서 모의투자 신청 상태 확인
+2025-06-13 09:25:45,718 - ERROR - 2. APP_KEY와 APP_SECRET이 모의투자용인지 확인
+2025-06-13 09:25:45,719 - ERROR - 3. 계좌번호가 모의투자 계좌번호인지 확인
+2025-06-13 09:25:45,719 - ERROR - 4. API 서비스 이용약관 동의 여부 확인
+2025-06-13 09:25:45,720 - ERROR - 5. 잠시 후 다시 시도해보세요
+2025-06-13 09:25:45,720 - ERROR - 접근 토큰 발급에 실패했습니다 - 403 Client Error: Forbidden for url: https://openapivts.koreainvestment.com:29443/oauth2/tokenP
+2025-06-13 09:25:45,721 - WARNING - 종목 028260 정보 조회 실패: 403 Client Error: Forbidden for url: https://openapivts.koreainvestment.com:29443/oauth2/tokenP
+2025-06-13 09:25:45,952 - INFO - 모의투자 환경으로 API를 초기화합니다.
+2025-06-13 09:25:45,952 - INFO - 토큰 발급을 요청합니다.
+2025-06-13 09:25:45,952 - INFO - 요청 URL: https://openapivts.koreainvestment.com:29443/oauth2/tokenP
+2025-06-13 09:25:45,953 - INFO - APP_KEY 앞 4자리: PSJH****
+2025-06-13 09:25:45,953 - INFO - APP_SECRET 앞 4자리: W5ts****
+2025-06-13 09:25:45,980 - ERROR - 토큰 발급 실패 - 상태 코드: 403
+2025-06-13 09:25:45,980 - ERROR - 응답 내용: {"error_description":"접근토큰 발급 잠시 후 다시 시도하세요(1분당 1회)","error_code":"EGW00133"}
+2025-06-13 09:25:45,981 - ERROR - === 403 Forbidden 오류 해결 방법 ===
+2025-06-13 09:25:45,981 - ERROR - 1. 한국투자증권 홈페이지에서 모의투자 신청 상태 확인
+2025-06-13 09:25:45,981 - ERROR - 2. APP_KEY와 APP_SECRET이 모의투자용인지 확인
+2025-06-13 09:25:45,982 - ERROR - 3. 계좌번호가 모의투자 계좌번호인지 확인
+2025-06-13 09:25:45,982 - ERROR - 4. API 서비스 이용약관 동의 여부 확인
+2025-06-13 09:25:45,982 - ERROR - 5. 잠시 후 다시 시도해보세요
+2025-06-13 09:25:45,982 - ERROR - 접근 토큰 발급에 실패했습니다 - 403 Client Error: Forbidden for url: https://openapivts.koreainvestment.com:29443/oauth2/tokenP
+2025-06-13 09:25:45,983 - WARNING - 종목 068270 정보 조회 실패: 403 Client Error: Forbidden for url: https://openapivts.koreainvestment.com:29443/oauth2/tokenP
+2025-06-13 09:25:46,695 - INFO - 모의투자 환경으로 API를 초기화합니다.
+2025-06-13 09:25:46,695 - INFO - 토큰 발급을 요청합니다.
+2025-06-13 09:25:46,696 - INFO - 요청 URL: https://openapivts.koreainvestment.com:29443/oauth2/tokenP
+2025-06-13 09:25:46,696 - INFO - APP_KEY 앞 4자리: PSJH****
+2025-06-13 09:25:46,697 - INFO - APP_SECRET 앞 4자리: W5ts****
+2025-06-13 09:25:46,720 - ERROR - 토큰 발급 실패 - 상태 코드: 403
+2025-06-13 09:25:46,721 - ERROR - 응답 내용: {"error_description":"접근토큰 발급 잠시 후 다시 시도하세요(1분당 1회)","error_code":"EGW00133"}
+2025-06-13 09:25:46,721 - ERROR - === 403 Forbidden 오류 해결 방법 ===
+2025-06-13 09:25:46,721 - ERROR - 1. 한국투자증권 홈페이지에서 모의투자 신청 상태 확인
+2025-06-13 09:25:46,722 - ERROR - 2. APP_KEY와 APP_SECRET이 모의투자용인지 확인
+2025-06-13 09:25:46,722 - ERROR - 3. 계좌번호가 모의투자 계좌번호인지 확인
+2025-06-13 09:25:46,723 - ERROR - 4. API 서비스 이용약관 동의 여부 확인
+2025-06-13 09:25:46,724 - ERROR - 5. 잠시 후 다시 시도해보세요
+2025-06-13 09:25:46,724 - ERROR - 접근 토큰 발급에 실패했습니다 - 403 Client Error: Forbidden for url: https://openapivts.koreainvestment.com:29443/oauth2/tokenP
+2025-06-13 09:25:46,725 - WARNING - 종목 207940 정보 조회 실패: 403 Client Error: Forbidden for url: https://openapivts.koreainvestment.com:29443/oauth2/tokenP
+2025-06-13 09:25:46,725 - INFO - 거래대금 상위 종목 조회 중...
+2025-06-13 09:25:46,952 - INFO - 모의투자 환경으로 API를 초기화합니다.
+2025-06-13 09:25:46,952 - INFO - 토큰 발급을 요청합니다.
+2025-06-13 09:25:46,952 - INFO - 요청 URL: https://openapivts.koreainvestment.com:29443/oauth2/tokenP
+2025-06-13 09:25:46,953 - INFO - APP_KEY 앞 4자리: PSJH****
+2025-06-13 09:25:46,953 - INFO - APP_SECRET 앞 4자리: W5ts****
+2025-06-13 09:25:46,978 - ERROR - 토큰 발급 실패 - 상태 코드: 403
+2025-06-13 09:25:46,978 - ERROR - 응답 내용: {"error_description":"접근토큰 발급 잠시 후 다시 시도하세요(1분당 1회)","error_code":"EGW00133"}
+2025-06-13 09:25:46,978 - ERROR - === 403 Forbidden 오류 해결 방법 ===
+2025-06-13 09:25:46,978 - ERROR - 1. 한국투자증권 홈페이지에서 모의투자 신청 상태 확인
+2025-06-13 09:25:46,979 - ERROR - 2. APP_KEY와 APP_SECRET이 모의투자용인지 확인
+2025-06-13 09:25:46,979 - ERROR - 3. 계좌번호가 모의투자 계좌번호인지 확인
+2025-06-13 09:25:46,979 - ERROR - 4. API 서비스 이용약관 동의 여부 확인
+2025-06-13 09:25:46,980 - ERROR - 5. 잠시 후 다시 시도해보세요
+2025-06-13 09:25:46,980 - ERROR - 접근 토큰 발급에 실패했습니다 - 403 Client Error: Forbidden for url: https://openapivts.koreainvestment.com:29443/oauth2/tokenP
+2025-06-13 09:25:47,696 - INFO - 모의투자 환경으로 API를 초기화합니다.
+2025-06-13 09:25:47,696 - INFO - 토큰 발급을 요청합니다.
+2025-06-13 09:25:47,696 - INFO - 요청 URL: https://openapivts.koreainvestment.com:29443/oauth2/tokenP
+2025-06-13 09:25:47,697 - INFO - APP_KEY 앞 4자리: PSJH****
+2025-06-13 09:25:47,697 - INFO - APP_SECRET 앞 4자리: W5ts****
+2025-06-13 09:25:47,724 - ERROR - 토큰 발급 실패 - 상태 코드: 403
+2025-06-13 09:25:47,724 - ERROR - 응답 내용: {"error_description":"접근토큰 발급 잠시 후 다시 시도하세요(1분당 1회)","error_code":"EGW00133"}
+2025-06-13 09:25:47,725 - ERROR - === 403 Forbidden 오류 해결 방법 ===
+2025-06-13 09:25:47,725 - ERROR - 1. 한국투자증권 홈페이지에서 모의투자 신청 상태 확인
+2025-06-13 09:25:47,725 - ERROR - 2. APP_KEY와 APP_SECRET이 모의투자용인지 확인
+2025-06-13 09:25:47,725 - ERROR - 3. 계좌번호가 모의투자 계좌번호인지 확인
+2025-06-13 09:25:47,726 - ERROR - 4. API 서비스 이용약관 동의 여부 확인
+2025-06-13 09:25:47,726 - ERROR - 5. 잠시 후 다시 시도해보세요
+2025-06-13 09:25:47,726 - ERROR - 접근 토큰 발급에 실패했습니다 - 403 Client Error: Forbidden for url: https://openapivts.koreainvestment.com:29443/oauth2/tokenP
+2025-06-13 09:25:47,952 - INFO - 모의투자 환경으로 API를 초기화합니다.
+2025-06-13 09:25:47,953 - INFO - 토큰 발급을 요청합니다.
+2025-06-13 09:25:47,953 - INFO - 요청 URL: https://openapivts.koreainvestment.com:29443/oauth2/tokenP
+2025-06-13 09:25:47,954 - INFO - APP_KEY 앞 4자리: PSJH****
+2025-06-13 09:25:47,954 - INFO - APP_SECRET 앞 4자리: W5ts****
+2025-06-13 09:25:47,980 - ERROR - 토큰 발급 실패 - 상태 코드: 403
+2025-06-13 09:25:47,980 - ERROR - 응답 내용: {"error_description":"접근토큰 발급 잠시 후 다시 시도하세요(1분당 1회)","error_code":"EGW00133"}
+2025-06-13 09:25:47,981 - ERROR - === 403 Forbidden 오류 해결 방법 ===
+2025-06-13 09:25:47,981 - ERROR - 1. 한국투자증권 홈페이지에서 모의투자 신청 상태 확인
+2025-06-13 09:25:47,981 - ERROR - 2. APP_KEY와 APP_SECRET이 모의투자용인지 확인
+2025-06-13 09:25:47,981 - ERROR - 3. 계좌번호가 모의투자 계좌번호인지 확인
+2025-06-13 09:25:47,982 - ERROR - 4. API 서비스 이용약관 동의 여부 확인
+2025-06-13 09:25:47,982 - ERROR - 5. 잠시 후 다시 시도해보세요
+2025-06-13 09:25:47,982 - ERROR - 접근 토큰 발급에 실패했습니다 - 403 Client Error: Forbidden for url: https://openapivts.koreainvestment.com:29443/oauth2/tokenP
+2025-06-13 09:25:48,696 - INFO - 모의투자 환경으로 API를 초기화합니다.
+2025-06-13 09:25:48,696 - INFO - 토큰 발급을 요청합니다.
+2025-06-13 09:25:48,697 - INFO - 요청 URL: https://openapivts.koreainvestment.com:29443/oauth2/tokenP
+2025-06-13 09:25:48,698 - INFO - APP_KEY 앞 4자리: PSJH****
+2025-06-13 09:25:48,699 - INFO - APP_SECRET 앞 4자리: W5ts****
+2025-06-13 09:25:48,737 - ERROR - 토큰 발급 실패 - 상태 코드: 403
+2025-06-13 09:25:48,737 - ERROR - 응답 내용: {"error_description":"접근토큰 발급 잠시 후 다시 시도하세요(1분당 1회)","error_code":"EGW00133"}
+2025-06-13 09:25:48,738 - ERROR - === 403 Forbidden 오류 해결 방법 ===
+2025-06-13 09:25:48,738 - ERROR - 1. 한국투자증권 홈페이지에서 모의투자 신청 상태 확인
+2025-06-13 09:25:48,738 - ERROR - 2. APP_KEY와 APP_SECRET이 모의투자용인지 확인
+2025-06-13 09:25:48,738 - ERROR - 3. 계좌번호가 모의투자 계좌번호인지 확인
+2025-06-13 09:25:48,739 - ERROR - 4. API 서비스 이용약관 동의 여부 확인
+2025-06-13 09:25:48,739 - ERROR - 5. 잠시 후 다시 시도해보세요
+2025-06-13 09:25:48,739 - ERROR - 접근 토큰 발급에 실패했습니다 - 403 Client Error: Forbidden for url: https://openapivts.koreainvestment.com:29443/oauth2/tokenP
+2025-06-13 09:25:48,955 - INFO - 모의투자 환경으로 API를 초기화합니다.
+2025-06-13 09:25:48,957 - INFO - 토큰 발급을 요청합니다.
+2025-06-13 09:25:48,957 - INFO - 요청 URL: https://openapivts.koreainvestment.com:29443/oauth2/tokenP
+2025-06-13 09:25:48,958 - INFO - APP_KEY 앞 4자리: PSJH****
+2025-06-13 09:25:48,958 - INFO - APP_SECRET 앞 4자리: W5ts****
+2025-06-13 09:25:48,985 - ERROR - 토큰 발급 실패 - 상태 코드: 403
+2025-06-13 09:25:48,986 - ERROR - 응답 내용: {"error_description":"접근토큰 발급 잠시 후 다시 시도하세요(1분당 1회)","error_code":"EGW00133"}
+2025-06-13 09:25:48,987 - ERROR - === 403 Forbidden 오류 해결 방법 ===
+2025-06-13 09:25:48,987 - ERROR - 1. 한국투자증권 홈페이지에서 모의투자 신청 상태 확인
+2025-06-13 09:25:48,987 - ERROR - 2. APP_KEY와 APP_SECRET이 모의투자용인지 확인
+2025-06-13 09:25:48,987 - ERROR - 3. 계좌번호가 모의투자 계좌번호인지 확인
+2025-06-13 09:25:48,988 - ERROR - 4. API 서비스 이용약관 동의 여부 확인
+2025-06-13 09:25:48,988 - ERROR - 5. 잠시 후 다시 시도해보세요
+2025-06-13 09:25:48,991 - ERROR - 접근 토큰 발급에 실패했습니다 - 403 Client Error: Forbidden for url: https://openapivts.koreainvestment.com:29443/oauth2/tokenP
+2025-06-13 09:25:48,992 - INFO - 등락률 순위 조회 중...
+2025-06-13 09:25:49,696 - INFO - 모의투자 환경으로 API를 초기화합니다.
+2025-06-13 09:25:49,697 - INFO - 토큰 발급을 요청합니다.
+2025-06-13 09:25:49,697 - INFO - 요청 URL: https://openapivts.koreainvestment.com:29443/oauth2/tokenP
+2025-06-13 09:25:49,697 - INFO - APP_KEY 앞 4자리: PSJH****
+2025-06-13 09:25:49,698 - INFO - APP_SECRET 앞 4자리: W5ts****
+2025-06-13 09:25:49,719 - ERROR - 토큰 발급 실패 - 상태 코드: 403
+2025-06-13 09:25:49,719 - ERROR - 응답 내용: {"error_description":"접근토큰 발급 잠시 후 다시 시도하세요(1분당 1회)","error_code":"EGW00133"}
+2025-06-13 09:25:49,720 - ERROR - === 403 Forbidden 오류 해결 방법 ===
+2025-06-13 09:25:49,720 - ERROR - 1. 한국투자증권 홈페이지에서 모의투자 신청 상태 확인
+2025-06-13 09:25:49,720 - ERROR - 2. APP_KEY와 APP_SECRET이 모의투자용인지 확인
+2025-06-13 09:25:49,720 - ERROR - 3. 계좌번호가 모의투자 계좌번호인지 확인
+2025-06-13 09:25:49,720 - ERROR - 4. API 서비스 이용약관 동의 여부 확인
+2025-06-13 09:25:49,721 - ERROR - 5. 잠시 후 다시 시도해보세요
+2025-06-13 09:25:49,721 - ERROR - 접근 토큰 발급에 실패했습니다 - 403 Client Error: Forbidden for url: https://openapivts.koreainvestment.com:29443/oauth2/tokenP
+2025-06-13 09:25:49,958 - INFO - 모의투자 환경으로 API를 초기화합니다.
+2025-06-13 09:25:49,959 - INFO - 토큰 발급을 요청합니다.
+2025-06-13 09:25:49,960 - INFO - 요청 URL: https://openapivts.koreainvestment.com:29443/oauth2/tokenP
+2025-06-13 09:25:49,960 - INFO - APP_KEY 앞 4자리: PSJH****
+2025-06-13 09:25:49,961 - INFO - APP_SECRET 앞 4자리: W5ts****
+2025-06-13 09:25:49,984 - ERROR - 토큰 발급 실패 - 상태 코드: 403
+2025-06-13 09:25:49,984 - ERROR - 응답 내용: {"error_description":"접근토큰 발급 잠시 후 다시 시도하세요(1분당 1회)","error_code":"EGW00133"}
+2025-06-13 09:25:49,985 - ERROR - === 403 Forbidden 오류 해결 방법 ===
+2025-06-13 09:25:49,985 - ERROR - 1. 한국투자증권 홈페이지에서 모의투자 신청 상태 확인
+2025-06-13 09:25:49,985 - ERROR - 2. APP_KEY와 APP_SECRET이 모의투자용인지 확인
+2025-06-13 09:25:49,985 - ERROR - 3. 계좌번호가 모의투자 계좌번호인지 확인
+2025-06-13 09:25:49,986 - ERROR - 4. API 서비스 이용약관 동의 여부 확인
+2025-06-13 09:25:49,986 - ERROR - 5. 잠시 후 다시 시도해보세요
+2025-06-13 09:25:49,986 - ERROR - 접근 토큰 발급에 실패했습니다 - 403 Client Error: Forbidden for url: https://openapivts.koreainvestment.com:29443/oauth2/tokenP
+2025-06-13 09:25:50,696 - INFO - 모의투자 환경으로 API를 초기화합니다.
+2025-06-13 09:25:50,697 - INFO - 토큰 발급을 요청합니다.
+2025-06-13 09:25:50,697 - INFO - 요청 URL: https://openapivts.koreainvestment.com:29443/oauth2/tokenP
+2025-06-13 09:25:50,697 - INFO - APP_KEY 앞 4자리: PSJH****
+2025-06-13 09:25:50,697 - INFO - APP_SECRET 앞 4자리: W5ts****
+2025-06-13 09:25:50,717 - ERROR - 토큰 발급 실패 - 상태 코드: 403
+2025-06-13 09:25:50,718 - ERROR - 응답 내용: {"error_description":"접근토큰 발급 잠시 후 다시 시도하세요(1분당 1회)","error_code":"EGW00133"}
+2025-06-13 09:25:50,718 - ERROR - === 403 Forbidden 오류 해결 방법 ===
+2025-06-13 09:25:50,718 - ERROR - 1. 한국투자증권 홈페이지에서 모의투자 신청 상태 확인
+2025-06-13 09:25:50,719 - ERROR - 2. APP_KEY와 APP_SECRET이 모의투자용인지 확인
+2025-06-13 09:25:50,719 - ERROR - 3. 계좌번호가 모의투자 계좌번호인지 확인
+2025-06-13 09:25:50,719 - ERROR - 4. API 서비스 이용약관 동의 여부 확인
+2025-06-13 09:25:50,720 - ERROR - 5. 잠시 후 다시 시도해보세요
+2025-06-13 09:25:50,720 - ERROR - 접근 토큰 발급에 실패했습니다 - 403 Client Error: Forbidden for url: https://openapivts.koreainvestment.com:29443/oauth2/tokenP
+2025-06-13 09:25:50,957 - INFO - 모의투자 환경으로 API를 초기화합니다.
+2025-06-13 09:25:50,958 - INFO - 토큰 발급을 요청합니다.
+2025-06-13 09:25:50,959 - INFO - 요청 URL: https://openapivts.koreainvestment.com:29443/oauth2/tokenP
+2025-06-13 09:25:50,960 - INFO - APP_KEY 앞 4자리: PSJH****
+2025-06-13 09:25:50,960 - INFO - APP_SECRET 앞 4자리: W5ts****
+2025-06-13 09:25:50,990 - ERROR - 토큰 발급 실패 - 상태 코드: 403
+2025-06-13 09:25:50,991 - ERROR - 응답 내용: {"error_description":"접근토큰 발급 잠시 후 다시 시도하세요(1분당 1회)","error_code":"EGW00133"}
+2025-06-13 09:25:50,992 - ERROR - === 403 Forbidden 오류 해결 방법 ===
+2025-06-13 09:25:50,993 - ERROR - 1. 한국투자증권 홈페이지에서 모의투자 신청 상태 확인
+2025-06-13 09:25:50,993 - ERROR - 2. APP_KEY와 APP_SECRET이 모의투자용인지 확인
+2025-06-13 09:25:50,994 - ERROR - 3. 계좌번호가 모의투자 계좌번호인지 확인
+2025-06-13 09:25:50,994 - ERROR - 4. API 서비스 이용약관 동의 여부 확인
+2025-06-13 09:25:50,994 - ERROR - 5. 잠시 후 다시 시도해보세요
+2025-06-13 09:25:50,994 - ERROR - 접근 토큰 발급에 실패했습니다 - 403 Client Error: Forbidden for url: https://openapivts.koreainvestment.com:29443/oauth2/tokenP
+2025-06-13 09:25:51,697 - INFO - 모의투자 환경으로 API를 초기화합니다.
+2025-06-13 09:25:51,697 - INFO - 토큰 발급을 요청합니다.
+2025-06-13 09:25:51,698 - INFO - 요청 URL: https://openapivts.koreainvestment.com:29443/oauth2/tokenP
+2025-06-13 09:25:51,698 - INFO - APP_KEY 앞 4자리: PSJH****
+2025-06-13 09:25:51,698 - INFO - APP_SECRET 앞 4자리: W5ts****
+2025-06-13 09:25:51,722 - ERROR - 토큰 발급 실패 - 상태 코드: 403
+2025-06-13 09:25:51,723 - ERROR - 응답 내용: {"error_description":"접근토큰 발급 잠시 후 다시 시도하세요(1분당 1회)","error_code":"EGW00133"}
+2025-06-13 09:25:51,724 - ERROR - === 403 Forbidden 오류 해결 방법 ===
+2025-06-13 09:25:51,724 - ERROR - 1. 한국투자증권 홈페이지에서 모의투자 신청 상태 확인
+2025-06-13 09:25:51,724 - ERROR - 2. APP_KEY와 APP_SECRET이 모의투자용인지 확인
+2025-06-13 09:25:51,725 - ERROR - 3. 계좌번호가 모의투자 계좌번호인지 확인
+2025-06-13 09:25:51,725 - ERROR - 4. API 서비스 이용약관 동의 여부 확인
+2025-06-13 09:25:51,725 - ERROR - 5. 잠시 후 다시 시도해보세요
+2025-06-13 09:25:51,726 - ERROR - 접근 토큰 발급에 실패했습니다 - 403 Client Error: Forbidden for url: https://openapivts.koreainvestment.com:29443/oauth2/tokenP
+2025-06-13 09:25:51,958 - INFO - 모의투자 환경으로 API를 초기화합니다.
+2025-06-13 09:25:51,959 - INFO - 토큰 발급을 요청합니다.
+2025-06-13 09:25:51,959 - INFO - 요청 URL: https://openapivts.koreainvestment.com:29443/oauth2/tokenP
+2025-06-13 09:25:51,960 - INFO - APP_KEY 앞 4자리: PSJH****
+2025-06-13 09:25:51,960 - INFO - APP_SECRET 앞 4자리: W5ts****
+2025-06-13 09:25:51,985 - ERROR - 토큰 발급 실패 - 상태 코드: 403
+2025-06-13 09:25:51,985 - ERROR - 응답 내용: {"error_description":"접근토큰 발급 잠시 후 다시 시도하세요(1분당 1회)","error_code":"EGW00133"}
+2025-06-13 09:25:51,985 - ERROR - === 403 Forbidden 오류 해결 방법 ===
+2025-06-13 09:25:51,986 - ERROR - 1. 한국투자증권 홈페이지에서 모의투자 신청 상태 확인
+2025-06-13 09:25:51,986 - ERROR - 2. APP_KEY와 APP_SECRET이 모의투자용인지 확인
+2025-06-13 09:25:51,986 - ERROR - 3. 계좌번호가 모의투자 계좌번호인지 확인
+2025-06-13 09:25:51,987 - ERROR - 4. API 서비스 이용약관 동의 여부 확인
+2025-06-13 09:25:51,987 - ERROR - 5. 잠시 후 다시 시도해보세요
+2025-06-13 09:25:51,987 - ERROR - 접근 토큰 발급에 실패했습니다 - 403 Client Error: Forbidden for url: https://openapivts.koreainvestment.com:29443/oauth2/tokenP
+2025-06-13 09:25:52,697 - INFO - 모의투자 환경으로 API를 초기화합니다.
+2025-06-13 09:25:52,698 - INFO - 토큰 발급을 요청합니다.
+2025-06-13 09:25:52,698 - INFO - 요청 URL: https://openapivts.koreainvestment.com:29443/oauth2/tokenP
+2025-06-13 09:25:52,698 - INFO - APP_KEY 앞 4자리: PSJH****
+2025-06-13 09:25:52,698 - INFO - APP_SECRET 앞 4자리: W5ts****
+2025-06-13 09:25:52,934 - ERROR - 토큰 발급 실패 - 상태 코드: 403
+2025-06-13 09:25:52,935 - ERROR - 응답 내용: {"error_description":"접근토큰 발급 잠시 후 다시 시도하세요(1분당 1회)","error_code":"EGW00133"}
+2025-06-13 09:25:52,935 - ERROR - === 403 Forbidden 오류 해결 방법 ===
+2025-06-13 09:25:52,935 - ERROR - 1. 한국투자증권 홈페이지에서 모의투자 신청 상태 확인
+2025-06-13 09:25:52,935 - ERROR - 2. APP_KEY와 APP_SECRET이 모의투자용인지 확인
+2025-06-13 09:25:52,936 - ERROR - 3. 계좌번호가 모의투자 계좌번호인지 확인
+2025-06-13 09:25:52,936 - ERROR - 4. API 서비스 이용약관 동의 여부 확인
+2025-06-13 09:25:52,936 - ERROR - 5. 잠시 후 다시 시도해보세요
+2025-06-13 09:25:52,937 - ERROR - 접근 토큰 발급에 실패했습니다 - 403 Client Error: Forbidden for url: https://openapivts.koreainvestment.com:29443/oauth2/tokenP
+2025-06-13 09:25:52,960 - INFO - 모의투자 환경으로 API를 초기화합니다.
+2025-06-13 09:25:52,961 - INFO - 토큰 발급을 요청합니다.
+2025-06-13 09:25:52,961 - INFO - 요청 URL: https://openapivts.koreainvestment.com:29443/oauth2/tokenP
+2025-06-13 09:25:52,961 - INFO - APP_KEY 앞 4자리: PSJH****
+2025-06-13 09:25:52,962 - INFO - APP_SECRET 앞 4자리: W5ts****
+2025-06-13 09:25:53,000 - ERROR - 토큰 발급 실패 - 상태 코드: 403
+2025-06-13 09:25:53,000 - ERROR - 응답 내용: {"error_description":"접근토큰 발급 잠시 후 다시 시도하세요(1분당 1회)","error_code":"EGW00133"}
+2025-06-13 09:25:53,001 - ERROR - === 403 Forbidden 오류 해결 방법 ===
+2025-06-13 09:25:53,001 - ERROR - 1. 한국투자증권 홈페이지에서 모의투자 신청 상태 확인
+2025-06-13 09:25:53,001 - ERROR - 2. APP_KEY와 APP_SECRET이 모의투자용인지 확인
+2025-06-13 09:25:53,001 - ERROR - 3. 계좌번호가 모의투자 계좌번호인지 확인
+2025-06-13 09:25:53,002 - ERROR - 4. API 서비스 이용약관 동의 여부 확인
+2025-06-13 09:25:53,002 - ERROR - 5. 잠시 후 다시 시도해보세요
+2025-06-13 09:25:53,002 - ERROR - 접근 토큰 발급에 실패했습니다 - 403 Client Error: Forbidden for url: https://openapivts.koreainvestment.com:29443/oauth2/tokenP
+2025-06-13 09:25:53,698 - INFO - 모의투자 환경으로 API를 초기화합니다.
+2025-06-13 09:25:53,698 - INFO - 토큰 발급을 요청합니다.
+2025-06-13 09:25:53,699 - INFO - 요청 URL: https://openapivts.koreainvestment.com:29443/oauth2/tokenP
+2025-06-13 09:25:53,699 - INFO - APP_KEY 앞 4자리: PSJH****
+2025-06-13 09:25:53,699 - INFO - APP_SECRET 앞 4자리: W5ts****
+2025-06-13 09:25:53,722 - ERROR - 토큰 발급 실패 - 상태 코드: 403
+2025-06-13 09:25:53,723 - ERROR - 응답 내용: {"error_description":"접근토큰 발급 잠시 후 다시 시도하세요(1분당 1회)","error_code":"EGW00133"}
+2025-06-13 09:25:53,723 - ERROR - === 403 Forbidden 오류 해결 방법 ===
+2025-06-13 09:25:53,723 - ERROR - 1. 한국투자증권 홈페이지에서 모의투자 신청 상태 확인
+2025-06-13 09:25:53,723 - ERROR - 2. APP_KEY와 APP_SECRET이 모의투자용인지 확인
+2025-06-13 09:25:53,724 - ERROR - 3. 계좌번호가 모의투자 계좌번호인지 확인
+2025-06-13 09:25:53,724 - ERROR - 4. API 서비스 이용약관 동의 여부 확인
+2025-06-13 09:25:53,724 - ERROR - 5. 잠시 후 다시 시도해보세요
+2025-06-13 09:25:53,724 - ERROR - 접근 토큰 발급에 실패했습니다 - 403 Client Error: Forbidden for url: https://openapivts.koreainvestment.com:29443/oauth2/tokenP
+2025-06-13 09:25:53,960 - INFO - 모의투자 환경으로 API를 초기화합니다.
+2025-06-13 09:25:53,961 - INFO - 토큰 발급을 요청합니다.
+2025-06-13 09:25:53,961 - INFO - 요청 URL: https://openapivts.koreainvestment.com:29443/oauth2/tokenP
+2025-06-13 09:25:53,961 - INFO - APP_KEY 앞 4자리: PSJH****
+2025-06-13 09:25:53,962 - INFO - APP_SECRET 앞 4자리: W5ts****
+2025-06-13 09:25:53,983 - ERROR - 토큰 발급 실패 - 상태 코드: 403
+2025-06-13 09:25:53,983 - ERROR - 응답 내용: {"error_description":"접근토큰 발급 잠시 후 다시 시도하세요(1분당 1회)","error_code":"EGW00133"}
+2025-06-13 09:25:53,984 - ERROR - === 403 Forbidden 오류 해결 방법 ===
+2025-06-13 09:25:53,984 - ERROR - 1. 한국투자증권 홈페이지에서 모의투자 신청 상태 확인
+2025-06-13 09:25:53,984 - ERROR - 2. APP_KEY와 APP_SECRET이 모의투자용인지 확인
+2025-06-13 09:25:53,984 - ERROR - 3. 계좌번호가 모의투자 계좌번호인지 확인
+2025-06-13 09:25:53,985 - ERROR - 4. API 서비스 이용약관 동의 여부 확인
+2025-06-13 09:25:53,985 - ERROR - 5. 잠시 후 다시 시도해보세요
+2025-06-13 09:25:53,985 - ERROR - 접근 토큰 발급에 실패했습니다 - 403 Client Error: Forbidden for url: https://openapivts.koreainvestment.com:29443/oauth2/tokenP
+2025-06-13 09:25:53,986 - INFO - 외국인/기관 순매수 순위 조회 중...
+2025-06-13 09:25:53,986 - INFO - 업종별 등락률 조회 중...
+2025-06-13 09:25:53,986 - INFO - 시장 랭킹 데이터 수집 완료
+2025-06-13 09:25:53,986 - INFO - 제미나이 AI 시장 분석 요청 중...
+2025-06-13 09:25:54,384 - ERROR - 제미나이 AI 분석 중 오류 발생: 404 models/gemini-pro is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.
+Traceback (most recent call last):
+  File "C:\Users\USER\Desktop\test_stock\market_analyzer.py", line 241, in analyze_market_with_ai
+    response = self.model.generate_content(prompt)
+  File "C:\Users\USER\Desktop\test_stock\venv\Lib\site-packages\google\generativeai\generative_models.py", line 331, in generate_content
+    response = self._client.generate_content(
+        request,
+        **request_options,
+    )
+  File "C:\Users\USER\Desktop\test_stock\venv\Lib\site-packages\google\ai\generativelanguage_v1beta\services\generative_service\client.py", line 835, in generate_content
+    response = rpc(
+        request,
+    ...<2 lines>...
+        metadata=metadata,
+    )
+  File "C:\Users\USER\Desktop\test_stock\venv\Lib\site-packages\google\api_core\gapic_v1\method.py", line 131, in __call__
+    return wrapped_func(*args, **kwargs)
+  File "C:\Users\USER\Desktop\test_stock\venv\Lib\site-packages\google\api_core\retry\retry_unary.py", line 294, in retry_wrapped_func
+    return retry_target(
+        target,
+    ...<3 lines>...
+        on_error=on_error,
+    )
+  File "C:\Users\USER\Desktop\test_stock\venv\Lib\site-packages\google\api_core\retry\retry_unary.py", line 156, in retry_target
+    next_sleep = _retry_error_helper(
+        exc,
+    ...<6 lines>...
+        timeout,
+    )
+  File "C:\Users\USER\Desktop\test_stock\venv\Lib\site-packages\google\api_core\retry\retry_base.py", line 214, in _retry_error_helper
+    raise final_exc from source_exc
+  File "C:\Users\USER\Desktop\test_stock\venv\Lib\site-packages\google\api_core\retry\retry_unary.py", line 147, in retry_target
+    result = target()
+  File "C:\Users\USER\Desktop\test_stock\venv\Lib\site-packages\google\api_core\timeout.py", line 130, in func_with_timeout
+    return func(*args, **kwargs)
+  File "C:\Users\USER\Desktop\test_stock\venv\Lib\site-packages\google\api_core\grpc_helpers.py", line 78, in error_remapped_callable
+    raise exceptions.from_grpc_error(exc) from exc
+google.api_core.exceptions.NotFound: 404 models/gemini-pro is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.
+2025-06-13 09:25:54,397 - WARNING - AI 시장 분석 결과를 받지 못했습니다
+2025-06-13 09:25:54,397 - INFO - 📈 시장 상황 분석 시작 (기준: KOSPI 200일 이동평균선)
+2025-06-13 09:25:55,282 - ERROR - 기술적 분석 중 오류 발생: unsupported format string passed to Series.__format__
+2025-06-13 09:25:55,283 - INFO - 🎯 최종 판단: NEUTRAL (기술적 분석만 적용)
+2025-06-13 09:25:55,283 - WARNING - 📉 하락장/중립장으로 판단되어 신규 매수는 진행하지 않습니다
+2025-06-13 09:25:55,284 - INFO - ✅ 리밸런싱 사이클 완료
+2025-06-13 09:25:55,284 - INFO - --- 사이클 종료, 5분 대기 ---
+2025-06-13 09:26:36,101 - INFO - === 환경 변수 로드 상태 확인 ===
+2025-06-13 09:26:36,102 - INFO - 선택된 환경: MOCK(모의투자)
+2025-06-13 09:26:36,102 - INFO - IS_MOCK 설정: True
+2025-06-13 09:26:36,102 - INFO - APP_KEY 존재: 예
+2025-06-13 09:26:36,102 - INFO - APP_SECRET 존재: 예
+2025-06-13 09:26:36,102 - INFO - ACCOUNT_NUMBER 존재: 예
+2025-06-13 09:26:36,102 - INFO - APP_KEY 앞 4자리: PSJH****
+2025-06-13 09:26:36,104 - INFO - APP_SECRET 앞 4자리: W5ts****
+2025-06-13 09:26:36,104 - INFO - ACCOUNT_NUMBER: 50128558-01
+2025-06-13 09:26:36,105 - INFO - MOCK(모의투자) 환경 설정 값 로드 완료. AI 통합 시스템을 시작합니다.
+2025-06-13 09:26:36,105 - INFO - AI 통합 시스템을 초기화합니다.
+2025-06-13 09:26:36,105 - INFO - MOCK(모의투자) 환경으로 API를 초기화합니다.
+2025-06-13 09:26:36,106 - INFO - RateLimiter가 1.0초당 2회 호출로 설정되었습니다.
+2025-06-13 09:26:36,106 - INFO - 저장된 토큰 파일이 없습니다.
+2025-06-13 09:26:36,107 - INFO - MOCK 환경에서 새로운 토큰 발급을 시작합니다.
+2025-06-13 09:26:36,107 - WARNING - ⚠️  토큰은 하루에 1회만 발급 가능하며, 24시간 동안 유효합니다!
+2025-06-13 09:26:36,108 - INFO - 토큰 발급을 요청합니다.
+2025-06-13 09:26:36,108 - INFO - 요청 URL: https://openapivts.koreainvestment.com:29443/oauth2/tokenP
+2025-06-13 09:26:36,108 - INFO - APP_KEY 앞 4자리: PSJH****
+2025-06-13 09:26:36,109 - INFO - APP_SECRET 앞 4자리: W5ts****
+2025-06-13 09:26:36,140 - ERROR - 토큰 발급 실패 - 상태 코드: 403
+2025-06-13 09:26:36,141 - ERROR - 응답 내용: {"error_description":"접근토큰 발급 잠시 후 다시 시도하세요(1분당 1회)","error_code":"EGW00133"}
+2025-06-13 09:26:36,141 - ERROR - 🚫 토큰 발급 빈도 제한 오류!
+2025-06-13 09:26:36,141 - ERROR - 💡 해결 방법:
+2025-06-13 09:26:36,141 - ERROR - 1. 하루에 1회만 토큰 발급이 가능합니다
+2025-06-13 09:26:36,142 - ERROR - 2. 이미 오늘 토큰을 발급받았다면 내일까지 기다려야 합니다
+2025-06-13 09:26:36,142 - ERROR - 3. 기존 토큰이 있다면 24시간 동안 재사용하세요
+2025-06-13 09:26:36,142 - ERROR - 4. 1분 후 다시 시도해볼 수도 있습니다
+2025-06-13 09:26:36,142 - ERROR - 접근 토큰 발급에 실패했습니다 - 403 Client Error: Forbidden for url: https://openapivts.koreainvestment.com:29443/oauth2/tokenP
+2025-06-13 09:26:36,143 - ERROR - 시스템 초기화 중 오류 발생: 403 Client Error: Forbidden for url: https://openapivts.koreainvestment.com:29443/oauth2/tokenP
+2025-06-13 09:26:36,144 - ERROR - 프로그램 실행 중 오류 발생: 403 Client Error: Forbidden for url: https://openapivts.koreainvestment.com:29443/oauth2/tokenP
+2025-06-13 09:38:00,915 - INFO - === 환경 변수 로드 상태 확인 ===
+2025-06-13 09:38:00,916 - INFO - 선택된 환경: MOCK(모의투자)
+2025-06-13 09:38:00,916 - INFO - IS_MOCK 설정: True
+2025-06-13 09:38:00,917 - INFO - APP_KEY 존재: 예
+2025-06-13 09:38:00,918 - INFO - APP_SECRET 존재: 예
+2025-06-13 09:38:00,919 - INFO - ACCOUNT_NUMBER 존재: 예
+2025-06-13 09:38:00,919 - INFO - APP_KEY 앞 4자리: PSJH****
+2025-06-13 09:38:00,919 - INFO - APP_SECRET 앞 4자리: W5ts****
+2025-06-13 09:38:00,920 - INFO - ACCOUNT_NUMBER: 50128558-01
+2025-06-13 09:38:00,920 - INFO - MOCK(모의투자) 환경 설정 값 로드 완료. AI 통합 시스템을 시작합니다.
+2025-06-13 09:38:00,920 - INFO - AI 통합 시스템을 초기화합니다.
+2025-06-13 09:38:00,920 - INFO - MOCK(모의투자) 환경으로 API를 초기화합니다.
+2025-06-13 09:38:00,921 - INFO - RateLimiter가 1.0초당 2회 호출로 설정되었습니다.
+2025-06-13 09:38:00,921 - INFO - 📱 텔레그램 알림 기능이 활성화되었습니다.
+2025-06-13 09:38:00,922 - INFO - 저장된 토큰 파일이 없습니다.
+2025-06-13 09:38:00,922 - INFO - 🆕 첫 토큰 발급이므로 발급 가능합니다.
+2025-06-13 09:38:00,923 - INFO - MOCK 환경에서 새로운 토큰 발급을 시작합니다.
+2025-06-13 09:38:01,838 - INFO - 📱 텔레그램 알림 전송 완료
+2025-06-13 09:38:01,839 - INFO - 토큰 발급을 요청합니다.
+2025-06-13 09:38:02,008 - INFO - ✅ 접근 토큰 발급이 완료되었습니다.
+2025-06-13 09:38:02,009 - INFO - 토큰이 mock_token.json에 저장되었습니다.
+2025-06-13 09:38:02,888 - INFO - 📱 텔레그램 알림 전송 완료
+2025-06-13 09:38:02,889 - INFO - === 토큰 상태 확인 ===
+2025-06-13 09:38:02,889 - INFO - 상태: 유효
+2025-06-13 09:38:02,889 - INFO - 메시지: 토큰이 유효합니다. (남은 시간: 23:59:59.118934)
+2025-06-13 09:38:02,889 - INFO - 권장 조치: 정상 사용 가능
+2025-06-13 09:38:02,890 - INFO - 🤖 제미나이 모델 'gemini-1.5-flash'이 초기화되었습니다.
+2025-06-13 09:38:02,890 - INFO - 📋 모델 정보:
+2025-06-13 09:38:02,890 - INFO -    이름: gemini-1.5-flash
+2025-06-13 09:38:02,891 - INFO -    특징: 빠른 응답 속도와 효율적인 분석
+2025-06-13 09:38:02,891 - INFO -    최적 용도: 실시간 매매 신호, 빠른 시장 분석
+2025-06-13 09:38:02,891 - INFO -    속도: 매우 빠름
+2025-06-13 09:38:02,892 - INFO -    비용: 저렴
+2025-06-13 09:38:02,892 - INFO - 🎛️ 생성 설정:
+2025-06-13 09:38:02,892 - INFO -    Temperature: 0.3
+2025-06-13 09:38:02,893 - INFO -    Max Tokens: 1000
+2025-06-13 09:38:02,893 - INFO -    Top P: 0.8
+2025-06-13 09:38:02,893 - INFO -    Top K: 40
+2025-06-13 09:38:02,894 - INFO - 시스템 초기화가 완료되었습니다.
+2025-06-13 09:38:02,894 - INFO - === 아르키메데스 프로젝트 AI 자동매매 시스템 가동 ===
+2025-06-13 09:38:02,894 - INFO - 제미나이 AI 분석 기능 통합 완료
+2025-06-13 09:38:02,894 - INFO - 🔑 토큰 상태: 유효 - 토큰이 유효합니다. (남은 시간: 23:59:59.113353)
+2025-06-13 09:38:02,895 - ERROR - 프로그램 실행 중 오류 발생: 'KIS_API' object has no attribute 'check_token_renewal_needed'
+2025-06-13 09:39:35,156 - INFO - === 환경 변수 로드 상태 확인 ===
+2025-06-13 09:39:35,156 - INFO - 선택된 환경: MOCK(모의투자)
+2025-06-13 09:39:35,156 - INFO - IS_MOCK 설정: True
+2025-06-13 09:39:35,157 - INFO - APP_KEY 존재: 예
+2025-06-13 09:39:35,157 - INFO - APP_SECRET 존재: 예
+2025-06-13 09:39:35,157 - INFO - ACCOUNT_NUMBER 존재: 예
+2025-06-13 09:39:35,157 - INFO - APP_KEY 앞 4자리: PSJH****
+2025-06-13 09:39:35,157 - INFO - APP_SECRET 앞 4자리: W5ts****
+2025-06-13 09:39:35,158 - INFO - ACCOUNT_NUMBER: 50128558-01
+2025-06-13 09:39:35,158 - INFO - MOCK(모의투자) 환경 설정 값 로드 완료. AI 통합 시스템을 시작합니다.
+2025-06-13 09:39:35,158 - INFO - AI 통합 시스템을 초기화합니다.
+2025-06-13 09:39:35,158 - INFO - MOCK(모의투자) 환경으로 API를 초기화합니다.
+2025-06-13 09:39:35,159 - INFO - RateLimiter가 1.0초당 2회 호출로 설정되었습니다.
+2025-06-13 09:39:35,159 - INFO - 📱 텔레그램 알림 기능이 활성화되었습니다.
+2025-06-13 09:39:35,160 - INFO - 저장된 토큰을 로드했습니다. (남은 시간: 23:58:26.847784)
+2025-06-13 09:39:35,160 - INFO - === 토큰 상태 확인 ===
+2025-06-13 09:39:35,160 - INFO - 상태: 유효
+2025-06-13 09:39:35,161 - INFO - 메시지: 토큰이 유효합니다. (남은 시간: 23:58:26.847517)
+2025-06-13 09:39:35,161 - INFO - 권장 조치: 정상 사용 가능
+2025-06-13 09:39:35,161 - INFO - 🤖 제미나이 모델 'gemini-1.5-flash'이 초기화되었습니다.
+2025-06-13 09:39:35,161 - INFO - 📋 모델 정보:
+2025-06-13 09:39:35,162 - INFO -    이름: gemini-1.5-flash
+2025-06-13 09:39:35,162 - INFO -    특징: 빠른 응답 속도와 효율적인 분석
+2025-06-13 09:39:35,162 - INFO -    최적 용도: 실시간 매매 신호, 빠른 시장 분석
+2025-06-13 09:39:35,163 - INFO -    속도: 매우 빠름
+2025-06-13 09:39:35,163 - INFO -    비용: 저렴
+2025-06-13 09:39:35,163 - INFO - 🎛️ 생성 설정:
+2025-06-13 09:39:35,164 - INFO -    Temperature: 0.3
+2025-06-13 09:39:35,164 - INFO -    Max Tokens: 1000
+2025-06-13 09:39:35,164 - INFO -    Top P: 0.8
+2025-06-13 09:39:35,165 - INFO -    Top K: 40
+2025-06-13 09:39:35,165 - INFO - 시스템 초기화가 완료되었습니다.
+2025-06-13 09:39:35,165 - INFO - === 아르키메데스 프로젝트 AI 자동매매 시스템 가동 ===
+2025-06-13 09:39:35,166 - INFO - 제미나이 AI 분석 기능 통합 완료
+2025-06-13 09:39:35,166 - INFO - 🔑 토큰 상태: 유효 - 토큰이 유효합니다. (남은 시간: 23:58:26.841668)
+2025-06-13 09:39:35,167 - INFO - --- AI 리밸런싱 사이클 시작 (주기: 5분) ---
+2025-06-13 09:39:35,167 - INFO - 🔄 AI 기반 포트폴리오 리밸런싱 시작
+2025-06-13 09:39:35,167 - INFO - 포트폴리오를 동기화합니다.
+2025-06-13 09:39:35,276 - INFO - 포트폴리오 동기화 완료 - 총 자산: 0원, 현금: 0원
+2025-06-13 09:39:35,276 - INFO - 보유 종목 수: 0개
+2025-06-13 09:39:35,277 - INFO - 🤖 제미나이 AI 시장 분석을 시작합니다...
+2025-06-13 09:39:35,278 - INFO - 거래량 상위 종목 조회 중...
+2025-06-13 09:39:40,214 - INFO - 거래대금 상위 종목 조회 중...
+2025-06-13 09:39:42,313 - INFO - 등락률 순위 조회 중...
+2025-06-13 09:39:47,318 - INFO - 외국인/기관 순매수 순위 조회 중...
+2025-06-13 09:39:47,318 - INFO - 업종별 등락률 조회 중...
+2025-06-13 09:39:47,318 - INFO - 시장 랭킹 데이터 수집 완료
+2025-06-13 09:39:47,319 - INFO - 🤖 gemini-1.5-flash 시장 분석 시작...
+2025-06-13 09:39:50,865 - INFO - ✅ gemini-1.5-flash 분석 완료
+2025-06-13 09:39:50,865 - INFO - 🎯 제미나이 AI 시장 분석 완료
+2025-06-13 09:39:50,866 - INFO - ==================================================
+2025-06-13 09:39:50,866 - INFO - 📋 AI 시장 분석 결과:
+2025-06-13 09:39:50,866 - INFO - 제공된 데이터에는 상승률 및 하락률 상위 3개 종목의 종목 코드가 누락되어 있습니다.  종목 코드를 추가해야 정확한 분석이 가능합니다.  하락률 상위 3개 종목의 데이터가 모두 양수(+)인 것도 오류로 보입니다. 하락률은 음수(-)여야 합니다.
+
+데이터가 완성된다면 다음과 같은 분석이 가능합니다:
+
+* **거래량과 주가 변동의 관계:** 거래량이 많은 종목 (005930)이 주가 하락을 보였지만,  거래량이 적은 종목들도 상승 또는 하락을 보였습니다.  거래량과 주가 변동의 상관관계를 더 자세히 분석할 수 있습니다.
+
+* **주요 상승/하락 종목 분석:** 종목 코드가 추가되면 각 종목의 업종을 확인하고, 업종별 등락률과 비교하여 상승/하락 원인을 추측할 수 있습니다. 예를 들어, 반도체 업종의 상승이 특정 종목의 상승에 영향을 미쳤는지 분석할 수 있습니다.
+
+* **업종별 동향 분석:** 반도체와 인터넷 업종은 상승세를 보였고, 철강과 화학 업종은 하락세를 보였습니다.  이러한 업종별 움직임의 원인을 뉴스나 시장 상황을 참고하여 분석할 수 있습니다.
+
+* **투자 전략 수립:** 위 분석 결과를 바탕으로 투자 전략을 수립할 수 있습니다. 예를 들어,  거래량이 많고 주가가 하락한 종목에 대한 매수 여부를 결정하거나, 상승세를 보이는 업종에 투자하는 전략을 세울 수 있습니다.
+
+
+**데이터 수정 후 다시 질문해주시면 더욱 자세하고 정확한 분석을 제공해 드리겠습니다.**
+2025-06-13 09:39:50,868 - INFO - ==================================================
+2025-06-13 09:39:50,868 - INFO - 🚦 gemini-1.5-flash 매매 신호 생성 중...
+2025-06-13 09:39:50,869 - ERROR - 🚫 gemini-1.5-flash 신호 생성 중 오류: 'MarketAnalyzer' object has no attribute '_create_trading_signal_prompt'
+2025-06-13 09:39:50,869 - INFO - 📈 시장 상황 분석 시작 (기준: KOSPI 200일 이동평균선)
+2025-06-13 09:39:51,684 - ERROR - 기술적 분석 중 오류 발생: unsupported format string passed to Series.__format__
+2025-06-13 09:39:51,684 - INFO - 🎯 최종 판단: NEUTRAL (기술적 분석만 적용)
+2025-06-13 09:39:51,684 - WARNING - 📉 하락장/중립장으로 판단되어 신규 매수는 진행하지 않습니다
+2025-06-13 09:39:51,685 - INFO - ✅ 리밸런싱 사이클 완료
+2025-06-13 09:39:51,685 - INFO - --- 사이클 종료, 5분 대기 ---
+2025-06-13 09:44:51,685 - INFO - --- AI 리밸런싱 사이클 시작 (주기: 5분) ---
+2025-06-13 09:44:51,686 - INFO - 🔄 AI 기반 포트폴리오 리밸런싱 시작
+2025-06-13 09:44:51,686 - INFO - 포트폴리오를 동기화합니다.
+2025-06-13 09:44:51,764 - INFO - 포트폴리오 동기화 완료 - 총 자산: 0원, 현금: 0원
+2025-06-13 09:44:51,764 - INFO - 보유 종목 수: 0개
+2025-06-13 09:44:51,765 - INFO - 🤖 제미나이 AI 시장 분석을 시작합니다...
+2025-06-13 09:44:51,765 - INFO - 거래량 상위 종목 조회 중...
+2025-06-13 09:44:56,716 - INFO - 거래대금 상위 종목 조회 중...
+2025-06-13 09:44:58,811 - INFO - 등락률 순위 조회 중...
+2025-06-13 09:45:03,814 - INFO - 외국인/기관 순매수 순위 조회 중...
+2025-06-13 09:45:03,814 - INFO - 업종별 등락률 조회 중...
+2025-06-13 09:45:03,815 - INFO - 시장 랭킹 데이터 수집 완료
+2025-06-13 09:45:03,815 - INFO - 🤖 gemini-1.5-flash 시장 분석 시작...
+2025-06-13 09:45:06,806 - INFO - ✅ gemini-1.5-flash 분석 완료
+2025-06-13 09:45:06,807 - INFO - 🎯 제미나이 AI 시장 분석 완료
+2025-06-13 09:45:06,807 - INFO - ==================================================
+2025-06-13 09:45:06,807 - INFO - 📋 AI 시장 분석 결과:
+2025-06-13 09:45:06,808 - INFO - This data shows a snapshot of stock market performance.  Here's a summary and some observations:
+
+**Key Observations:**
+
+* **Samsung Electronics (005930) leads in trading volume** despite experiencing a price decrease of -1.43%. This suggests significant trading activity, possibly due to larger institutional investors or significant price fluctuations throughout the day.
+
+* **High volume doesn't necessarily correlate with high returns:**  While (005930) had the highest trading volume, it also had a negative return.
+
+* **Top performers are missing data:** The "Top 3 Gainers" and "Top 3 Losers" sections are incomplete, lacking stock codes and percentages.  This makes it impossible to draw complete conclusions about the best and worst-performing stocks.  The provided data seems to have a mistake, as it lists positive percentages for both the top gainers and losers.
+
+* **Technology sectors are strong:** The positive performance of the Semiconductor (+2.50%) and Internet (+1.80%) sectors suggests a positive sentiment towards technology stocks.
+
+* **Cyclicals underperform:** The negative performance of the Steel (-0.50%) and Chemical (-1.20%) sectors indicates potential weakness in cyclical industries.
+
+
+**To improve the data:**
+
+* **Complete the Top Gainers and Losers sections:**  Include the stock codes and their corresponding percentage changes.
+* **Clarify the inconsistency:** The positive percentages in both the "Top 3 Gainers" and "Top 3 Losers" sections are contradictory and need correction.  It's likely an error in data entry.
+
+
+With the missing information filled in, a more comprehensive analysis could be performed.  The current data provides a partial picture of market activity.
+2025-06-13 09:45:06,811 - INFO - ==================================================
+2025-06-13 09:45:06,811 - INFO - 🚦 gemini-1.5-flash 매매 신호 생성 중...
+2025-06-13 09:45:06,812 - ERROR - 🚫 gemini-1.5-flash 신호 생성 중 오류: 'MarketAnalyzer' object has no attribute '_create_trading_signal_prompt'
+2025-06-13 09:45:06,812 - INFO - 📈 시장 상황 분석 시작 (기준: KOSPI 200일 이동평균선)
+2025-06-13 09:45:06,842 - ERROR - 기술적 분석 중 오류 발생: unsupported format string passed to Series.__format__
+2025-06-13 09:45:06,843 - INFO - 🎯 최종 판단: NEUTRAL (기술적 분석만 적용)
+2025-06-13 09:45:06,843 - WARNING - 📉 하락장/중립장으로 판단되어 신규 매수는 진행하지 않습니다
+2025-06-13 09:45:06,844 - INFO - ✅ 리밸런싱 사이클 완료
+2025-06-13 09:45:06,844 - INFO - --- 사이클 종료, 5분 대기 ---
+2025-06-13 09:50:06,844 - INFO - --- AI 리밸런싱 사이클 시작 (주기: 5분) ---
+2025-06-13 09:50:06,845 - INFO - 🔄 AI 기반 포트폴리오 리밸런싱 시작
+2025-06-13 09:50:06,845 - INFO - 포트폴리오를 동기화합니다.
+2025-06-13 09:50:06,958 - INFO - 포트폴리오 동기화 완료 - 총 자산: 0원, 현금: 0원
+2025-06-13 09:50:06,959 - INFO - 보유 종목 수: 0개
+2025-06-13 09:50:06,960 - INFO - 🤖 제미나이 AI 시장 분석을 시작합니다...
+2025-06-13 09:50:06,960 - INFO - 거래량 상위 종목 조회 중...
+2025-06-13 09:50:11,899 - INFO - 거래대금 상위 종목 조회 중...
+2025-06-13 09:50:13,996 - INFO - 등락률 순위 조회 중...
+2025-06-13 09:50:19,002 - INFO - 외국인/기관 순매수 순위 조회 중...
+2025-06-13 09:50:19,002 - INFO - 업종별 등락률 조회 중...
+2025-06-13 09:50:19,002 - INFO - 시장 랭킹 데이터 수집 완료
+2025-06-13 09:50:19,003 - INFO - 🤖 gemini-1.5-flash 시장 분석 시작...
+2025-06-13 09:50:21,977 - INFO - ✅ gemini-1.5-flash 분석 완료
+2025-06-13 09:50:21,977 - INFO - 🎯 제미나이 AI 시장 분석 완료
+2025-06-13 09:50:21,978 - INFO - ==================================================
+2025-06-13 09:50:21,978 - INFO - 📋 AI 시장 분석 결과:
+2025-06-13 09:50:21,978 - INFO - This data shows a snapshot of stock market performance.  Here's a summary and some observations:
+
+**Key Observations:**
+
+* **Samsung Electronics (005930) leads in trading volume** despite experiencing a significant price drop (-1.60%). This suggests high trading activity, possibly due to investor uncertainty or profit-taking.
+
+* **High volume doesn't necessarily correlate with high price movement.**  While Samsung Electronics had the highest volume, its price decreased considerably.  Conversely, other stocks with much lower volume showed positive price changes.
+
+* **Missing Stock Symbols:** The "Top 3 Gainers" and "Top 3 Losers" sections are incomplete.  The stock symbols are missing, making it impossible to fully analyze the performance of these specific stocks.  This is a significant data gap.
+
+* **Sector Performance is Mixed:**  The technology sector (represented by "Semiconductor" and "Internet") shows strong gains, while others like "Steel" and "Chemical" are in the red. This suggests sector-specific factors are influencing market movement.
+
+**To improve the data:**
+
+* **Complete the missing stock symbols** in the "Top 3 Gainers" and "Top 3 Losers" sections.  This is crucial for a complete analysis.
+* **Provide a time frame.**  The data lacks context.  Is this daily, weekly, or monthly performance?  Knowing the timeframe is essential for proper interpretation.
+* **Consider adding market capitalization data.**  Including market capitalization would provide a better understanding of the relative importance of each stock's movement.
+
+
+In short, the provided data offers a glimpse into market activity, but its incompleteness limits the depth of analysis.  Filling in the missing information would significantly enhance its value.
+2025-06-13 09:50:21,980 - INFO - ==================================================
+2025-06-13 09:50:21,981 - INFO - 🚦 gemini-1.5-flash 매매 신호 생성 중...
+2025-06-13 09:50:21,981 - ERROR - 🚫 gemini-1.5-flash 신호 생성 중 오류: 'MarketAnalyzer' object has no attribute '_create_trading_signal_prompt'
+2025-06-13 09:50:21,981 - INFO - 📈 시장 상황 분석 시작 (기준: KOSPI 200일 이동평균선)
+2025-06-13 09:50:22,019 - ERROR - 기술적 분석 중 오류 발생: unsupported format string passed to Series.__format__
+2025-06-13 09:50:22,020 - INFO - 🎯 최종 판단: NEUTRAL (기술적 분석만 적용)
+2025-06-13 09:50:22,020 - WARNING - 📉 하락장/중립장으로 판단되어 신규 매수는 진행하지 않습니다
+2025-06-13 09:50:22,020 - INFO - ✅ 리밸런싱 사이클 완료
+2025-06-13 09:50:22,021 - INFO - --- 사이클 종료, 5분 대기 ---
+2025-06-13 09:55:22,021 - INFO - --- AI 리밸런싱 사이클 시작 (주기: 5분) ---
+2025-06-13 09:55:22,022 - INFO - 🔄 AI 기반 포트폴리오 리밸런싱 시작
+2025-06-13 09:55:22,022 - INFO - 포트폴리오를 동기화합니다.
+2025-06-13 09:55:22,129 - INFO - 포트폴리오 동기화 완료 - 총 자산: 0원, 현금: 0원
+2025-06-13 09:55:22,130 - INFO - 보유 종목 수: 0개
+2025-06-13 09:55:22,130 - INFO - 🤖 제미나이 AI 시장 분석을 시작합니다...
+2025-06-13 09:55:22,130 - INFO - 거래량 상위 종목 조회 중...
+2025-06-13 09:55:27,064 - INFO - 거래대금 상위 종목 조회 중...
+2025-06-13 09:55:29,181 - INFO - 등락률 순위 조회 중...
+2025-06-13 09:55:34,176 - INFO - 외국인/기관 순매수 순위 조회 중...
+2025-06-13 09:55:34,177 - INFO - 업종별 등락률 조회 중...
+2025-06-13 09:55:34,177 - INFO - 시장 랭킹 데이터 수집 완료
+2025-06-13 09:55:34,178 - INFO - 🤖 gemini-1.5-flash 시장 분석 시작...
+2025-06-13 09:55:37,394 - INFO - ✅ gemini-1.5-flash 분석 완료
+2025-06-13 09:55:37,395 - INFO - 🎯 제미나이 AI 시장 분석 완료
+2025-06-13 09:55:37,395 - INFO - ==================================================
+2025-06-13 09:55:37,395 - INFO - 📋 AI 시장 분석 결과:
+2025-06-13 09:55:37,396 - INFO - This data shows a snapshot of stock market performance.  Let's break down the key takeaways:
+
+**Key Observations:**
+
+* **Samsung Electronics (005930) dominates trading volume:** Despite a -2.18% decrease, it accounts for a significantly larger trading volume (7,255,374 shares) than any other stock listed. This suggests high investor interest, even with a negative price movement.
+
+* **Mixed performance across top traded stocks:** The top 5 traded stocks show a mixed bag of performance, with some increasing and others decreasing in value. This indicates a lack of clear market direction.
+
+* **Incomplete Top Performers and Underperformers:** The lists for the top 3 gainers and losers are incomplete, missing the stock codes and percentages.  This makes it difficult to draw conclusions about the best and worst-performing stocks.  The provided data is contradictory as it lists positive percentages for stocks in the "top losers" section.
+
+* **Sector Performance:**  The sector data shows a divergence in performance.  The semiconductor and internet sectors are performing strongly (+2.50% and +1.80% respectively), while the chemical and steel sectors are underperforming (-1.20% and -0.50%).  The automotive sector shows a modest gain (+0.30%).
+
+
+**Missing Information and Inconsistencies:**
+
+To get a clearer picture, the following information is needed:
+
+* **Stock codes for top 3 gainers and losers:**  This is crucial for understanding which specific stocks are driving the market's performance.
+* **Correction of contradictory data:** The top 3 losers list shows positive percentages, which is inconsistent and needs correction.
+
+**In conclusion:**  While the data provides a glimpse into market activity, the missing and inconsistent information limits the depth of analysis.  A complete dataset would allow for a more comprehensive understanding of market trends and investor sentiment.
+2025-06-13 09:55:37,398 - INFO - ==================================================
+2025-06-13 09:55:37,399 - INFO - 🚦 gemini-1.5-flash 매매 신호 생성 중...
+2025-06-13 09:55:37,399 - ERROR - 🚫 gemini-1.5-flash 신호 생성 중 오류: 'MarketAnalyzer' object has no attribute '_create_trading_signal_prompt'
+2025-06-13 09:55:37,399 - INFO - 📈 시장 상황 분석 시작 (기준: KOSPI 200일 이동평균선)
+2025-06-13 09:55:37,428 - ERROR - 기술적 분석 중 오류 발생: unsupported format string passed to Series.__format__
+2025-06-13 09:55:37,429 - INFO - 🎯 최종 판단: NEUTRAL (기술적 분석만 적용)
+2025-06-13 09:55:37,429 - WARNING - 📉 하락장/중립장으로 판단되어 신규 매수는 진행하지 않습니다
+2025-06-13 09:55:37,429 - INFO - ✅ 리밸런싱 사이클 완료
+2025-06-13 09:55:37,429 - INFO - --- 사이클 종료, 5분 대기 ---
+2025-06-13 10:00:37,430 - INFO - --- AI 리밸런싱 사이클 시작 (주기: 5분) ---
+2025-06-13 10:00:37,431 - INFO - 🔄 AI 기반 포트폴리오 리밸런싱 시작
+2025-06-13 10:00:37,432 - INFO - 포트폴리오를 동기화합니다.
+2025-06-13 10:00:37,521 - INFO - 포트폴리오 동기화 완료 - 총 자산: 0원, 현금: 0원
+2025-06-13 10:00:37,522 - INFO - 보유 종목 수: 0개
+2025-06-13 10:00:37,522 - INFO - 🤖 제미나이 AI 시장 분석을 시작합니다...
+2025-06-13 10:00:37,522 - INFO - 거래량 상위 종목 조회 중...
+2025-06-13 10:00:42,467 - INFO - 거래대금 상위 종목 조회 중...
+2025-06-13 10:00:44,558 - INFO - 등락률 순위 조회 중...
+2025-06-13 10:00:49,560 - INFO - 외국인/기관 순매수 순위 조회 중...
+2025-06-13 10:00:49,561 - INFO - 업종별 등락률 조회 중...
+2025-06-13 10:00:49,561 - INFO - 시장 랭킹 데이터 수집 완료
+2025-06-13 10:00:49,561 - INFO - 🤖 gemini-1.5-flash 시장 분석 시작...
+2025-06-13 10:00:52,523 - INFO - ✅ gemini-1.5-flash 분석 완료
+2025-06-13 10:00:52,523 - INFO - 🎯 제미나이 AI 시장 분석 완료
+2025-06-13 10:00:52,523 - INFO - ==================================================
+2025-06-13 10:00:52,524 - INFO - 📋 AI 시장 분석 결과:
+2025-06-13 10:00:52,524 - INFO - This data shows a snapshot of stock market performance.  Here's a summary and some observations:
+
+**Key Observations:**
+
+* **Samsung Electronics (005930) dominates trading volume:** Despite a -2.02% decrease, it accounts for significantly more trading activity than any other stock listed. This suggests high investor interest, even with a negative price movement.
+
+* **Discrepancy in Top Gainers/Losers:** The provided data for top gainers and losers is incomplete and inconsistent.  The same tickers are missing from both lists, and the percentages don't match the data in the volume list.  This needs correction to be meaningful.
+
+* **Sector Performance is Mixed:**  The sector data shows a mixed bag.  Technology sectors (Semiconductors and Internet) are performing well, while others like Chemicals and Steel are showing negative performance.  This suggests sector-specific factors are influencing market movement.
+
+**To make this data more useful, we need:**
+
+* **Complete Tickers for Top Gainers/Losers:**  The missing stock symbols for the top gainers and losers are crucial for a complete picture.  These should be filled in.
+
+* **Consistency Check:** The percentages in the top gainers/losers section should match the percentages in the volume section for the same stocks.
+
+* **Context:**  The date and time of this data snapshot are missing.  This is essential for understanding the context of the market movements.
+
+
+Once the missing information is provided and inconsistencies are resolved, a more comprehensive analysis can be performed.  For example, we could then discuss:
+
+* Correlation between volume and price movement.
+* The overall market sentiment based on the sector performance.
+* Potential reasons for the performance of individual stocks and sectors.
+2025-06-13 10:00:52,528 - INFO - ==================================================
+2025-06-13 10:00:52,528 - INFO - 🚦 gemini-1.5-flash 매매 신호 생성 중...
+2025-06-13 10:00:52,528 - ERROR - 🚫 gemini-1.5-flash 신호 생성 중 오류: 'MarketAnalyzer' object has no attribute '_create_trading_signal_prompt'
+2025-06-13 10:00:52,529 - INFO - 📈 시장 상황 분석 시작 (기준: KOSPI 200일 이동평균선)
+2025-06-13 10:00:52,557 - ERROR - 기술적 분석 중 오류 발생: unsupported format string passed to Series.__format__
+2025-06-13 10:00:52,559 - INFO - 🎯 최종 판단: NEUTRAL (기술적 분석만 적용)
+2025-06-13 10:00:52,559 - WARNING - 📉 하락장/중립장으로 판단되어 신규 매수는 진행하지 않습니다
+2025-06-13 10:00:52,560 - INFO - ✅ 리밸런싱 사이클 완료
+2025-06-13 10:00:52,560 - INFO - --- 사이클 종료, 5분 대기 ---
+2025-06-13 10:05:52,560 - INFO - --- AI 리밸런싱 사이클 시작 (주기: 5분) ---
+2025-06-13 10:05:52,561 - INFO - 🔄 AI 기반 포트폴리오 리밸런싱 시작
+2025-06-13 10:05:52,561 - INFO - 포트폴리오를 동기화합니다.
+2025-06-13 10:05:52,657 - INFO - 포트폴리오 동기화 완료 - 총 자산: 0원, 현금: 0원
+2025-06-13 10:05:52,658 - INFO - 보유 종목 수: 0개
+2025-06-13 10:05:52,658 - INFO - 🤖 제미나이 AI 시장 분석을 시작합니다...
+2025-06-13 10:05:52,659 - INFO - 거래량 상위 종목 조회 중...
+2025-06-13 10:05:57,596 - INFO - 거래대금 상위 종목 조회 중...
+2025-06-13 10:05:59,691 - INFO - 등락률 순위 조회 중...
+2025-06-13 10:06:04,723 - INFO - 외국인/기관 순매수 순위 조회 중...
+2025-06-13 10:06:04,723 - INFO - 업종별 등락률 조회 중...
+2025-06-13 10:06:04,724 - INFO - 시장 랭킹 데이터 수집 완료
+2025-06-13 10:06:04,724 - INFO - 🤖 gemini-1.5-flash 시장 분석 시작...
+2025-06-13 10:06:07,164 - INFO - ✅ gemini-1.5-flash 분석 완료
+2025-06-13 10:06:07,164 - INFO - 🎯 제미나이 AI 시장 분석 완료
+2025-06-13 10:06:07,165 - INFO - ==================================================
+2025-06-13 10:06:07,165 - INFO - 📋 AI 시장 분석 결과:
+2025-06-13 10:06:07,166 - INFO - 제공된 데이터에는 문제가 있습니다.  하락률 상위 3개 종목과 상승률 상위 3개 종목에 모두 동일한 값(+1.78%, +0.85%, +0.40%)이 들어가 있습니다.  하락률 상위 3개 종목에는 음수 값이 들어가야 정상입니다.  데이터를 다시 확인하고 수정해주세요.
+
+수정된 데이터를 제공해주시면, 거래량 및 등락률을 바탕으로 더 유용한 분석 결과를 제공할 수 있습니다.  예를 들어, 다음과 같은 분석이 가능합니다:
+
+* **거래량과 등락률의 상관관계 분석:**  거래량이 많은 종목이 등락률이 큰 경향이 있는지 분석할 수 있습니다.
+* **업종별 시장 동향 분석:**  각 업종의 등락률을 비교하여 시장의 전반적인 흐름을 파악할 수 있습니다.
+* **주요 종목 분석:**  각 종목의 등락률과 거래량을 분석하여 투자 전략을 세우는 데 도움을 줄 수 있습니다.
+
+
+올바른 데이터를 제공해주시면 더욱 정확하고 유익한 정보를 드릴 수 있습니다.
+2025-06-13 10:06:07,168 - INFO - ==================================================
+2025-06-13 10:06:07,168 - INFO - 🚦 gemini-1.5-flash 매매 신호 생성 중...
+2025-06-13 10:06:07,168 - ERROR - 🚫 gemini-1.5-flash 신호 생성 중 오류: 'MarketAnalyzer' object has no attribute '_create_trading_signal_prompt'
+2025-06-13 10:06:07,168 - INFO - 📈 시장 상황 분석 시작 (기준: KOSPI 200일 이동평균선)
+2025-06-13 10:06:07,206 - ERROR - 기술적 분석 중 오류 발생: unsupported format string passed to Series.__format__
+2025-06-13 10:06:07,206 - INFO - 🎯 최종 판단: NEUTRAL (기술적 분석만 적용)
+2025-06-13 10:06:07,207 - WARNING - 📉 하락장/중립장으로 판단되어 신규 매수는 진행하지 않습니다
+2025-06-13 10:06:07,207 - INFO - ✅ 리밸런싱 사이클 완료
+2025-06-13 10:06:07,208 - INFO - --- 사이클 종료, 5분 대기 ---
+2025-06-13 10:11:07,208 - INFO - --- AI 리밸런싱 사이클 시작 (주기: 5분) ---
+2025-06-13 10:11:07,209 - INFO - 🔄 AI 기반 포트폴리오 리밸런싱 시작
+2025-06-13 10:11:07,209 - INFO - 포트폴리오를 동기화합니다.
+2025-06-13 10:11:07,308 - INFO - 포트폴리오 동기화 완료 - 총 자산: 0원, 현금: 0원
+2025-06-13 10:11:07,309 - INFO - 보유 종목 수: 0개
+2025-06-13 10:11:07,309 - INFO - 🤖 제미나이 AI 시장 분석을 시작합니다...
+2025-06-13 10:11:07,310 - INFO - 거래량 상위 종목 조회 중...
+2025-06-13 10:11:12,245 - INFO - 거래대금 상위 종목 조회 중...
+2025-06-13 10:11:14,346 - INFO - 등락률 순위 조회 중...
+2025-06-13 10:11:19,343 - INFO - 외국인/기관 순매수 순위 조회 중...
+2025-06-13 10:11:19,344 - INFO - 업종별 등락률 조회 중...
+2025-06-13 10:11:19,344 - INFO - 시장 랭킹 데이터 수집 완료
+2025-06-13 10:11:19,344 - INFO - 🤖 gemini-1.5-flash 시장 분석 시작...
+2025-06-13 10:11:22,171 - INFO - ✅ gemini-1.5-flash 분석 완료
+2025-06-13 10:11:22,171 - INFO - 🎯 제미나이 AI 시장 분석 완료
+2025-06-13 10:11:22,172 - INFO - ==================================================
+2025-06-13 10:11:22,172 - INFO - 📋 AI 시장 분석 결과:
+2025-06-13 10:11:22,172 - INFO - 제공된 데이터에는 하락률 상위 3개 종목의 종목 코드와 이름이 누락되어 있습니다.  상승률 상위 3개 종목 역시 종목 코드와 이름이 없습니다.  이 정보가 없으면 완전한 분석을 할 수 없습니다.
+
+하지만, 주어진 정보만으로는 다음과 같은 분석을 할 수 있습니다.
+
+**주요 관찰:**
+
+* **거래량:** 삼성전자(005930)가 압도적으로 높은 거래량을 보이고 있습니다.  이는 시장의 주목도를 반영하는 것으로 해석할 수 있습니다.
+* **가격 변동:** 삼성전자는 하락했지만 거래량이 많아 시장의 큰 관심을 받고 있음을 알 수 있습니다.  다른 종목들은 상대적으로 가격 변동이 적습니다.
+* **업종별 동향:** 반도체와 인터넷 업종은 상승세를 보이고 있는 반면, 철강과 화학 업종은 하락세를 보이고 있습니다.  자동차 업종은 소폭 상승했습니다.
+
+**결론:**
+
+제공된 데이터만으로는 명확한 결론을 내리기 어렵습니다.  상승률 및 하락률 상위 종목의 종목 코드와 이름이 추가되어야 더욱 정확한 분석이 가능합니다.  추가 정보를 제공해주시면 더 자세한 분석을 해드리겠습니다.
+2025-06-13 10:11:22,174 - INFO - ==================================================
+2025-06-13 10:11:22,174 - INFO - 🚦 gemini-1.5-flash 매매 신호 생성 중...
+2025-06-13 10:11:22,175 - ERROR - 🚫 gemini-1.5-flash 신호 생성 중 오류: 'MarketAnalyzer' object has no attribute '_create_trading_signal_prompt'
+2025-06-13 10:11:22,175 - INFO - 📈 시장 상황 분석 시작 (기준: KOSPI 200일 이동평균선)
+2025-06-13 10:11:22,202 - ERROR - 기술적 분석 중 오류 발생: unsupported format string passed to Series.__format__
+2025-06-13 10:11:22,203 - INFO - 🎯 최종 판단: NEUTRAL (기술적 분석만 적용)
+2025-06-13 10:11:22,203 - WARNING - 📉 하락장/중립장으로 판단되어 신규 매수는 진행하지 않습니다
+2025-06-13 10:11:22,204 - INFO - ✅ 리밸런싱 사이클 완료
+2025-06-13 10:11:22,204 - INFO - --- 사이클 종료, 5분 대기 ---
+2025-06-13 10:16:22,205 - INFO - --- AI 리밸런싱 사이클 시작 (주기: 5분) ---
+2025-06-13 10:16:22,205 - INFO - 🔄 AI 기반 포트폴리오 리밸런싱 시작
+2025-06-13 10:16:22,206 - INFO - 포트폴리오를 동기화합니다.
+2025-06-13 10:16:22,320 - INFO - 포트폴리오 동기화 완료 - 총 자산: 0원, 현금: 0원
+2025-06-13 10:16:22,320 - INFO - 보유 종목 수: 0개
+2025-06-13 10:16:22,321 - INFO - 🤖 제미나이 AI 시장 분석을 시작합니다...
+2025-06-13 10:16:22,321 - INFO - 거래량 상위 종목 조회 중...
+2025-06-13 10:16:27,236 - INFO - 거래대금 상위 종목 조회 중...
+2025-06-13 10:16:29,356 - INFO - 등락률 순위 조회 중...
+2025-06-13 10:16:34,384 - INFO - 외국인/기관 순매수 순위 조회 중...
+2025-06-13 10:16:34,385 - INFO - 업종별 등락률 조회 중...
+2025-06-13 10:16:34,385 - INFO - 시장 랭킹 데이터 수집 완료
+2025-06-13 10:16:34,385 - INFO - 🤖 gemini-1.5-flash 시장 분석 시작...
+2025-06-13 10:16:37,439 - INFO - ✅ gemini-1.5-flash 분석 완료
+2025-06-13 10:16:37,440 - INFO - 🎯 제미나이 AI 시장 분석 완료
+2025-06-13 10:16:37,440 - INFO - ==================================================
+2025-06-13 10:16:37,441 - INFO - 📋 AI 시장 분석 결과:
+2025-06-13 10:16:37,441 - INFO - This data shows a snapshot of stock market performance.  Here's a summary and some observations:
+
+**Key Observations:**
+
+* **High Volume, Negative Return:**  Samsung Electronics (005930) had the highest trading volume but experienced a significant price drop (-1.85%). This suggests potential selling pressure despite high trading activity.
+
+* **Low Volume, Positive Return:**  Some stocks with lower trading volume (e.g., 035420) showed positive returns, indicating potentially less market influence.
+
+* **Inconsistency in Top/Bottom Lists:** The provided "상승률 상위 3개 종목" (Top 3 Gainers) and "하락률 상위 3개 종목" (Top 3 Losers) lists are incomplete and inconsistent.  They are missing stock codes and, strangely, show only positive percentages. This is an error in the data provided.
+
+* **Sector Performance:** The sector data shows a mixed bag.  Technology sectors like Semiconductors (+2.50%) and Internet (+1.80%) performed well, while others like Chemicals (-1.20%) and Steel (-0.50%) underperformed.
+
+
+**To improve the data:**
+
+* **Complete Top/Bottom Lists:**  Provide the full stock codes and percentage changes for the top 3 gainers and top 3 losers.
+* **Verify Data Consistency:**  Check for errors in the data, particularly the discrepancy in the top gainers/losers lists.  Positive percentages in a "losers" list is incorrect.
+
+With complete and accurate data, a more comprehensive analysis could be performed, including identifying potential market trends and relationships between volume, price changes, and sector performance.
+2025-06-13 10:16:37,443 - INFO - ==================================================
+2025-06-13 10:16:37,443 - INFO - 🚦 gemini-1.5-flash 매매 신호 생성 중...
+2025-06-13 10:16:37,444 - ERROR - 🚫 gemini-1.5-flash 신호 생성 중 오류: 'MarketAnalyzer' object has no attribute '_create_trading_signal_prompt'
+2025-06-13 10:16:37,444 - INFO - 📈 시장 상황 분석 시작 (기준: KOSPI 200일 이동평균선)
+2025-06-13 10:16:37,472 - ERROR - 기술적 분석 중 오류 발생: unsupported format string passed to Series.__format__
+2025-06-13 10:16:37,473 - INFO - 🎯 최종 판단: NEUTRAL (기술적 분석만 적용)
+2025-06-13 10:16:37,473 - WARNING - 📉 하락장/중립장으로 판단되어 신규 매수는 진행하지 않습니다
+2025-06-13 10:16:37,473 - INFO - ✅ 리밸런싱 사이클 완료
+2025-06-13 10:16:37,474 - INFO - --- 사이클 종료, 5분 대기 ---
+2025-06-13 10:21:37,475 - INFO - --- AI 리밸런싱 사이클 시작 (주기: 5분) ---
+2025-06-13 10:21:37,476 - INFO - 🔄 AI 기반 포트폴리오 리밸런싱 시작
+2025-06-13 10:21:37,476 - INFO - 포트폴리오를 동기화합니다.
+2025-06-13 10:21:37,611 - INFO - 포트폴리오 동기화 완료 - 총 자산: 0원, 현금: 0원
+2025-06-13 10:21:37,611 - INFO - 보유 종목 수: 0개
+2025-06-13 10:21:37,612 - INFO - 🤖 제미나이 AI 시장 분석을 시작합니다...
+2025-06-13 10:21:37,612 - INFO - 거래량 상위 종목 조회 중...
+2025-06-13 10:21:42,521 - INFO - 거래대금 상위 종목 조회 중...
+2025-06-13 10:21:44,652 - INFO - 등락률 순위 조회 중...
+2025-06-13 10:21:49,647 - INFO - 외국인/기관 순매수 순위 조회 중...
+2025-06-13 10:21:49,647 - INFO - 업종별 등락률 조회 중...
+2025-06-13 10:21:49,648 - INFO - 시장 랭킹 데이터 수집 완료
+2025-06-13 10:21:49,648 - INFO - 🤖 gemini-1.5-flash 시장 분석 시작...
+2025-06-13 10:21:53,209 - INFO - ✅ gemini-1.5-flash 분석 완료
+2025-06-13 10:21:53,210 - INFO - 🎯 제미나이 AI 시장 분석 완료
+2025-06-13 10:21:53,210 - INFO - ==================================================
+2025-06-13 10:21:53,211 - INFO - 📋 AI 시장 분석 결과:
+2025-06-13 10:21:53,211 - INFO - This data shows a snapshot of the stock market performance.  Here's a summary:
+
+**Key Observations:**
+
+* **High Volume, Negative Returns:**  The top 5 stocks by trading volume all experienced negative returns, with (005930) showing the largest decline (-2.02%).  This suggests a potential bearish sentiment in the market, at least for these heavily traded stocks.
+
+* **Missing Data:** The top 3 gainers and losers lists are incomplete.  The missing stock codes and percentages prevent a full analysis of the market's best and worst performers.  This is a significant limitation of the provided data.
+
+* **Sector Performance Divergence:**  The sector performance shows a mixed bag.  While the semiconductor (+2.50%) and internet (+1.80%) sectors performed well, the chemical (-1.20%) sector experienced a decline.  This highlights the sector-specific nature of market movements.
+
+**Inferences (with caveats due to incomplete data):**
+
+* The lack of data in the top gainers and losers lists makes it impossible to draw conclusions about the overall market trend beyond the observation of high-volume stocks performing poorly.  The missing data is crucial for a complete picture.
+
+* The strong performance of the semiconductor sector might be driving the overall market, but the negative performance of high-volume stocks suggests a more complex situation.
+
+* The data suggests that the market is not moving uniformly.  Some sectors are performing well while others are struggling.
+
+**To improve the analysis, the following information is needed:**
+
+* Stock codes and percentage changes for the top 3 gainers and losers.
+* More context, such as the date and time of the data capture, would be helpful.
+
+
+In short, the provided data offers a partial view of the market.  The missing information significantly limits the ability to draw definitive conclusions.
+2025-06-13 10:21:53,215 - INFO - ==================================================
+2025-06-13 10:21:53,216 - INFO - 🚦 gemini-1.5-flash 매매 신호 생성 중...
+2025-06-13 10:21:53,216 - ERROR - 🚫 gemini-1.5-flash 신호 생성 중 오류: 'MarketAnalyzer' object has no attribute '_create_trading_signal_prompt'
+2025-06-13 10:21:53,217 - INFO - 📈 시장 상황 분석 시작 (기준: KOSPI 200일 이동평균선)
+2025-06-13 10:21:53,244 - ERROR - 기술적 분석 중 오류 발생: unsupported format string passed to Series.__format__
+2025-06-13 10:21:53,245 - INFO - 🎯 최종 판단: NEUTRAL (기술적 분석만 적용)
+2025-06-13 10:21:53,245 - WARNING - 📉 하락장/중립장으로 판단되어 신규 매수는 진행하지 않습니다
+2025-06-13 10:21:53,246 - INFO - ✅ 리밸런싱 사이클 완료
+2025-06-13 10:21:53,246 - INFO - --- 사이클 종료, 5분 대기 ---
+2025-06-13 10:26:53,247 - INFO - --- AI 리밸런싱 사이클 시작 (주기: 5분) ---
+2025-06-13 10:26:53,248 - INFO - 🔄 AI 기반 포트폴리오 리밸런싱 시작
+2025-06-13 10:26:53,248 - INFO - 포트폴리오를 동기화합니다.
+2025-06-13 10:26:53,330 - INFO - 포트폴리오 동기화 완료 - 총 자산: 0원, 현금: 0원
+2025-06-13 10:26:53,330 - INFO - 보유 종목 수: 0개
+2025-06-13 10:26:53,331 - INFO - 🤖 제미나이 AI 시장 분석을 시작합니다...
+2025-06-13 10:26:53,331 - INFO - 거래량 상위 종목 조회 중...
+2025-06-13 10:26:58,283 - INFO - 거래대금 상위 종목 조회 중...
+2025-06-13 10:27:00,372 - INFO - 등락률 순위 조회 중...
+2025-06-13 10:27:05,386 - INFO - 외국인/기관 순매수 순위 조회 중...
+2025-06-13 10:27:05,386 - INFO - 업종별 등락률 조회 중...
+2025-06-13 10:27:05,387 - INFO - 시장 랭킹 데이터 수집 완료
+2025-06-13 10:27:05,387 - INFO - 🤖 gemini-1.5-flash 시장 분석 시작...
+2025-06-13 10:27:08,643 - INFO - ✅ gemini-1.5-flash 분석 완료
+2025-06-13 10:27:08,645 - INFO - 🎯 제미나이 AI 시장 분석 완료
+2025-06-13 10:27:08,645 - INFO - ==================================================
+2025-06-13 10:27:08,646 - INFO - 📋 AI 시장 분석 결과:
+2025-06-13 10:27:08,646 - INFO - 제공된 데이터에는 상승률 및 하락률 상위 3개 종목의 종목 코드가 누락되어 있습니다.  종목 코드를 추가하면 더욱 유용한 분석이 가능합니다.  현재 데이터만으로는 상승률/하락률 상위 종목과 거래량 상위 종목 간의 연관성을 파악하기 어렵습니다.
+
+하지만, 현재 데이터를 바탕으로 다음과 같은 정보를 추론할 수 있습니다.
+
+* **거래량과 주가 변동의 상관관계는 명확하지 않음:** 거래량이 가장 높은 (005930)은 -1.93% 하락했지만, 거래량이 상대적으로 적은 종목들도 상승과 하락을 보이고 있습니다.  거래량은 주가 변동의 원인이라기보다는 결과 또는 동시 발생 현상일 가능성이 높습니다.
+
+* **반도체 및 인터넷 업종 강세:** 반도체와 인터넷 업종은 각각 +2.50%와 +1.80% 상승하여 시장을 주도하고 있습니다.
+
+* **철강 및 화학 업종 약세:** 철강과 화학 업종은 각각 -0.50%와 -1.20% 하락하여 시장의 약세를 보이고 있습니다.
+
+* **데이터의 불완전성:** 상승률/하락률 상위 종목의 종목 코드가 없어 전체적인 시장 흐름을 정확하게 파악하기 어렵습니다.  종목 코드를 추가하면 더욱 정확하고 의미있는 분석이 가능합니다.
+
+
+종목 코드를 추가하여 질문을 다시 하시면 더욱 자세하고 정확한 분석 결과를 제공해 드릴 수 있습니다.
+2025-06-13 10:27:08,650 - INFO - ==================================================
+2025-06-13 10:27:08,652 - INFO - 🚦 gemini-1.5-flash 매매 신호 생성 중...
+2025-06-13 10:27:08,652 - ERROR - 🚫 gemini-1.5-flash 신호 생성 중 오류: 'MarketAnalyzer' object has no attribute '_create_trading_signal_prompt'
+2025-06-13 10:27:08,652 - INFO - 📈 시장 상황 분석 시작 (기준: KOSPI 200일 이동평균선)
+2025-06-13 10:27:08,734 - ERROR - 기술적 분석 중 오류 발생: unsupported format string passed to Series.__format__
+2025-06-13 10:27:08,736 - INFO - 🎯 최종 판단: NEUTRAL (기술적 분석만 적용)
+2025-06-13 10:27:08,736 - WARNING - 📉 하락장/중립장으로 판단되어 신규 매수는 진행하지 않습니다
+2025-06-13 10:27:08,736 - INFO - ✅ 리밸런싱 사이클 완료
+2025-06-13 10:27:08,737 - INFO - --- 사이클 종료, 5분 대기 ---
+2025-06-13 10:31:56,193 - INFO - === 환경 변수 로드 상태 확인 ===
+2025-06-13 10:31:56,194 - INFO - 선택된 환경: MOCK(모의투자)
+2025-06-13 10:31:56,194 - INFO - IS_MOCK 설정: True
+2025-06-13 10:31:56,194 - INFO - APP_KEY 존재: 예
+2025-06-13 10:31:56,194 - INFO - APP_SECRET 존재: 예
+2025-06-13 10:31:56,194 - INFO - ACCOUNT_NUMBER 존재: 예
+2025-06-13 10:31:56,194 - INFO - APP_KEY 앞 4자리: PSJH****
+2025-06-13 10:31:56,195 - INFO - APP_SECRET 앞 4자리: W5ts****
+2025-06-13 10:31:56,195 - INFO - ACCOUNT_NUMBER: 50128558-01
+2025-06-13 10:31:56,195 - INFO - MOCK(모의투자) 환경 설정 값 로드 완료. AI 통합 시스템을 시작합니다.
+2025-06-13 10:31:56,195 - INFO - AI 통합 시스템을 초기화합니다.
+2025-06-13 10:31:56,195 - INFO - MOCK(모의투자) 환경으로 API를 초기화합니다.
+2025-06-13 10:31:56,196 - INFO - RateLimiter가 1.0초당 2회 호출로 설정되었습니다.
+2025-06-13 10:31:56,196 - INFO - 📱 텔레그램 알림 기능이 활성화되었습니다.
+2025-06-13 10:31:56,197 - INFO - 저장된 토큰을 로드했습니다. (남은 시간: 23:06:05.810590)
+2025-06-13 10:31:56,198 - INFO - 📅 자동 토큰 발급 스케줄러가 시작되었습니다.
+2025-06-13 10:31:56,198 - INFO - ⏰ 매일 08:00에 새로운 토큰을 발급합니다.
+2025-06-13 10:31:56,199 - INFO - === 토큰 상태 확인 ===
+2025-06-13 10:31:56,199 - INFO - 상태: 유효
+2025-06-13 10:31:56,200 - INFO - 메시지: 토큰이 유효합니다. (남은 시간: 23:06:05.808925)
+2025-06-13 10:31:56,200 - INFO - 권장 조치: 정상 사용 가능
+2025-06-13 10:31:56,200 - INFO - 🤖 제미나이 모델 'gemini-1.5-flash'이 초기화되었습니다.
+2025-06-13 10:31:56,201 - INFO - 📋 모델 정보:
+2025-06-13 10:31:56,201 - INFO -    이름: gemini-1.5-flash
+2025-06-13 10:31:56,202 - INFO -    특징: 빠른 응답 속도와 효율적인 분석
+2025-06-13 10:31:56,203 - INFO -    최적 용도: 실시간 매매 신호, 빠른 시장 분석
+2025-06-13 10:31:56,203 - INFO -    속도: 매우 빠름
+2025-06-13 10:31:56,204 - INFO -    비용: 저렴
+2025-06-13 10:31:56,204 - INFO - 🎛️ 생성 설정:
+2025-06-13 10:31:56,204 - INFO -    Temperature: 0.3
+2025-06-13 10:31:56,205 - INFO -    Max Tokens: 1000
+2025-06-13 10:31:56,205 - INFO -    Top P: 0.8
+2025-06-13 10:31:56,205 - INFO -    Top K: 40
+2025-06-13 10:31:56,206 - WARNING - FRED_API_KEY가 설정되지 않아 거시 경제 지표 분석이 제한됩니다.
+2025-06-13 10:31:56,206 - ERROR - 시스템 초기화 중 오류 발생: 'KIS_API' object has no attribute 'upper'
+2025-06-13 10:31:56,206 - ERROR - 프로그램 실행 중 오류 발생: 'KIS_API' object has no attribute 'upper'
+2025-06-13 10:31:56,207 - INFO - 📅 토큰 스케줄러가 중지되었습니다.
+2025-06-13 10:33:21,371 - INFO - === 환경 변수 로드 상태 확인 ===
+2025-06-13 10:33:21,372 - INFO - 선택된 환경: MOCK(모의투자)
+2025-06-13 10:33:21,372 - INFO - IS_MOCK 설정: True
+2025-06-13 10:33:21,372 - INFO - APP_KEY 존재: 예
+2025-06-13 10:33:21,373 - INFO - APP_SECRET 존재: 예
+2025-06-13 10:33:21,373 - INFO - ACCOUNT_NUMBER 존재: 예
+2025-06-13 10:33:21,373 - INFO - APP_KEY 앞 4자리: PSJH****
+2025-06-13 10:33:21,373 - INFO - APP_SECRET 앞 4자리: W5ts****
+2025-06-13 10:33:21,373 - INFO - ACCOUNT_NUMBER: 50128558-01
+2025-06-13 10:33:21,373 - INFO - MOCK(모의투자) 환경 설정 값 로드 완료. AI 통합 시스템을 시작합니다.
+2025-06-13 10:33:21,374 - INFO - AI 통합 시스템을 초기화합니다.
+2025-06-13 10:33:21,375 - INFO - MOCK(모의투자) 환경으로 API를 초기화합니다.
+2025-06-13 10:33:21,376 - INFO - RateLimiter가 1.0초당 2회 호출로 설정되었습니다.
+2025-06-13 10:33:21,376 - INFO - 📱 텔레그램 알림 기능이 활성화되었습니다.
+2025-06-13 10:33:21,377 - INFO - 저장된 토큰을 로드했습니다. (남은 시간: 23:04:40.630747)
+2025-06-13 10:33:21,378 - INFO - 📅 자동 토큰 발급 스케줄러가 시작되었습니다.
+2025-06-13 10:33:21,378 - INFO - ⏰ 매일 08:00에 새로운 토큰을 발급합니다.
+2025-06-13 10:33:21,379 - INFO - === 토큰 상태 확인 ===
+2025-06-13 10:33:21,379 - INFO - 상태: 유효
+2025-06-13 10:33:21,379 - INFO - 메시지: 토큰이 유효합니다. (남은 시간: 23:04:40.628701)
+2025-06-13 10:33:21,380 - INFO - 권장 조치: 정상 사용 가능
+2025-06-13 10:33:21,381 - INFO - 🤖 제미나이 모델 'gemini-1.5-flash'이 초기화되었습니다.
+2025-06-13 10:33:21,381 - INFO - 📋 모델 정보:
+2025-06-13 10:33:21,382 - INFO -    이름: gemini-1.5-flash
+2025-06-13 10:33:21,382 - INFO -    특징: 빠른 응답 속도와 효율적인 분석
+2025-06-13 10:33:21,382 - INFO -    최적 용도: 실시간 매매 신호, 빠른 시장 분석
+2025-06-13 10:33:21,382 - INFO -    속도: 매우 빠름
+2025-06-13 10:33:21,383 - INFO -    비용: 저렴
+2025-06-13 10:33:21,383 - INFO - 🎛️ 생성 설정:
+2025-06-13 10:33:21,383 - INFO -    Temperature: 0.3
+2025-06-13 10:33:21,384 - INFO -    Max Tokens: 1000
+2025-06-13 10:33:21,384 - INFO -    Top P: 0.8
+2025-06-13 10:33:21,384 - INFO -    Top K: 40
+2025-06-13 10:33:21,384 - WARNING - FRED_API_KEY가 설정되지 않아 거시 경제 지표 분석이 제한됩니다.
+2025-06-13 10:33:21,385 - ERROR - 시스템 초기화 중 오류 발생: 'KIS_API' object has no attribute 'upper'
+2025-06-13 10:33:21,385 - ERROR - 프로그램 실행 중 오류 발생: 'KIS_API' object has no attribute 'upper'
+2025-06-13 10:33:21,385 - INFO - 📅 토큰 스케줄러가 중지되었습니다.
+2025-06-13 10:35:10,651 - INFO - === 환경 변수 로드 상태 확인 ===
+2025-06-13 10:35:10,651 - INFO - 선택된 환경: MOCK(모의투자)
+2025-06-13 10:35:10,652 - INFO - IS_MOCK 설정: True
+2025-06-13 10:35:10,652 - INFO - APP_KEY 존재: 예
+2025-06-13 10:35:10,652 - INFO - APP_SECRET 존재: 예
+2025-06-13 10:35:10,653 - INFO - ACCOUNT_NUMBER 존재: 예
+2025-06-13 10:35:10,653 - INFO - APP_KEY 앞 4자리: PSJH****
+2025-06-13 10:35:10,653 - INFO - APP_SECRET 앞 4자리: W5ts****
+2025-06-13 10:35:10,654 - INFO - ACCOUNT_NUMBER: 50128558-01
+2025-06-13 10:35:10,654 - INFO - MOCK(모의투자) 환경 설정 값 로드 완료. AI 통합 시스템을 시작합니다.
+2025-06-13 10:35:10,654 - INFO - AI 통합 시스템을 초기화합니다.
+2025-06-13 10:35:10,654 - INFO - MOCK(모의투자) 환경으로 API를 초기화합니다.
+2025-06-13 10:35:10,655 - INFO - RateLimiter가 1.0초당 2회 호출로 설정되었습니다.
+2025-06-13 10:35:10,655 - INFO - 📱 텔레그램 알림 기능이 활성화되었습니다.
+2025-06-13 10:35:10,656 - INFO - 저장된 토큰을 로드했습니다. (남은 시간: 23:02:51.351954)
+2025-06-13 10:35:10,658 - INFO - 📅 자동 토큰 발급 스케줄러가 시작되었습니다.
+2025-06-13 10:35:10,659 - INFO - ⏰ 매일 08:00에 새로운 토큰을 발급합니다.
+2025-06-13 10:35:10,660 - INFO - === 토큰 상태 확인 ===
+2025-06-13 10:35:10,660 - INFO - 상태: 유효
+2025-06-13 10:35:10,660 - INFO - 메시지: 토큰이 유효합니다. (남은 시간: 23:02:51.347999)
+2025-06-13 10:35:10,661 - INFO - 권장 조치: 정상 사용 가능
+2025-06-13 10:35:10,662 - INFO - 🤖 제미나이 모델 'gemini-1.5-flash'이 초기화되었습니다.
+2025-06-13 10:35:10,662 - INFO - 📋 모델 정보:
+2025-06-13 10:35:10,664 - INFO -    이름: gemini-1.5-flash
+2025-06-13 10:35:10,665 - INFO -    특징: 빠른 응답 속도와 효율적인 분석
+2025-06-13 10:35:10,665 - INFO -    최적 용도: 실시간 매매 신호, 빠른 시장 분석
+2025-06-13 10:35:10,666 - INFO -    속도: 매우 빠름
+2025-06-13 10:35:10,666 - INFO -    비용: 저렴
+2025-06-13 10:35:10,667 - INFO - 🎛️ 생성 설정:
+2025-06-13 10:35:10,667 - INFO -    Temperature: 0.3
+2025-06-13 10:35:10,667 - INFO -    Max Tokens: 1000
+2025-06-13 10:35:10,668 - INFO -    Top P: 0.8
+2025-06-13 10:35:10,668 - INFO -    Top K: 40
+2025-06-13 10:35:10,668 - WARNING - FRED_API_KEY가 설정되지 않아 거시 경제 지표 분석이 제한됩니다.
+2025-06-13 10:35:10,671 - WARNING - ⚠️ ONeilScanner 초기화 실패: 'KIS_API' object has no attribute 'upper'
+2025-06-13 10:35:10,671 - INFO - ✅ MinerviniScreener 초기화 완료
+2025-06-13 10:35:10,672 - INFO - 🎯 척후병 매수 전략이 활성화되었습니다.
+2025-06-13 10:35:12,399 - INFO - 📱 텔레그램 알림 전송 완료
+2025-06-13 10:35:12,400 - INFO - 📅 다음 자동 토큰 발급 예정: 2025-06-14 07:00:00
+2025-06-13 10:35:13,286 - INFO - 📱 텔레그램 알림 전송 완료
+2025-06-13 10:35:13,287 - INFO - 시스템 초기화가 완료되었습니다.
+2025-06-13 10:35:13,287 - INFO - === 아르키메데스 프로젝트 AI 자동매매 시스템 가동 ===
+2025-06-13 10:35:13,288 - INFO - 제미나이 AI 분석 기능 통합 완료
+2025-06-13 10:35:13,288 - INFO - 📅 자동 토큰 발급: 매일 08:00 (다음: 2025-06-14 07:00:00)
+2025-06-13 10:35:13,288 - INFO - 🔑 토큰 상태: 유효 - 토큰이 유효합니다. (남은 시간: 23:02:48.719161)
+2025-06-13 10:35:13,289 - INFO - --- AI 리밸런싱 사이클 시작 (주기: 5분) ---
+2025-06-13 10:35:13,289 - INFO - 🔄 AI 기반 포트폴리오 리밸런싱 시작
+2025-06-13 10:35:13,290 - INFO - 🧭 시장 체제 분석(Market Regime Analysis) 시작...
+2025-06-13 10:35:14,165 - ERROR - 시장 체제 분석 중 오류: The truth value of a Series is ambiguous. Use a.empty, a.bool(), a.item(), a.any() or a.all().
+Traceback (most recent call last):
+  File "C:\Users\USER\Desktop\test_stock\market_analyzer.py", line 442, in get_market_regime_analysis
+    market_trend = self._get_market_trend(kospi_index)
+  File "C:\Users\USER\Desktop\test_stock\market_analyzer.py", line 477, in _get_market_trend
+    if current > ma50 > ma200: return "STRONG_UPTREND"
+       ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\USER\Desktop\test_stock\venv\Lib\site-packages\pandas\core\generic.py", line 1577, in __nonzero__
+    raise ValueError(
+    ...<2 lines>...
+    )
+ValueError: The truth value of a Series is ambiguous. Use a.empty, a.bool(), a.item(), a.any() or a.all().
+2025-06-13 10:35:14,173 - INFO - 🧭 현재 시장 체제: NEUTRAL
+2025-06-13 10:35:14,173 - INFO - 포트폴리오를 동기화합니다.
+2025-06-13 10:35:14,271 - INFO - 포트폴리오 동기화 완료 - 총 자산: 0원, 현금: 0원
+2025-06-13 10:35:14,272 - INFO - 보유 종목 수: 0개
+2025-06-13 10:35:14,272 - INFO - 🔍 후보 종목 선정을 시작합니다...
+2025-06-13 10:35:15,150 - INFO - 📱 텔레그램 알림 전송 완료
+2025-06-13 10:35:15,151 - INFO - 📊 우량주 후보군에서 5개 추가: ['005930', '000660', '035420', '005490', '051910']
+2025-06-13 10:35:18,102 - INFO - 📱 텔레그램 알림 전송 완료
+2025-06-13 10:35:18,103 - INFO - ✅ 최종 후보 종목 5개 선정: ['005930', '000660', '035420', '005490', '051910']
+2025-06-13 10:35:18,103 - INFO - --- 사이클 종료, 5분 대기 ---
+2025-06-13 10:40:18,114 - INFO - --- AI 리밸런싱 사이클 시작 (주기: 5분) ---
+2025-06-13 10:40:18,116 - INFO - 🔄 AI 기반 포트폴리오 리밸런싱 시작
+2025-06-13 10:40:18,116 - INFO - 🧭 시장 체제 분석(Market Regime Analysis) 시작...
+2025-06-13 10:40:18,412 - ERROR - 시장 체제 분석 중 오류: The truth value of a Series is ambiguous. Use a.empty, a.bool(), a.item(), a.any() or a.all().
+Traceback (most recent call last):
+  File "C:\Users\USER\Desktop\test_stock\market_analyzer.py", line 442, in get_market_regime_analysis
+    market_trend = self._get_market_trend(kospi_index)
+  File "C:\Users\USER\Desktop\test_stock\market_analyzer.py", line 477, in _get_market_trend
+  File "C:\Users\USER\Desktop\test_stock\venv\Lib\site-packages\pandas\core\generic.py", line 1577, in __nonzero__
+    raise ValueError(
+    ...<2 lines>...
+    )
+ValueError: The truth value of a Series is ambiguous. Use a.empty, a.bool(), a.item(), a.any() or a.all().
+2025-06-13 10:40:18,415 - INFO - 🧭 현재 시장 체제: NEUTRAL
+2025-06-13 10:40:18,415 - INFO - 포트폴리오를 동기화합니다.
+2025-06-13 10:40:18,498 - INFO - 포트폴리오 동기화 완료 - 총 자산: 0원, 현금: 0원
+2025-06-13 10:40:18,499 - INFO - 보유 종목 수: 0개
+2025-06-13 10:40:18,500 - INFO - 🔍 후보 종목 선정을 시작합니다...
+2025-06-13 10:40:19,389 - INFO - 📱 텔레그램 알림 전송 완료
+2025-06-13 10:40:19,389 - INFO - 📊 우량주 후보군에서 5개 추가: ['005930', '000660', '035420', '005490', '051910']
+2025-06-13 10:40:22,323 - INFO - 📱 텔레그램 알림 전송 완료
+2025-06-13 10:40:22,323 - INFO - ✅ 최종 후보 종목 5개 선정: ['005930', '000660', '035420', '005490', '051910']
+2025-06-13 10:40:22,324 - INFO - --- 사이클 종료, 5분 대기 ---
+2025-06-13 10:45:21,360 - INFO - --- AI 리밸런싱 사이클 시작 (주기: 5분) ---
+2025-06-13 10:45:21,361 - INFO - 🔄 AI 기반 포트폴리오 리밸런싱 시작
+2025-06-13 10:45:21,361 - INFO - 🧭 시장 체제 분석(Market Regime Analysis) 시작...
+2025-06-13 10:45:21,641 - ERROR - 시장 체제 분석 중 오류: The truth value of a Series is ambiguous. Use a.empty, a.bool(), a.item(), a.any() or a.all().
+Traceback (most recent call last):
+  File "C:\Users\USER\Desktop\test_stock\market_analyzer.py", line 442, in get_market_regime_analysis
+    market_trend = self._get_market_trend(kospi_index)
+  File "C:\Users\USER\Desktop\test_stock\market_analyzer.py", line 477, in _get_market_trend
+  File "C:\Users\USER\Desktop\test_stock\venv\Lib\site-packages\pandas\core\generic.py", line 1577, in __nonzero__
+    raise ValueError(
+    ...<2 lines>...
+    )
+ValueError: The truth value of a Series is ambiguous. Use a.empty, a.bool(), a.item(), a.any() or a.all().
+2025-06-13 10:45:21,644 - INFO - 🧭 현재 시장 체제: NEUTRAL
+2025-06-13 10:45:21,644 - INFO - 포트폴리오를 동기화합니다.
+2025-06-13 10:45:21,721 - INFO - 포트폴리오 동기화 완료 - 총 자산: 0원, 현금: 0원
+2025-06-13 10:45:21,721 - INFO - 보유 종목 수: 0개
+2025-06-13 10:45:21,721 - INFO - 🔍 후보 종목 선정을 시작합니다...
+2025-06-13 10:45:22,619 - INFO - 📱 텔레그램 알림 전송 완료
+2025-06-13 10:45:22,619 - INFO - 📊 우량주 후보군에서 5개 추가: ['005930', '000660', '035420', '005490', '051910']
+2025-06-13 10:45:25,549 - INFO - 📱 텔레그램 알림 전송 완료
+2025-06-13 10:45:25,549 - INFO - ✅ 최종 후보 종목 5개 선정: ['005930', '000660', '035420', '005490', '051910']
+2025-06-13 10:45:25,550 - INFO - --- 사이클 종료, 5분 대기 ---
+2025-06-13 10:50:25,556 - INFO - --- AI 리밸런싱 사이클 시작 (주기: 5분) ---
+2025-06-13 10:50:25,557 - INFO - 🔄 AI 기반 포트폴리오 리밸런싱 시작
+2025-06-13 10:50:25,557 - INFO - 🧭 시장 체제 분석(Market Regime Analysis) 시작...
+2025-06-13 10:50:25,854 - ERROR - 시장 체제 분석 중 오류: The truth value of a Series is ambiguous. Use a.empty, a.bool(), a.item(), a.any() or a.all().
+Traceback (most recent call last):
+  File "C:\Users\USER\Desktop\test_stock\market_analyzer.py", line 442, in get_market_regime_analysis
+    market_trend = self._get_market_trend(kospi_index)
+  File "C:\Users\USER\Desktop\test_stock\market_analyzer.py", line 477, in _get_market_trend
+  File "C:\Users\USER\Desktop\test_stock\venv\Lib\site-packages\pandas\core\generic.py", line 1577, in __nonzero__
+    raise ValueError(
+    ...<2 lines>...
+    )
+ValueError: The truth value of a Series is ambiguous. Use a.empty, a.bool(), a.item(), a.any() or a.all().
+2025-06-13 10:50:25,856 - INFO - 🧭 현재 시장 체제: NEUTRAL
+2025-06-13 10:50:25,857 - INFO - 포트폴리오를 동기화합니다.
+2025-06-13 10:50:25,937 - INFO - 포트폴리오 동기화 완료 - 총 자산: 0원, 현금: 0원
+2025-06-13 10:50:25,938 - INFO - 보유 종목 수: 0개
+2025-06-13 10:50:25,938 - INFO - 🔍 후보 종목 선정을 시작합니다...
+2025-06-13 10:50:26,823 - INFO - 📱 텔레그램 알림 전송 완료
+2025-06-13 10:50:26,824 - INFO - 📊 우량주 후보군에서 5개 추가: ['005930', '000660', '035420', '005490', '051910']
+2025-06-13 10:50:29,740 - INFO - 📱 텔레그램 알림 전송 완료
+2025-06-13 10:50:29,742 - INFO - ✅ 최종 후보 종목 5개 선정: ['005930', '000660', '035420', '005490', '051910']
+2025-06-13 10:50:29,742 - INFO - --- 사이클 종료, 5분 대기 ---
+2025-06-13 10:52:58,243 - INFO - === 환경 변수 로드 상태 확인 ===
+2025-06-13 10:52:58,244 - INFO - 선택된 환경: MOCK(모의투자)
+2025-06-13 10:52:58,244 - INFO - IS_MOCK 설정: True
+2025-06-13 10:52:58,244 - INFO - APP_KEY 존재: 예
+2025-06-13 10:52:58,244 - INFO - APP_SECRET 존재: 예
+2025-06-13 10:52:58,244 - INFO - ACCOUNT_NUMBER 존재: 예
+2025-06-13 10:52:58,244 - INFO - APP_KEY 앞 4자리: PSJH****
+2025-06-13 10:52:58,245 - INFO - APP_SECRET 앞 4자리: W5ts****
+2025-06-13 10:52:58,245 - INFO - ACCOUNT_NUMBER: 50128558-01
+2025-06-13 10:52:58,245 - INFO - MOCK(모의투자) 환경 설정 값 로드 완료. AI 통합 시스템을 시작합니다.
+2025-06-13 10:52:58,245 - INFO - AI 통합 시스템을 초기화합니다.
+2025-06-13 10:52:58,245 - INFO - MOCK(모의투자) 환경으로 API를 초기화합니다.
+2025-06-13 10:52:58,246 - INFO - RateLimiter가 1.0초당 2회 호출로 설정되었습니다.
+2025-06-13 10:52:58,246 - INFO - 📱 텔레그램 알림 기능이 활성화되었습니다.
+2025-06-13 10:52:58,247 - INFO - 저장된 토큰을 로드했습니다. (남은 시간: 22:45:03.760642)
+2025-06-13 10:52:58,248 - INFO - 📅 자동 토큰 발급 스케줄러가 시작되었습니다.
+2025-06-13 10:52:58,248 - INFO - ⏰ 매일 06:00에 새로운 토큰을 발급합니다.
+2025-06-13 10:52:58,248 - INFO - 📅 자동 토큰 발급 스케줄러가 시작되었습니다.
+2025-06-13 10:52:58,249 - INFO - ⏰ 매일 06:00에 새로운 토큰을 발급합니다.
+2025-06-13 10:52:58,249 - INFO - === 토큰 상태 확인 ===
+2025-06-13 10:52:58,250 - INFO - 상태: 유효
+2025-06-13 10:52:58,250 - INFO - 메시지: 토큰이 유효합니다. (남은 시간: 22:45:03.758341)
+2025-06-13 10:52:58,251 - INFO - 권장 조치: 정상 사용 가능
+2025-06-13 10:52:58,251 - INFO - 🤖 제미나이 모델 'gemini-1.5-flash'이 초기화되었습니다.
+2025-06-13 10:52:58,252 - INFO - 📋 모델 정보:
+2025-06-13 10:52:58,252 - INFO -    이름: gemini-1.5-flash
+2025-06-13 10:52:58,253 - INFO -    특징: 빠른 응답 속도와 효율적인 분석
+2025-06-13 10:52:58,253 - INFO -    최적 용도: 실시간 매매 신호, 빠른 시장 분석
+2025-06-13 10:52:58,254 - INFO -    속도: 매우 빠름
+2025-06-13 10:52:58,254 - INFO -    비용: 저렴
+2025-06-13 10:52:58,255 - INFO - 🎛️ 생성 설정:
+2025-06-13 10:52:58,256 - INFO -    Temperature: 0.3
+2025-06-13 10:52:58,256 - INFO -    Max Tokens: 1000
+2025-06-13 10:52:58,256 - INFO -    Top P: 0.8
+2025-06-13 10:52:58,257 - INFO -    Top K: 40
+2025-06-13 10:52:58,259 - WARNING - FRED_API_KEY가 설정되지 않아 거시 경제 지표 분석이 제한됩니다.
+2025-06-13 10:52:58,287 - INFO - ONeil CAN SLIM 스캐너가 초기화되었습니다.
+2025-06-13 10:52:58,315 - INFO - ✅ ONeilScanner 초기화 완료
+2025-06-13 10:52:58,316 - INFO - ✅ MinerviniScreener 초기화 완료
+2025-06-13 10:52:58,318 - INFO - 🎯 척후병 매수 전략이 활성화되었습니다.
+2025-06-13 10:52:59,211 - INFO - 📱 텔레그램 알림 전송 완료
+2025-06-13 10:52:59,212 - INFO - 📅 다음 자동 토큰 발급 예정: 2025-06-14 06:00:00
+2025-06-13 10:53:00,092 - INFO - 📱 텔레그램 알림 전송 완료
+2025-06-13 10:53:00,093 - INFO - 시스템 초기화가 완료되었습니다.
+2025-06-13 10:53:00,093 - INFO - === 아르키메데스 프로젝트 AI 자동매매 시스템 가동 ===
+2025-06-13 10:53:00,093 - INFO - 제미나이 AI 분석 기능 통합 완료
+2025-06-13 10:53:00,093 - INFO - 📅 자동 토큰 발급: 매일 06:00 (다음: 2025-06-14 06:00:00)
+2025-06-13 10:53:00,094 - INFO - 🔑 토큰 상태: 유효 - 토큰이 유효합니다. (남은 시간: 22:45:01.913995)
+2025-06-13 10:53:00,094 - INFO - --- AI 리밸런싱 사이클 시작 (주기: 5분) ---
+2025-06-13 10:53:00,094 - INFO - 🔄 AI 기반 포트폴리오 리밸런싱 시작
+2025-06-13 10:53:00,095 - INFO - 🧭 시장 체제 분석(Market Regime Analysis) 시작...
+2025-06-13 10:53:01,151 - ERROR - 시장 체제 분석 중 오류: 'MarketAnalyzer' object has no attribute 'logger'
+Traceback (most recent call last):
+  File "c:\Users\USER\Desktop\test_stock\market_analyzer.py", line 485, in _get_market_trend
+    if pd.isna(ma200) or pd.isna(ma50) or pd.isna(ma20):
+       ~~~~~~~^^^^^^^
+  File "C:\Users\USER\Desktop\test_stock\venv\Lib\site-packages\pandas\core\generic.py", line 1577, in __nonzero__
+    raise ValueError(
+    ...<2 lines>...
+    )
+ValueError: The truth value of a Series is ambiguous. Use a.empty, a.bool(), a.item(), a.any() or a.all().
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\USER\Desktop\test_stock\market_analyzer.py", line 442, in get_market_regime_analysis
+    market_trend = self._get_market_trend(kospi_index)
+  File "c:\Users\USER\Desktop\test_stock\market_analyzer.py", line 501, in _get_market_trend
+    self.logger.error(f"시장 트렌드 분석 중 오류: {e}")
+    ^^^^^^^^^^^
+AttributeError: 'MarketAnalyzer' object has no attribute 'logger'
+2025-06-13 10:53:01,164 - INFO - 🧭 현재 시장 체제: NEUTRAL
+2025-06-13 10:53:01,164 - INFO - 포트폴리오를 동기화합니다.
+2025-06-13 10:53:01,164 - INFO - 🌐 API 요청: GET https://openapivts.koreainvestment.com:29443/uapi/domestic-stock/v1/trading/inquire-balance
+2025-06-13 10:53:01,245 - INFO - 📥 응답 상태: 200
+2025-06-13 10:53:01,246 - INFO - 📥 응답 데이터: {"ctx_area_fk100":"                                                                                                    ","ctx_area_nk100":"                                                                                                    ","output1":[{"pdno":"005930","prdt_name":"삼성전자","trad_dvsn_name":"현금","bfdy_buy_qty":"0","bfdy_sll_qty":"0","thdt_buyqty":"1","thdt_sll_qty":"0","hldg_qty":"1","ord_psbl_qty":"1","pchs_avg_pric":"58500.0000","pchs_amt":"58500","prpr":"58500","evlu_amt":"58500","evlu_pfls_amt":"0","evlu_pfls_rt":"0.00","evlu_erng_rt":"0.00000000","loan_dt":"","loan_amt":"0","stln_slng_chgs":"0","expd_dt":"","fltt_rt":"-1.68000000","bfdy_cprs_icdc":"1000","item_mgna_rt_name":"20%","grta_rt_name":"","sbst_pric":"0","stck_loan_unpr":"0.0000"}],"output2":[{"dnca_tot_amt":"500000000","nxdy_excc_amt":"500000000","prvs_rcdl_excc_amt":"499941500","cma_evlu_amt":"0","bfdy_buy_amt":"0","thdt_buy_amt":"58500","nxdy_auto_rdpt_amt":"0","bfdy_sll_amt":"0","thdt_sll_amt":"0","d2_auto_rdpt_amt":"0","bfdy_tlex_amt":"0","thdt_tlex_amt":"0","tot_loan_amt":"0","scts_evlu_amt":"58500","tot_evlu_amt":"500000000","nass_amt":"500000000","fncg_gld_auto_rdpt_yn":"","pchs_amt_smtl_amt":"58500","evlu_amt_smtl_amt":"58500","evlu_pfls_smtl_amt":"0","tot_stln_slng_chgs":"0","bfdy_tot_asst_evlu_amt":"500000000","asst_icdc_amt":"0","asst_icdc_erng_rt":"0.00000000"}],"rt_cd":"0","msg_cd":"20310000","msg1":"모의투자 조회가 완료되었습니다.                                                 "}
+2025-06-13 10:53:01,248 - INFO - 포트폴리오 동기화 완료 - 총 자산: 0원, 현금: 0원
+2025-06-13 10:53:01,248 - INFO - 보유 종목 수: 0개
+2025-06-13 10:53:01,248 - INFO - 💰 현재 상태 - 총자산: 0원, 현금: 0원, 보유종목: 0개
+2025-06-13 10:53:01,248 - INFO - 🎖️ 척후병 전략 실행
+2025-06-13 10:53:01,249 - INFO - 🔍 척후병 전략을 시작합니다...
+2025-06-13 10:53:01,249 - INFO - 포트폴리오를 동기화합니다.
+2025-06-13 10:53:01,249 - INFO - 🌐 API 요청: GET https://openapivts.koreainvestment.com:29443/uapi/domestic-stock/v1/trading/inquire-balance
+2025-06-13 10:53:01,342 - INFO - 📥 응답 상태: 200
+2025-06-13 10:53:01,343 - INFO - 📥 응답 데이터: {"ctx_area_fk100":"                                                                                                    ","ctx_area_nk100":"                                                                                                    ","output1":[{"pdno":"005930","prdt_name":"삼성전자","trad_dvsn_name":"현금","bfdy_buy_qty":"0","bfdy_sll_qty":"0","thdt_buyqty":"1","thdt_sll_qty":"0","hldg_qty":"1","ord_psbl_qty":"1","pchs_avg_pric":"58500.0000","pchs_amt":"58500","prpr":"58500","evlu_amt":"58500","evlu_pfls_amt":"0","evlu_pfls_rt":"0.00","evlu_erng_rt":"0.00000000","loan_dt":"","loan_amt":"0","stln_slng_chgs":"0","expd_dt":"","fltt_rt":"-1.68000000","bfdy_cprs_icdc":"1000","item_mgna_rt_name":"20%","grta_rt_name":"","sbst_pric":"0","stck_loan_unpr":"0.0000"}],"output2":[{"dnca_tot_amt":"500000000","nxdy_excc_amt":"500000000","prvs_rcdl_excc_amt":"499941500","cma_evlu_amt":"0","bfdy_buy_amt":"0","thdt_buy_amt":"58500","nxdy_auto_rdpt_amt":"0","bfdy_sll_amt":"0","thdt_sll_amt":"0","d2_auto_rdpt_amt":"0","bfdy_tlex_amt":"0","thdt_tlex_amt":"0","tot_loan_amt":"0","scts_evlu_amt":"58500","tot_evlu_amt":"500000000","nass_amt":"500000000","fncg_gld_auto_rdpt_yn":"","pchs_amt_smtl_amt":"58500","evlu_amt_smtl_amt":"58500","evlu_pfls_smtl_amt":"0","tot_stln_slng_chgs":"0","bfdy_tot_asst_evlu_amt":"500000000","asst_icdc_amt":"0","asst_icdc_erng_rt":"0.00000000"}],"rt_cd":"0","msg_cd":"20310000","msg1":"모의투자 조회가 완료되었습니다.                                                 "}
+2025-06-13 10:53:01,345 - INFO - 포트폴리오 동기화 완료 - 총 자산: 0원, 현금: 0원
+2025-06-13 10:53:01,345 - INFO - 보유 종목 수: 0개
+2025-06-13 10:53:01,345 - INFO - 💰 현재 현금잔고: 0원
+2025-06-13 10:53:01,345 - INFO - 🔍 후보 종목 선정을 시작합니다...
+2025-06-13 10:53:02,214 - INFO - 📱 텔레그램 알림 전송 완료
+2025-06-13 10:53:02,214 - INFO - 📊 우량주 후보군에서 5개 추가: ['005930', '000660', '035420', '005490', '051910']
+2025-06-13 10:53:02,214 - INFO - 📝 기본 종목명: 005930 -> 삼성전자
+2025-06-13 10:53:02,215 - INFO - 🌐 API 요청: GET https://openapivts.koreainvestment.com:29443/uapi/domestic-stock/v1/quotations/inquire-price
+2025-06-13 10:53:02,254 - INFO - 📥 응답 상태: 200
+2025-06-13 10:53:02,255 - INFO - 📥 응답 데이터: {"output":{"iscd_stat_cls_code":"55","marg_rate":"20.00","rprs_mrkt_kor_name":"KOSPI200","bstp_kor_isnm":"전기·전자","temp_stop_yn":"N","oprc_rang_cont_yn":"N","clpr_rang_cont_yn":"N","crdt_able_yn":"Y","grmn_rate_cls_code":"40","elw_pblc_yn":"Y","stck_prpr":"58500","prdy_vrss":"-1000","prdy_vrss_sign":"5","prdy_ctrt":"-1.68","acml_tr_pbmn":"554337874850","acml_vol":"9404473","prdy_vrss_vol_rate":"52.97","stck_oprc":"60200","stck_hgpr":"60200","stck_lwpr":"58200","stck_mxpr":"77300","stck_llam":"41700","stck_sdpr":"59500","wghn_avrg_stck_prc":"58944.07","hts_frgn_ehrt":"49.82","frgn_ntby_qty":"0","pgtr_ntby_qty":"-497377","pvt_scnd_dmrs_prc":"60300","pvt_frst_dmrs_prc":"59900","pvt_pont_val":"59600","pvt_frst_dmsp_prc":"59200","pvt_scnd_dmsp_prc":"58900","dmrs_val":"59750","dmsp_val":"59050","cpfn":"7780","rstc_wdth_prc":"17800","stck_fcam":"100","stck_sspr":"44030","aspr_unit":"100","hts_deal_qty_unit_val":"1","lstn_stcn":"5919637922","hts_avls":"3462988","per":"11.82","pbr":"1.01","stac_month":"12","vol_tnrt":"0.16","eps":"4950.00","bps":"57930.00","d250_hgpr":"88800","d250_hgpr_date":"20240711","d250_hgpr_vrss_prpr_rate":"-34.12","d250_lwpr":"49900","d250_lwpr_date":"20241114","d250_lwpr_vrss_prpr_rate":"17.23","stck_dryy_hgpr":"62000","dryy_hgpr_vrss_prpr_rate":"-5.65","dryy_hgpr_date":"20250327","stck_dryy_lwpr":"50800","dryy_lwpr_vrss_prpr_rate":"15.16","dryy_lwpr_date":"20250203","w52_hgpr":"88800","w52_hgpr_vrss_prpr_ctrt":"-34.12","w52_hgpr_date":"20240711","w52_lwpr":"49900","w52_lwpr_vrss_prpr_ctrt":"17.23","w52_lwpr_date":"20241114","whol_loan_rmnd_rate":"0.21","ssts_yn":"Y","stck_shrn_iscd":"005930","fcam_cnnm":"100","cpfn_cnnm":"7,780 억","frgn_hldn_qty":"2949355692","vi_cls_code":"N","ovtm_vi_cls_code":"N","last_ssts_cntg_qty":"481450","invt_caful_yn":"N","mrkt_warn_cls_code":"00","short_over_yn":"N","sltr_yn":"N","mang_issu_cls_code":"N"},"rt_cd":"0","msg_cd":"MCA00000","msg1":"정상처리 되었습니다."}
+2025-06-13 10:53:02,258 - INFO - ✅ 삼성전자(005930): 58,500원 (-1.68%)
+2025-06-13 10:53:02,258 - INFO - 📝 기본 종목명: 000660 -> SK하이닉스
+2025-06-13 10:53:02,258 - INFO - 🌐 API 요청: GET https://openapivts.koreainvestment.com:29443/uapi/domestic-stock/v1/quotations/inquire-price
+2025-06-13 10:53:02,306 - INFO - 📥 응답 상태: 200
+2025-06-13 10:53:02,306 - INFO - 📥 응답 데이터: {"output":{"iscd_stat_cls_code":"55","marg_rate":"20.00","rprs_mrkt_kor_name":"KOSPI200","bstp_kor_isnm":"전기·전자","temp_stop_yn":"N","oprc_rang_cont_yn":"N","clpr_rang_cont_yn":"N","crdt_able_yn":"Y","grmn_rate_cls_code":"40","elw_pblc_yn":"Y","stck_prpr":"238000","prdy_vrss":"2500","prdy_vrss_sign":"2","prdy_ctrt":"1.06","acml_tr_pbmn":"458015457500","acml_vol":"1922081","prdy_vrss_vol_rate":"38.49","stck_oprc":"240500","stck_hgpr":"243000","stck_lwpr":"233750","stck_mxpr":"306000","stck_llam":"165000","stck_sdpr":"235500","wghn_avrg_stck_prc":"238291.45","hts_frgn_ehrt":"55.19","frgn_ntby_qty":"0","pgtr_ntby_qty":"-62763","pvt_scnd_dmrs_prc":"250500","pvt_frst_dmrs_prc":"243000","pvt_pont_val":"239000","pvt_frst_dmsp_prc":"231500","pvt_scnd_dmsp_prc":"227500","dmrs_val":"241000","dmsp_val":"229500","cpfn":"36577","rstc_wdth_prc":"70500","stck_fcam":"5000","stck_sspr":"169560","aspr_unit":"500","hts_deal_qty_unit_val":"1","lstn_stcn":"728002365","hts_avls":"1732646","per":"8.76","pbr":"2.28","stac_month":"12","vol_tnrt":"0.26","eps":"27182.00","bps":"104567.00","d250_hgpr":"248500","d250_hgpr_date":"20240711","d250_hgpr_vrss_prpr_rate":"-4.23","d250_lwpr":"144700","d250_lwpr_date":"20240919","d250_lwpr_vrss_prpr_rate":"64.48","stck_dryy_hgpr":"246500","dryy_hgpr_vrss_prpr_rate":"-3.45","dryy_hgpr_date":"20250612","stck_dryy_lwpr":"162700","dryy_lwpr_vrss_prpr_rate":"46.28","dryy_lwpr_date":"20250409","w52_hgpr":"248500","w52_hgpr_vrss_prpr_ctrt":"-4.23","w52_hgpr_date":"20240711","w52_lwpr":"144700","w52_lwpr_vrss_prpr_ctrt":"64.48","w52_lwpr_date":"20240919","whol_loan_rmnd_rate":"0.17","ssts_yn":"Y","stck_shrn_iscd":"000660","fcam_cnnm":"5,000","cpfn_cnnm":"36,576 억","frgn_hldn_qty":"401768306","vi_cls_code":"N","ovtm_vi_cls_code":"N","last_ssts_cntg_qty":"252506","invt_caful_yn":"N","mrkt_warn_cls_code":"00","short_over_yn":"N","sltr_yn":"N","mang_issu_cls_code":"N"},"rt_cd":"0","msg_cd":"MCA00000","msg1":"정상처리 되었습니다."}
+2025-06-13 10:53:02,309 - INFO - ✅ SK하이닉스(000660): 238,000원 (+1.06%)
+2025-06-13 10:53:02,309 - INFO - 📝 기본 종목명: 035420 -> NAVER
+2025-06-13 10:53:03,215 - INFO - 🌐 API 요청: GET https://openapivts.koreainvestment.com:29443/uapi/domestic-stock/v1/quotations/inquire-price
+2025-06-13 10:53:03,248 - INFO - 📥 응답 상태: 200
+2025-06-13 10:53:03,249 - INFO - 📥 응답 데이터: {"output":{"iscd_stat_cls_code":"55","marg_rate":"20.00","rprs_mrkt_kor_name":"KOSPI200","bstp_kor_isnm":"IT 서비스","temp_stop_yn":"N","oprc_rang_cont_yn":"N","clpr_rang_cont_yn":"N","crdt_able_yn":"Y","grmn_rate_cls_code":"40","elw_pblc_yn":"Y","stck_prpr":"200500","prdy_vrss":"1600","prdy_vrss_sign":"2","prdy_ctrt":"0.80","acml_tr_pbmn":"101153978400","acml_vol":"502447","prdy_vrss_vol_rate":"80.43","stck_oprc":"203500","stck_hgpr":"206000","stck_lwpr":"197900","stck_mxpr":"258500","stck_llam":"139300","stck_sdpr":"198900","wghn_avrg_stck_prc":"201322.69","hts_frgn_ehrt":"48.56","frgn_ntby_qty":"0","pgtr_ntby_qty":"-76409","pvt_scnd_dmrs_prc":"202366","pvt_frst_dmrs_prc":"200632","pvt_pont_val":"199766","pvt_frst_dmsp_prc":"198032","pvt_scnd_dmsp_prc":"197166","dmrs_val":"200200","dmsp_val":"197600","cpfn":"165","rstc_wdth_prc":"59600","stck_fcam":"100","stck_sspr":"151160","aspr_unit":"500","hts_deal_qty_unit_val":"1","lstn_stcn":"158437008","hts_avls":"317666","per":"16.83","pbr":"1.21","stac_month":"12","vol_tnrt":"0.32","eps":"11913.00","bps":"166221.00","d250_hgpr":"235500","d250_hgpr_date":"20250207","d250_hgpr_vrss_prpr_rate":"-14.86","d250_lwpr":"151100","d250_lwpr_date":"20240805","d250_lwpr_vrss_prpr_rate":"32.69","stck_dryy_hgpr":"235500","dryy_hgpr_vrss_prpr_rate":"-14.86","dryy_hgpr_date":"20250207","stck_dryy_lwpr":"176200","dryy_lwpr_vrss_prpr_rate":"13.79","dryy_lwpr_date":"20250409","w52_hgpr":"235500","w52_hgpr_vrss_prpr_ctrt":"-14.86","w52_hgpr_date":"20250207","w52_lwpr":"151100","w52_lwpr_vrss_prpr_ctrt":"32.69","w52_lwpr_date":"20240805","whol_loan_rmnd_rate":"0.55","ssts_yn":"Y","stck_shrn_iscd":"035420","fcam_cnnm":"100","cpfn_cnnm":"164 억","frgn_hldn_qty":"76944450","vi_cls_code":"N","ovtm_vi_cls_code":"N","last_ssts_cntg_qty":"13964","invt_caful_yn":"N","mrkt_warn_cls_code":"00","short_over_yn":"N","sltr_yn":"N","mang_issu_cls_code":"N"},"rt_cd":"0","msg_cd":"MCA00000","msg1":"정상처리 되었습니다."}
+2025-06-13 10:53:03,252 - INFO - ✅ NAVER(035420): 200,500원 (+0.80%)
+2025-06-13 10:53:03,253 - INFO - 📝 기본 종목명: 005490 -> POSCO홀딩스
+2025-06-13 10:53:03,259 - INFO - 🌐 API 요청: GET https://openapivts.koreainvestment.com:29443/uapi/domestic-stock/v1/quotations/inquire-price
+2025-06-13 10:53:03,368 - INFO - 📥 응답 상태: 200
+2025-06-13 10:53:03,369 - INFO - 📥 응답 데이터: {"output":{"iscd_stat_cls_code":"55","marg_rate":"20.00","rprs_mrkt_kor_name":"KOSPI200","bstp_kor_isnm":"금속","temp_stop_yn":"N","oprc_rang_cont_yn":"N","clpr_rang_cont_yn":"N","crdt_able_yn":"Y","grmn_rate_cls_code":"40","elw_pblc_yn":"Y","stck_prpr":"261000","prdy_vrss":"-4500","prdy_vrss_sign":"5","prdy_ctrt":"-1.69","acml_tr_pbmn":"33008915750","acml_vol":"125917","prdy_vrss_vol_rate":"29.66","stck_oprc":"265000","stck_hgpr":"265500","stck_lwpr":"260000","stck_mxpr":"345000","stck_llam":"186000","stck_sdpr":"265500","wghn_avrg_stck_prc":"262148.21","hts_frgn_ehrt":"29.22","frgn_ntby_qty":"0","pgtr_ntby_qty":"13344","pvt_scnd_dmrs_prc":"271500","pvt_frst_dmrs_prc":"268500","pvt_pont_val":"265500","pvt_frst_dmsp_prc":"262500","pvt_scnd_dmsp_prc":"259500","dmrs_val":"270000","dmsp_val":"264000","cpfn":"4824","rstc_wdth_prc":"79500","stck_fcam":"5000","stck_sspr":"201780","aspr_unit":"500","hts_deal_qty_unit_val":"1","lstn_stcn":"80932952","hts_avls":"211235","per":"19.96","pbr":"0.38","stac_month":"12","vol_tnrt":"0.16","eps":"13073.00","bps":"689205.00","d250_hgpr":"397000","d250_hgpr_date":"20240715","d250_hgpr_vrss_prpr_rate":"-34.26","d250_lwpr":"227500","d250_lwpr_date":"20250210","d250_lwpr_vrss_prpr_rate":"14.73","stck_dryy_hgpr":"337000","dryy_hgpr_vrss_prpr_rate":"-22.55","dryy_hgpr_date":"20250320","stck_dryy_lwpr":"227500","dryy_lwpr_vrss_prpr_rate":"14.73","dryy_lwpr_date":"20250210","w52_hgpr":"397000","w52_hgpr_vrss_prpr_ctrt":"-34.26","w52_hgpr_date":"20240715","w52_lwpr":"227500","w52_lwpr_vrss_prpr_ctrt":"14.73","w52_lwpr_date":"20250210","whol_loan_rmnd_rate":"0.74","ssts_yn":"Y","stck_shrn_iscd":"005490","fcam_cnnm":"5,000","cpfn_cnnm":"4,824 억","frgn_hldn_qty":"23652230","vi_cls_code":"N","ovtm_vi_cls_code":"N","last_ssts_cntg_qty":"36238","invt_caful_yn":"N","mrkt_warn_cls_code":"00","short_over_yn":"N","sltr_yn":"N","mang_issu_cls_code":"N"},"rt_cd":"0","msg_cd":"MCA00000","msg1":"정상처리 되었습니다."}
+2025-06-13 10:53:03,371 - INFO - ✅ POSCO홀딩스(005490): 261,000원 (-1.69%)
+2025-06-13 10:53:03,372 - INFO - 📝 기본 종목명: 051910 -> LG화학
+2025-06-13 10:53:04,217 - INFO - 🌐 API 요청: GET https://openapivts.koreainvestment.com:29443/uapi/domestic-stock/v1/quotations/inquire-price
+2025-06-13 10:53:04,250 - INFO - 📥 응답 상태: 200
+2025-06-13 10:53:04,252 - INFO - 📥 응답 데이터: {"output":{"iscd_stat_cls_code":"55","marg_rate":"20.00","rprs_mrkt_kor_name":"KOSPI200","bstp_kor_isnm":"화학","temp_stop_yn":"N","oprc_rang_cont_yn":"N","clpr_rang_cont_yn":"N","crdt_able_yn":"Y","grmn_rate_cls_code":"40","elw_pblc_yn":"Y","stck_prpr":"209000","prdy_vrss":"-1500","prdy_vrss_sign":"5","prdy_ctrt":"-0.71","acml_tr_pbmn":"31134163500","acml_vol":"147962","prdy_vrss_vol_rate":"33.13","stck_oprc":"211000","stck_hgpr":"213500","stck_lwpr":"207000","stck_mxpr":"273500","stck_llam":"147500","stck_sdpr":"210500","wghn_avrg_stck_prc":"210420.00","hts_frgn_ehrt":"30.24","frgn_ntby_qty":"0","pgtr_ntby_qty":"33208","pvt_scnd_dmrs_prc":"216500","pvt_frst_dmrs_prc":"213500","pvt_pont_val":"210000","pvt_frst_dmsp_prc":"207000","pvt_scnd_dmsp_prc":"203500","dmrs_val":"215000","dmsp_val":"208500","cpfn":"3530","rstc_wdth_prc":"63000","stck_fcam":"5000","stck_sspr":"155770","aspr_unit":"500","hts_deal_qty_unit_val":"1","lstn_stcn":"70592343","hts_avls":"147538","per":"-23.68","pbr":"0.49","stac_month":"12","vol_tnrt":"0.21","eps":"-8825.00","bps":"425191.00","d250_hgpr":"388000","d250_hgpr_date":"20240607","d250_hgpr_vrss_prpr_rate":"-46.13","d250_lwpr":"181500","d250_lwpr_date":"20250526","d250_lwpr_vrss_prpr_rate":"15.15","stck_dryy_hgpr":"276000","dryy_hgpr_vrss_prpr_rate":"-24.28","dryy_hgpr_date":"20250327","stck_dryy_lwpr":"181500","dryy_lwpr_vrss_prpr_rate":"15.15","dryy_lwpr_date":"20250526","w52_hgpr":"377500","w52_hgpr_vrss_prpr_ctrt":"-44.64","w52_hgpr_date":"20240613","w52_lwpr":"181500","w52_lwpr_vrss_prpr_ctrt":"15.15","w52_lwpr_date":"20250526","whol_loan_rmnd_rate":"0.66","ssts_yn":"Y","stck_shrn_iscd":"051910","fcam_cnnm":"5,000","cpfn_cnnm":"3,529 억","frgn_hldn_qty":"21347190","vi_cls_code":"N","ovtm_vi_cls_code":"N","last_ssts_cntg_qty":"21480","invt_caful_yn":"N","mrkt_warn_cls_code":"00","short_over_yn":"N","sltr_yn":"N","mang_issu_cls_code":"N"},"rt_cd":"0","msg_cd":"MCA00000","msg1":"정상처리 되었습니다."}
+2025-06-13 10:53:04,257 - INFO - ✅ LG화학(051910): 209,000원 (-0.71%)
+2025-06-13 10:53:05,128 - INFO - 📱 텔레그램 알림 전송 완료
+2025-06-13 10:53:05,129 - INFO - ✅ 최종 후보 종목 5개 선정: ['005930', '000660', '035420', '005490', '051910']
+2025-06-13 10:53:05,129 - INFO - 🌐 API 요청: GET https://openapivts.koreainvestment.com:29443/uapi/domestic-stock/v1/quotations/inquire-price
+2025-06-13 10:53:05,163 - INFO - 📥 응답 상태: 200
+2025-06-13 10:53:05,164 - INFO - 📥 응답 데이터: {"output":{"iscd_stat_cls_code":"55","marg_rate":"20.00","rprs_mrkt_kor_name":"KOSPI200","bstp_kor_isnm":"전기·전자","temp_stop_yn":"N","oprc_rang_cont_yn":"N","clpr_rang_cont_yn":"N","crdt_able_yn":"Y","grmn_rate_cls_code":"40","elw_pblc_yn":"Y","stck_prpr":"58500","prdy_vrss":"-1000","prdy_vrss_sign":"5","prdy_ctrt":"-1.68","acml_tr_pbmn":"554501302400","acml_vol":"9407268","prdy_vrss_vol_rate":"52.98","stck_oprc":"60200","stck_hgpr":"60200","stck_lwpr":"58200","stck_mxpr":"77300","stck_llam":"41700","stck_sdpr":"59500","wghn_avrg_stck_prc":"58943.93","hts_frgn_ehrt":"49.82","frgn_ntby_qty":"0","pgtr_ntby_qty":"-497377","pvt_scnd_dmrs_prc":"60300","pvt_frst_dmrs_prc":"59900","pvt_pont_val":"59600","pvt_frst_dmsp_prc":"59200","pvt_scnd_dmsp_prc":"58900","dmrs_val":"59750","dmsp_val":"59050","cpfn":"7780","rstc_wdth_prc":"17800","stck_fcam":"100","stck_sspr":"44030","aspr_unit":"100","hts_deal_qty_unit_val":"1","lstn_stcn":"5919637922","hts_avls":"3462988","per":"11.82","pbr":"1.01","stac_month":"12","vol_tnrt":"0.16","eps":"4950.00","bps":"57930.00","d250_hgpr":"88800","d250_hgpr_date":"20240711","d250_hgpr_vrss_prpr_rate":"-34.12","d250_lwpr":"49900","d250_lwpr_date":"20241114","d250_lwpr_vrss_prpr_rate":"17.23","stck_dryy_hgpr":"62000","dryy_hgpr_vrss_prpr_rate":"-5.65","dryy_hgpr_date":"20250327","stck_dryy_lwpr":"50800","dryy_lwpr_vrss_prpr_rate":"15.16","dryy_lwpr_date":"20250203","w52_hgpr":"88800","w52_hgpr_vrss_prpr_ctrt":"-34.12","w52_hgpr_date":"20240711","w52_lwpr":"49900","w52_lwpr_vrss_prpr_ctrt":"17.23","w52_lwpr_date":"20241114","whol_loan_rmnd_rate":"0.21","ssts_yn":"Y","stck_shrn_iscd":"005930","fcam_cnnm":"100","cpfn_cnnm":"7,780 억","frgn_hldn_qty":"2949355692","vi_cls_code":"N","ovtm_vi_cls_code":"N","last_ssts_cntg_qty":"481450","invt_caful_yn":"N","mrkt_warn_cls_code":"00","short_over_yn":"N","sltr_yn":"N","mang_issu_cls_code":"N"},"rt_cd":"0","msg_cd":"MCA00000","msg1":"정상처리 되었습니다."}
+2025-06-13 10:53:05,167 - INFO - 📝 후보 정보: 삼성전자(005930)
+2025-06-13 10:53:05,217 - INFO - 🌐 API 요청: GET https://openapivts.koreainvestment.com:29443/uapi/domestic-stock/v1/quotations/inquire-price
+2025-06-13 10:53:05,270 - INFO - 📥 응답 상태: 200
+2025-06-13 10:53:05,271 - INFO - 📥 응답 데이터: {"output":{"iscd_stat_cls_code":"55","marg_rate":"20.00","rprs_mrkt_kor_name":"KOSPI200","bstp_kor_isnm":"전기·전자","temp_stop_yn":"N","oprc_rang_cont_yn":"N","clpr_rang_cont_yn":"N","crdt_able_yn":"Y","grmn_rate_cls_code":"40","elw_pblc_yn":"Y","stck_prpr":"238000","prdy_vrss":"2500","prdy_vrss_sign":"2","prdy_ctrt":"1.06","acml_tr_pbmn":"458092331500","acml_vol":"1922404","prdy_vrss_vol_rate":"38.49","stck_oprc":"240500","stck_hgpr":"243000","stck_lwpr":"233750","stck_mxpr":"306000","stck_llam":"165000","stck_sdpr":"235500","wghn_avrg_stck_prc":"238291.40","hts_frgn_ehrt":"55.19","frgn_ntby_qty":"0","pgtr_ntby_qty":"-62763","pvt_scnd_dmrs_prc":"250500","pvt_frst_dmrs_prc":"243000","pvt_pont_val":"239000","pvt_frst_dmsp_prc":"231500","pvt_scnd_dmsp_prc":"227500","dmrs_val":"241000","dmsp_val":"229500","cpfn":"36577","rstc_wdth_prc":"70500","stck_fcam":"5000","stck_sspr":"169560","aspr_unit":"500","hts_deal_qty_unit_val":"1","lstn_stcn":"728002365","hts_avls":"1732646","per":"8.76","pbr":"2.28","stac_month":"12","vol_tnrt":"0.26","eps":"27182.00","bps":"104567.00","d250_hgpr":"248500","d250_hgpr_date":"20240711","d250_hgpr_vrss_prpr_rate":"-4.23","d250_lwpr":"144700","d250_lwpr_date":"20240919","d250_lwpr_vrss_prpr_rate":"64.48","stck_dryy_hgpr":"246500","dryy_hgpr_vrss_prpr_rate":"-3.45","dryy_hgpr_date":"20250612","stck_dryy_lwpr":"162700","dryy_lwpr_vrss_prpr_rate":"46.28","dryy_lwpr_date":"20250409","w52_hgpr":"248500","w52_hgpr_vrss_prpr_ctrt":"-4.23","w52_hgpr_date":"20240711","w52_lwpr":"144700","w52_lwpr_vrss_prpr_ctrt":"64.48","w52_lwpr_date":"20240919","whol_loan_rmnd_rate":"0.17","ssts_yn":"Y","stck_shrn_iscd":"000660","fcam_cnnm":"5,000","cpfn_cnnm":"36,576 억","frgn_hldn_qty":"401768306","vi_cls_code":"N","ovtm_vi_cls_code":"N","last_ssts_cntg_qty":"252506","invt_caful_yn":"N","mrkt_warn_cls_code":"00","short_over_yn":"N","sltr_yn":"N","mang_issu_cls_code":"N"},"rt_cd":"0","msg_cd":"MCA00000","msg1":"정상처리 되었습니다."}
+2025-06-13 10:53:05,273 - INFO - 📝 후보 정보: SK하이닉스(000660)
+2025-06-13 10:53:06,129 - INFO - 🌐 API 요청: GET https://openapivts.koreainvestment.com:29443/uapi/domestic-stock/v1/quotations/inquire-price
+2025-06-13 10:53:06,160 - INFO - 📥 응답 상태: 200
+2025-06-13 10:53:06,160 - INFO - 📥 응답 데이터: {"output":{"iscd_stat_cls_code":"55","marg_rate":"20.00","rprs_mrkt_kor_name":"KOSPI200","bstp_kor_isnm":"IT 서비스","temp_stop_yn":"N","oprc_rang_cont_yn":"N","clpr_rang_cont_yn":"N","crdt_able_yn":"Y","grmn_rate_cls_code":"40","elw_pblc_yn":"Y","stck_prpr":"200500","prdy_vrss":"1600","prdy_vrss_sign":"2","prdy_ctrt":"0.80","acml_tr_pbmn":"101153978400","acml_vol":"502447","prdy_vrss_vol_rate":"80.43","stck_oprc":"203500","stck_hgpr":"206000","stck_lwpr":"197900","stck_mxpr":"258500","stck_llam":"139300","stck_sdpr":"198900","wghn_avrg_stck_prc":"201322.69","hts_frgn_ehrt":"48.56","frgn_ntby_qty":"0","pgtr_ntby_qty":"-76409","pvt_scnd_dmrs_prc":"202366","pvt_frst_dmrs_prc":"200632","pvt_pont_val":"199766","pvt_frst_dmsp_prc":"198032","pvt_scnd_dmsp_prc":"197166","dmrs_val":"200200","dmsp_val":"197600","cpfn":"165","rstc_wdth_prc":"59600","stck_fcam":"100","stck_sspr":"151160","aspr_unit":"500","hts_deal_qty_unit_val":"1","lstn_stcn":"158437008","hts_avls":"317666","per":"16.83","pbr":"1.21","stac_month":"12","vol_tnrt":"0.32","eps":"11913.00","bps":"166221.00","d250_hgpr":"235500","d250_hgpr_date":"20250207","d250_hgpr_vrss_prpr_rate":"-14.86","d250_lwpr":"151100","d250_lwpr_date":"20240805","d250_lwpr_vrss_prpr_rate":"32.69","stck_dryy_hgpr":"235500","dryy_hgpr_vrss_prpr_rate":"-14.86","dryy_hgpr_date":"20250207","stck_dryy_lwpr":"176200","dryy_lwpr_vrss_prpr_rate":"13.79","dryy_lwpr_date":"20250409","w52_hgpr":"235500","w52_hgpr_vrss_prpr_ctrt":"-14.86","w52_hgpr_date":"20250207","w52_lwpr":"151100","w52_lwpr_vrss_prpr_ctrt":"32.69","w52_lwpr_date":"20240805","whol_loan_rmnd_rate":"0.55","ssts_yn":"Y","stck_shrn_iscd":"035420","fcam_cnnm":"100","cpfn_cnnm":"164 억","frgn_hldn_qty":"76944450","vi_cls_code":"N","ovtm_vi_cls_code":"N","last_ssts_cntg_qty":"13964","invt_caful_yn":"N","mrkt_warn_cls_code":"00","short_over_yn":"N","sltr_yn":"N","mang_issu_cls_code":"N"},"rt_cd":"0","msg_cd":"MCA00000","msg1":"정상처리 되었습니다."}
+2025-06-13 10:53:06,162 - INFO - 📝 후보 정보: NAVER(035420)
+2025-06-13 10:53:06,218 - INFO - 🌐 API 요청: GET https://openapivts.koreainvestment.com:29443/uapi/domestic-stock/v1/quotations/inquire-price
+2025-06-13 10:53:06,253 - INFO - 📥 응답 상태: 200
+2025-06-13 10:53:06,253 - INFO - 📥 응답 데이터: {"output":{"iscd_stat_cls_code":"55","marg_rate":"20.00","rprs_mrkt_kor_name":"KOSPI200","bstp_kor_isnm":"금속","temp_stop_yn":"N","oprc_rang_cont_yn":"N","clpr_rang_cont_yn":"N","crdt_able_yn":"Y","grmn_rate_cls_code":"40","elw_pblc_yn":"Y","stck_prpr":"261000","prdy_vrss":"-4500","prdy_vrss_sign":"5","prdy_ctrt":"-1.69","acml_tr_pbmn":"33008915750","acml_vol":"125917","prdy_vrss_vol_rate":"29.66","stck_oprc":"265000","stck_hgpr":"265500","stck_lwpr":"260000","stck_mxpr":"345000","stck_llam":"186000","stck_sdpr":"265500","wghn_avrg_stck_prc":"262148.21","hts_frgn_ehrt":"29.22","frgn_ntby_qty":"0","pgtr_ntby_qty":"13344","pvt_scnd_dmrs_prc":"271500","pvt_frst_dmrs_prc":"268500","pvt_pont_val":"265500","pvt_frst_dmsp_prc":"262500","pvt_scnd_dmsp_prc":"259500","dmrs_val":"270000","dmsp_val":"264000","cpfn":"4824","rstc_wdth_prc":"79500","stck_fcam":"5000","stck_sspr":"201780","aspr_unit":"500","hts_deal_qty_unit_val":"1","lstn_stcn":"80932952","hts_avls":"211235","per":"19.96","pbr":"0.38","stac_month":"12","vol_tnrt":"0.16","eps":"13073.00","bps":"689205.00","d250_hgpr":"397000","d250_hgpr_date":"20240715","d250_hgpr_vrss_prpr_rate":"-34.26","d250_lwpr":"227500","d250_lwpr_date":"20250210","d250_lwpr_vrss_prpr_rate":"14.73","stck_dryy_hgpr":"337000","dryy_hgpr_vrss_prpr_rate":"-22.55","dryy_hgpr_date":"20250320","stck_dryy_lwpr":"227500","dryy_lwpr_vrss_prpr_rate":"14.73","dryy_lwpr_date":"20250210","w52_hgpr":"397000","w52_hgpr_vrss_prpr_ctrt":"-34.26","w52_hgpr_date":"20240715","w52_lwpr":"227500","w52_lwpr_vrss_prpr_ctrt":"14.73","w52_lwpr_date":"20250210","whol_loan_rmnd_rate":"0.74","ssts_yn":"Y","stck_shrn_iscd":"005490","fcam_cnnm":"5,000","cpfn_cnnm":"4,824 억","frgn_hldn_qty":"23652230","vi_cls_code":"N","ovtm_vi_cls_code":"N","last_ssts_cntg_qty":"36238","invt_caful_yn":"N","mrkt_warn_cls_code":"00","short_over_yn":"N","sltr_yn":"N","mang_issu_cls_code":"N"},"rt_cd":"0","msg_cd":"MCA00000","msg1":"정상처리 되었습니다."}
+2025-06-13 10:53:06,256 - INFO - 📝 후보 정보: POSCO홀딩스(005490)
+2025-06-13 10:53:07,130 - INFO - 🌐 API 요청: GET https://openapivts.koreainvestment.com:29443/uapi/domestic-stock/v1/quotations/inquire-price
+2025-06-13 10:53:07,172 - INFO - 📥 응답 상태: 200
+2025-06-13 10:53:07,172 - INFO - 📥 응답 데이터: {"output":{"iscd_stat_cls_code":"55","marg_rate":"20.00","rprs_mrkt_kor_name":"KOSPI200","bstp_kor_isnm":"화학","temp_stop_yn":"N","oprc_rang_cont_yn":"N","clpr_rang_cont_yn":"N","crdt_able_yn":"Y","grmn_rate_cls_code":"40","elw_pblc_yn":"Y","stck_prpr":"209500","prdy_vrss":"-1000","prdy_vrss_sign":"5","prdy_ctrt":"-0.48","acml_tr_pbmn":"31136258000","acml_vol":"147972","prdy_vrss_vol_rate":"33.13","stck_oprc":"211000","stck_hgpr":"213500","stck_lwpr":"207000","stck_mxpr":"273500","stck_llam":"147500","stck_sdpr":"210500","wghn_avrg_stck_prc":"210419.93","hts_frgn_ehrt":"30.24","frgn_ntby_qty":"0","pgtr_ntby_qty":"33208","pvt_scnd_dmrs_prc":"216500","pvt_frst_dmrs_prc":"213500","pvt_pont_val":"210000","pvt_frst_dmsp_prc":"207000","pvt_scnd_dmsp_prc":"203500","dmrs_val":"215000","dmsp_val":"208500","cpfn":"3530","rstc_wdth_prc":"63000","stck_fcam":"5000","stck_sspr":"155770","aspr_unit":"500","hts_deal_qty_unit_val":"1","lstn_stcn":"70592343","hts_avls":"147891","per":"-23.74","pbr":"0.49","stac_month":"12","vol_tnrt":"0.21","eps":"-8825.00","bps":"425191.00","d250_hgpr":"388000","d250_hgpr_date":"20240607","d250_hgpr_vrss_prpr_rate":"-46.01","d250_lwpr":"181500","d250_lwpr_date":"20250526","d250_lwpr_vrss_prpr_rate":"15.43","stck_dryy_hgpr":"276000","dryy_hgpr_vrss_prpr_rate":"-24.09","dryy_hgpr_date":"20250327","stck_dryy_lwpr":"181500","dryy_lwpr_vrss_prpr_rate":"15.43","dryy_lwpr_date":"20250526","w52_hgpr":"377500","w52_hgpr_vrss_prpr_ctrt":"-44.50","w52_hgpr_date":"20240613","w52_lwpr":"181500","w52_lwpr_vrss_prpr_ctrt":"15.43","w52_lwpr_date":"20250526","whol_loan_rmnd_rate":"0.66","ssts_yn":"Y","stck_shrn_iscd":"051910","fcam_cnnm":"5,000","cpfn_cnnm":"3,529 억","frgn_hldn_qty":"21347190","vi_cls_code":"N","ovtm_vi_cls_code":"N","last_ssts_cntg_qty":"21480","invt_caful_yn":"N","mrkt_warn_cls_code":"00","short_over_yn":"N","sltr_yn":"N","mang_issu_cls_code":"N"},"rt_cd":"0","msg_cd":"MCA00000","msg1":"정상처리 되었습니다."}
+2025-06-13 10:53:07,174 - INFO - 📝 후보 정보: LG화학(051910)
+2025-06-13 10:53:08,047 - INFO - 📱 텔레그램 알림 전송 완료
+2025-06-13 10:53:08,048 - INFO - ✅ 척후병 후보 선정 완료: 삼성전자(005930), SK하이닉스(000660), NAVER(035420), POSCO홀딩스(005490), LG화학(051910)
+2025-06-13 10:53:08,048 - INFO - 🌐 API 요청: GET https://openapivts.koreainvestment.com:29443/uapi/domestic-stock/v1/quotations/inquire-price
+2025-06-13 10:53:08,088 - INFO - 📥 응답 상태: 200
+2025-06-13 10:53:08,089 - INFO - 📥 응답 데이터: {"output":{"iscd_stat_cls_code":"55","marg_rate":"20.00","rprs_mrkt_kor_name":"KOSPI200","bstp_kor_isnm":"전기·전자","temp_stop_yn":"N","oprc_rang_cont_yn":"N","clpr_rang_cont_yn":"N","crdt_able_yn":"Y","grmn_rate_cls_code":"40","elw_pblc_yn":"Y","stck_prpr":"58500","prdy_vrss":"-1000","prdy_vrss_sign":"5","prdy_ctrt":"-1.68","acml_tr_pbmn":"554550262700","acml_vol":"9408105","prdy_vrss_vol_rate":"52.99","stck_oprc":"60200","stck_hgpr":"60200","stck_lwpr":"58200","stck_mxpr":"77300","stck_llam":"41700","stck_sdpr":"59500","wghn_avrg_stck_prc":"58943.89","hts_frgn_ehrt":"49.82","frgn_ntby_qty":"0","pgtr_ntby_qty":"-498612","pvt_scnd_dmrs_prc":"60300","pvt_frst_dmrs_prc":"59900","pvt_pont_val":"59600","pvt_frst_dmsp_prc":"59200","pvt_scnd_dmsp_prc":"58900","dmrs_val":"59750","dmsp_val":"59050","cpfn":"7780","rstc_wdth_prc":"17800","stck_fcam":"100","stck_sspr":"44030","aspr_unit":"100","hts_deal_qty_unit_val":"1","lstn_stcn":"5919637922","hts_avls":"3462988","per":"11.82","pbr":"1.01","stac_month":"12","vol_tnrt":"0.16","eps":"4950.00","bps":"57930.00","d250_hgpr":"88800","d250_hgpr_date":"20240711","d250_hgpr_vrss_prpr_rate":"-34.12","d250_lwpr":"49900","d250_lwpr_date":"20241114","d250_lwpr_vrss_prpr_rate":"17.23","stck_dryy_hgpr":"62000","dryy_hgpr_vrss_prpr_rate":"-5.65","dryy_hgpr_date":"20250327","stck_dryy_lwpr":"50800","dryy_lwpr_vrss_prpr_rate":"15.16","dryy_lwpr_date":"20250203","w52_hgpr":"88800","w52_hgpr_vrss_prpr_ctrt":"-34.12","w52_hgpr_date":"20240711","w52_lwpr":"49900","w52_lwpr_vrss_prpr_ctrt":"17.23","w52_lwpr_date":"20241114","whol_loan_rmnd_rate":"0.21","ssts_yn":"Y","stck_shrn_iscd":"005930","fcam_cnnm":"100","cpfn_cnnm":"7,780 억","frgn_hldn_qty":"2949355692","vi_cls_code":"N","ovtm_vi_cls_code":"N","last_ssts_cntg_qty":"481450","invt_caful_yn":"N","mrkt_warn_cls_code":"00","short_over_yn":"N","sltr_yn":"N","mang_issu_cls_code":"N"},"rt_cd":"0","msg_cd":"MCA00000","msg1":"정상처리 되었습니다."}
+2025-06-13 10:53:08,090 - WARNING - 💸 삼성전자 매수 불가 - 현재가: 58,500원, 잔고: 0원
+2025-06-13 10:53:08,130 - INFO - 🌐 API 요청: GET https://openapivts.koreainvestment.com:29443/uapi/domestic-stock/v1/quotations/inquire-price
+2025-06-13 10:53:08,172 - INFO - 📥 응답 상태: 200
+2025-06-13 10:53:08,172 - INFO - 📥 응답 데이터: {"output":{"iscd_stat_cls_code":"55","marg_rate":"20.00","rprs_mrkt_kor_name":"KOSPI200","bstp_kor_isnm":"전기·전자","temp_stop_yn":"N","oprc_rang_cont_yn":"N","clpr_rang_cont_yn":"N","crdt_able_yn":"Y","grmn_rate_cls_code":"40","elw_pblc_yn":"Y","stck_prpr":"238000","prdy_vrss":"2500","prdy_vrss_sign":"2","prdy_ctrt":"1.06","acml_tr_pbmn":"458115417500","acml_vol":"1922501","prdy_vrss_vol_rate":"38.49","stck_oprc":"240500","stck_hgpr":"243000","stck_lwpr":"233750","stck_mxpr":"306000","stck_llam":"165000","stck_sdpr":"235500","wghn_avrg_stck_prc":"238291.38","hts_frgn_ehrt":"55.19","frgn_ntby_qty":"0","pgtr_ntby_qty":"-62523","pvt_scnd_dmrs_prc":"250500","pvt_frst_dmrs_prc":"243000","pvt_pont_val":"239000","pvt_frst_dmsp_prc":"231500","pvt_scnd_dmsp_prc":"227500","dmrs_val":"241000","dmsp_val":"229500","cpfn":"36577","rstc_wdth_prc":"70500","stck_fcam":"5000","stck_sspr":"169560","aspr_unit":"500","hts_deal_qty_unit_val":"1","lstn_stcn":"728002365","hts_avls":"1732646","per":"8.76","pbr":"2.28","stac_month":"12","vol_tnrt":"0.26","eps":"27182.00","bps":"104567.00","d250_hgpr":"248500","d250_hgpr_date":"20240711","d250_hgpr_vrss_prpr_rate":"-4.23","d250_lwpr":"144700","d250_lwpr_date":"20240919","d250_lwpr_vrss_prpr_rate":"64.48","stck_dryy_hgpr":"246500","dryy_hgpr_vrss_prpr_rate":"-3.45","dryy_hgpr_date":"20250612","stck_dryy_lwpr":"162700","dryy_lwpr_vrss_prpr_rate":"46.28","dryy_lwpr_date":"20250409","w52_hgpr":"248500","w52_hgpr_vrss_prpr_ctrt":"-4.23","w52_hgpr_date":"20240711","w52_lwpr":"144700","w52_lwpr_vrss_prpr_ctrt":"64.48","w52_lwpr_date":"20240919","whol_loan_rmnd_rate":"0.17","ssts_yn":"Y","stck_shrn_iscd":"000660","fcam_cnnm":"5,000","cpfn_cnnm":"36,576 억","frgn_hldn_qty":"401768306","vi_cls_code":"N","ovtm_vi_cls_code":"N","last_ssts_cntg_qty":"252506","invt_caful_yn":"N","mrkt_warn_cls_code":"00","short_over_yn":"N","sltr_yn":"N","mang_issu_cls_code":"N"},"rt_cd":"0","msg_cd":"MCA00000","msg1":"정상처리 되었습니다."}
+2025-06-13 10:53:08,174 - WARNING - 💸 SK하이닉스 매수 불가 - 현재가: 238,000원, 잔고: 0원
+2025-06-13 10:53:09,049 - INFO - 🌐 API 요청: GET https://openapivts.koreainvestment.com:29443/uapi/domestic-stock/v1/quotations/inquire-price
+2025-06-13 10:53:09,092 - INFO - 📥 응답 상태: 200
+2025-06-13 10:53:09,092 - INFO - 📥 응답 데이터: {"output":{"iscd_stat_cls_code":"55","marg_rate":"20.00","rprs_mrkt_kor_name":"KOSPI200","bstp_kor_isnm":"IT 서비스","temp_stop_yn":"N","oprc_rang_cont_yn":"N","clpr_rang_cont_yn":"N","crdt_able_yn":"Y","grmn_rate_cls_code":"40","elw_pblc_yn":"Y","stck_prpr":"200500","prdy_vrss":"1600","prdy_vrss_sign":"2","prdy_ctrt":"0.80","acml_tr_pbmn":"101154378900","acml_vol":"502449","prdy_vrss_vol_rate":"80.43","stck_oprc":"203500","stck_hgpr":"206000","stck_lwpr":"197900","stck_mxpr":"258500","stck_llam":"139300","stck_sdpr":"198900","wghn_avrg_stck_prc":"201322.68","hts_frgn_ehrt":"48.56","frgn_ntby_qty":"0","pgtr_ntby_qty":"-76409","pvt_scnd_dmrs_prc":"202366","pvt_frst_dmrs_prc":"200632","pvt_pont_val":"199766","pvt_frst_dmsp_prc":"198032","pvt_scnd_dmsp_prc":"197166","dmrs_val":"200200","dmsp_val":"197600","cpfn":"165","rstc_wdth_prc":"59600","stck_fcam":"100","stck_sspr":"151160","aspr_unit":"500","hts_deal_qty_unit_val":"1","lstn_stcn":"158437008","hts_avls":"317666","per":"16.83","pbr":"1.21","stac_month":"12","vol_tnrt":"0.32","eps":"11913.00","bps":"166221.00","d250_hgpr":"235500","d250_hgpr_date":"20250207","d250_hgpr_vrss_prpr_rate":"-14.86","d250_lwpr":"151100","d250_lwpr_date":"20240805","d250_lwpr_vrss_prpr_rate":"32.69","stck_dryy_hgpr":"235500","dryy_hgpr_vrss_prpr_rate":"-14.86","dryy_hgpr_date":"20250207","stck_dryy_lwpr":"176200","dryy_lwpr_vrss_prpr_rate":"13.79","dryy_lwpr_date":"20250409","w52_hgpr":"235500","w52_hgpr_vrss_prpr_ctrt":"-14.86","w52_hgpr_date":"20250207","w52_lwpr":"151100","w52_lwpr_vrss_prpr_ctrt":"32.69","w52_lwpr_date":"20240805","whol_loan_rmnd_rate":"0.55","ssts_yn":"Y","stck_shrn_iscd":"035420","fcam_cnnm":"100","cpfn_cnnm":"164 억","frgn_hldn_qty":"76944450","vi_cls_code":"N","ovtm_vi_cls_code":"N","last_ssts_cntg_qty":"13964","invt_caful_yn":"N","mrkt_warn_cls_code":"00","short_over_yn":"N","sltr_yn":"N","mang_issu_cls_code":"N"},"rt_cd":"0","msg_cd":"MCA00000","msg1":"정상처리 되었습니다."}
+2025-06-13 10:53:09,094 - WARNING - 💸 NAVER 매수 불가 - 현재가: 200,500원, 잔고: 0원
+2025-06-13 10:53:09,131 - INFO - 🌐 API 요청: GET https://openapivts.koreainvestment.com:29443/uapi/domestic-stock/v1/quotations/inquire-price
+2025-06-13 10:53:09,179 - INFO - 📥 응답 상태: 200
+2025-06-13 10:53:09,180 - INFO - 📥 응답 데이터: {"output":{"iscd_stat_cls_code":"55","marg_rate":"20.00","rprs_mrkt_kor_name":"KOSPI200","bstp_kor_isnm":"금속","temp_stop_yn":"N","oprc_rang_cont_yn":"N","clpr_rang_cont_yn":"N","crdt_able_yn":"Y","grmn_rate_cls_code":"40","elw_pblc_yn":"Y","stck_prpr":"261000","prdy_vrss":"-4500","prdy_vrss_sign":"5","prdy_ctrt":"-1.69","acml_tr_pbmn":"33008915750","acml_vol":"125917","prdy_vrss_vol_rate":"29.66","stck_oprc":"265000","stck_hgpr":"265500","stck_lwpr":"260000","stck_mxpr":"345000","stck_llam":"186000","stck_sdpr":"265500","wghn_avrg_stck_prc":"262148.21","hts_frgn_ehrt":"29.22","frgn_ntby_qty":"0","pgtr_ntby_qty":"13344","pvt_scnd_dmrs_prc":"271500","pvt_frst_dmrs_prc":"268500","pvt_pont_val":"265500","pvt_frst_dmsp_prc":"262500","pvt_scnd_dmsp_prc":"259500","dmrs_val":"270000","dmsp_val":"264000","cpfn":"4824","rstc_wdth_prc":"79500","stck_fcam":"5000","stck_sspr":"201780","aspr_unit":"500","hts_deal_qty_unit_val":"1","lstn_stcn":"80932952","hts_avls":"211235","per":"19.96","pbr":"0.38","stac_month":"12","vol_tnrt":"0.16","eps":"13073.00","bps":"689205.00","d250_hgpr":"397000","d250_hgpr_date":"20240715","d250_hgpr_vrss_prpr_rate":"-34.26","d250_lwpr":"227500","d250_lwpr_date":"20250210","d250_lwpr_vrss_prpr_rate":"14.73","stck_dryy_hgpr":"337000","dryy_hgpr_vrss_prpr_rate":"-22.55","dryy_hgpr_date":"20250320","stck_dryy_lwpr":"227500","dryy_lwpr_vrss_prpr_rate":"14.73","dryy_lwpr_date":"20250210","w52_hgpr":"397000","w52_hgpr_vrss_prpr_ctrt":"-34.26","w52_hgpr_date":"20240715","w52_lwpr":"227500","w52_lwpr_vrss_prpr_ctrt":"14.73","w52_lwpr_date":"20250210","whol_loan_rmnd_rate":"0.74","ssts_yn":"Y","stck_shrn_iscd":"005490","fcam_cnnm":"5,000","cpfn_cnnm":"4,824 억","frgn_hldn_qty":"23652230","vi_cls_code":"N","ovtm_vi_cls_code":"N","last_ssts_cntg_qty":"36238","invt_caful_yn":"N","mrkt_warn_cls_code":"00","short_over_yn":"N","sltr_yn":"N","mang_issu_cls_code":"N"},"rt_cd":"0","msg_cd":"MCA00000","msg1":"정상처리 되었습니다."}
+2025-06-13 10:53:09,183 - WARNING - 💸 POSCO홀딩스 매수 불가 - 현재가: 261,000원, 잔고: 0원
+2025-06-13 10:53:10,086 - INFO - 📱 텔레그램 알림 전송 완료
+2025-06-13 10:53:10,087 - INFO - --- 사이클 종료, 5분 대기 ---
+2025-06-13 10:57:27,512 - INFO - === 환경 변수 로드 상태 확인 ===
+2025-06-13 10:57:27,512 - INFO - 선택된 환경: MOCK(모의투자)
+2025-06-13 10:57:27,512 - INFO - IS_MOCK 설정: True
+2025-06-13 10:57:27,512 - INFO - APP_KEY 존재: 예
+2025-06-13 10:57:27,512 - INFO - APP_SECRET 존재: 예
+2025-06-13 10:57:27,513 - INFO - ACCOUNT_NUMBER 존재: 예
+2025-06-13 10:57:27,513 - INFO - APP_KEY 앞 4자리: PSJH****
+2025-06-13 10:57:27,513 - INFO - APP_SECRET 앞 4자리: W5ts****
+2025-06-13 10:57:27,513 - INFO - ACCOUNT_NUMBER: 50128558-01
+2025-06-13 10:57:27,513 - INFO - MOCK(모의투자) 환경 설정 값 로드 완료. AI 통합 시스템을 시작합니다.
+2025-06-13 10:57:27,513 - INFO - AI 통합 시스템을 초기화합니다.
+2025-06-13 10:57:27,514 - INFO - MOCK(모의투자) 환경으로 API를 초기화합니다.
+2025-06-13 10:57:27,514 - INFO - RateLimiter가 1.0초당 2회 호출로 설정되었습니다.
+2025-06-13 10:57:27,514 - INFO - 📱 텔레그램 알림 기능이 활성화되었습니다.
+2025-06-13 10:57:27,515 - INFO - 저장된 토큰을 로드했습니다. (남은 시간: 22:40:34.492633)
+2025-06-13 10:57:27,516 - INFO - 📅 자동 토큰 발급 스케줄러가 시작되었습니다.
+2025-06-13 10:57:27,516 - INFO - ⏰ 매일 06:00에 새로운 토큰을 발급합니다.
+2025-06-13 10:57:27,516 - INFO - 📅 자동 토큰 발급 스케줄러가 시작되었습니다.
+2025-06-13 10:57:27,516 - INFO - ⏰ 매일 06:00에 새로운 토큰을 발급합니다.
+2025-06-13 10:57:27,517 - INFO - === 토큰 상태 확인 ===
+2025-06-13 10:57:27,517 - INFO - 상태: 유효
+2025-06-13 10:57:27,517 - INFO - 메시지: 토큰이 유효합니다. (남은 시간: 22:40:34.490914)
+2025-06-13 10:57:27,517 - INFO - 권장 조치: 정상 사용 가능
+2025-06-13 10:57:27,518 - INFO - 🤖 제미나이 모델 'gemini-1.5-flash'이 초기화되었습니다.
+2025-06-13 10:57:27,518 - INFO - 📋 모델 정보:
+2025-06-13 10:57:27,519 - INFO -    이름: gemini-1.5-flash
+2025-06-13 10:57:27,519 - INFO -    특징: 빠른 응답 속도와 효율적인 분석
+2025-06-13 10:57:27,521 - INFO -    최적 용도: 실시간 매매 신호, 빠른 시장 분석
+2025-06-13 10:57:27,521 - INFO -    속도: 매우 빠름
+2025-06-13 10:57:27,522 - INFO -    비용: 저렴
+2025-06-13 10:57:27,522 - INFO - 🎛️ 생성 설정:
+2025-06-13 10:57:27,522 - INFO -    Temperature: 0.3
+2025-06-13 10:57:27,523 - INFO -    Max Tokens: 1000
+2025-06-13 10:57:27,523 - INFO -    Top P: 0.8
+2025-06-13 10:57:27,523 - INFO -    Top K: 40
+2025-06-13 10:57:27,524 - WARNING - FRED_API_KEY가 설정되지 않아 거시 경제 지표 분석이 제한됩니다.
+2025-06-13 10:57:27,524 - INFO - ONeil CAN SLIM 스캐너가 초기화되었습니다.
+2025-06-13 10:57:27,525 - INFO - ✅ ONeilScanner 초기화 완료
+2025-06-13 10:57:27,526 - INFO - ✅ MinerviniScreener 초기화 완료
+2025-06-13 10:57:27,526 - INFO - 🎯 척후병 매수 전략이 활성화되었습니다.
+2025-06-13 10:57:28,413 - INFO - 📱 텔레그램 알림 전송 완료
+2025-06-13 10:57:28,414 - INFO - 📅 다음 자동 토큰 발급 예정: 2025-06-14 06:00:00
+2025-06-13 10:57:29,329 - INFO - 📱 텔레그램 알림 전송 완료
+2025-06-13 10:57:29,330 - INFO - 시스템 초기화가 완료되었습니다.
+2025-06-13 10:57:29,330 - INFO - === 아르키메데스 프로젝트 AI 자동매매 시스템 가동 ===
+2025-06-13 10:57:29,331 - INFO - 제미나이 AI 분석 기능 통합 완료
+2025-06-13 10:57:29,331 - INFO - 📅 자동 토큰 발급: 매일 06:00 (다음: 2025-06-14 06:00:00)
+2025-06-13 10:57:29,332 - INFO - 🔑 토큰 상태: 유효 - 토큰이 유효합니다. (남은 시간: 22:40:32.676095)
+2025-06-13 10:57:29,332 - INFO - --- AI 리밸런싱 사이클 시작 (주기: 5분) ---
+2025-06-13 10:57:29,332 - INFO - 🔄 AI 기반 포트폴리오 리밸런싱 시작
+2025-06-13 10:57:29,333 - INFO - 🧭 시장 체제 분석(Market Regime Analysis) 시작...
+2025-06-13 10:57:30,088 - ERROR - 시장 체제 분석 중 오류: 'MarketAnalyzer' object has no attribute 'logger'
+Traceback (most recent call last):
+  File "c:\Users\USER\Desktop\test_stock\market_analyzer.py", line 485, in _get_market_trend
+    if pd.isna(ma200) or pd.isna(ma50) or pd.isna(ma20):
+       ~~~~~~~^^^^^^^
+  File "C:\Users\USER\Desktop\test_stock\venv\Lib\site-packages\pandas\core\generic.py", line 1577, in __nonzero__
+    raise ValueError(
+    ...<2 lines>...
+    )
+ValueError: The truth value of a Series is ambiguous. Use a.empty, a.bool(), a.item(), a.any() or a.all().
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\USER\Desktop\test_stock\market_analyzer.py", line 442, in get_market_regime_analysis
+    market_trend = self._get_market_trend(kospi_index)
+  File "c:\Users\USER\Desktop\test_stock\market_analyzer.py", line 501, in _get_market_trend
+    self.logger.error(f"시장 트렌드 분석 중 오류: {e}")
+    ^^^^^^^^^^^
+AttributeError: 'MarketAnalyzer' object has no attribute 'logger'
+2025-06-13 10:57:30,096 - INFO - 🧭 현재 시장 체제: NEUTRAL
+2025-06-13 10:57:30,096 - INFO - 포트폴리오를 동기화합니다.
+2025-06-13 10:57:30,096 - INFO - 🌐 API 요청: GET https://openapivts.koreainvestment.com:29443/uapi/domestic-stock/v1/trading/inquire-balance
+2025-06-13 10:57:30,181 - INFO - 📥 응답 상태: 200
+2025-06-13 10:57:30,182 - INFO - 📥 응답 데이터: {"ctx_area_fk100":"                                                                                                    ","ctx_area_nk100":"                                                                                                    ","output1":[{"pdno":"005930","prdt_name":"삼성전자","trad_dvsn_name":"현금","bfdy_buy_qty":"0","bfdy_sll_qty":"0","thdt_buyqty":"1","thdt_sll_qty":"0","hldg_qty":"1","ord_psbl_qty":"1","pchs_avg_pric":"58500.0000","pchs_amt":"58500","prpr":"58450","evlu_amt":"58450","evlu_pfls_amt":"-50","evlu_pfls_rt":"-0.09","evlu_erng_rt":"-0.08547009","loan_dt":"","loan_amt":"0","stln_slng_chgs":"0","expd_dt":"","fltt_rt":"-1.76000000","bfdy_cprs_icdc":"1050","item_mgna_rt_name":"20%","grta_rt_name":"","sbst_pric":"0","stck_loan_unpr":"0.0000"}],"output2":[{"dnca_tot_amt":"500000000","nxdy_excc_amt":"500000000","prvs_rcdl_excc_amt":"499941500","cma_evlu_amt":"0","bfdy_buy_amt":"0","thdt_buy_amt":"58500","nxdy_auto_rdpt_amt":"0","bfdy_sll_amt":"0","thdt_sll_amt":"0","d2_auto_rdpt_amt":"0","bfdy_tlex_amt":"0","thdt_tlex_amt":"0","tot_loan_amt":"0","scts_evlu_amt":"58450","tot_evlu_amt":"499999950","nass_amt":"499999950","fncg_gld_auto_rdpt_yn":"","pchs_amt_smtl_amt":"58500","evlu_amt_smtl_amt":"58450","evlu_pfls_smtl_amt":"-50","tot_stln_slng_chgs":"0","bfdy_tot_asst_evlu_amt":"500000000","asst_icdc_amt":"-50","asst_icdc_erng_rt":"-0.00001000"}],"rt_cd":"0","msg_cd":"20310000","msg1":"모의투자 조회가 완료되었습니다.                                                 "}
+2025-06-13 10:57:30,184 - INFO - 📋 잔고 조회 결과: {'ctx_area_fk100': '                                                                                                    ', 'ctx_area_nk100': '                                                                                                    ', 'output1': [{'pdno': '005930', 'prdt_name': '삼성전자', 'trad_dvsn_name': '현금', 'bfdy_buy_qty': '0', 'bfdy_sll_qty': '0', 'thdt_buyqty': '1', 'thdt_sll_qty': '0', 'hldg_qty': '1', 'ord_psbl_qty': '1', 'pchs_avg_pric': '58500.0000', 'pchs_amt': '58500', 'prpr': '58450', 'evlu_amt': '58450', 'evlu_pfls_amt': '-50', 'evlu_pfls_rt': '-0.09', 'evlu_erng_rt': '-0.08547009', 'loan_dt': '', 'loan_amt': '0', 'stln_slng_chgs': '0', 'expd_dt': '', 'fltt_rt': '-1.76000000', 'bfdy_cprs_icdc': '1050', 'item_mgna_rt_name': '20%', 'grta_rt_name': '', 'sbst_pric': '0', 'stck_loan_unpr': '0.0000'}], 'output2': [{'dnca_tot_amt': '500000000', 'nxdy_excc_amt': '500000000', 'prvs_rcdl_excc_amt': '499941500', 'cma_evlu_amt': '0', 'bfdy_buy_amt': '0', 'thdt_buy_amt': '58500', 'nxdy_auto_rdpt_amt': '0', 'bfdy_sll_amt': '0', 'thdt_sll_amt': '0', 'd2_auto_rdpt_amt': '0', 'bfdy_tlex_amt': '0', 'thdt_tlex_amt': '0', 'tot_loan_amt': '0', 'scts_evlu_amt': '58450', 'tot_evlu_amt': '499999950', 'nass_amt': '499999950', 'fncg_gld_auto_rdpt_yn': '', 'pchs_amt_smtl_amt': '58500', 'evlu_amt_smtl_amt': '58450', 'evlu_pfls_smtl_amt': '-50', 'tot_stln_slng_chgs': '0', 'bfdy_tot_asst_evlu_amt': '500000000', 'asst_icdc_amt': '-50', 'asst_icdc_erng_rt': '-0.00001000'}], 'rt_cd': '0', 'msg_cd': '20310000', 'msg1': '모의투자 조회가 완료되었습니다.                                                 '}
+2025-06-13 10:57:30,186 - INFO - 💰 현금잔고: 0원
+2025-06-13 10:57:30,187 - INFO - 💎 총자산: 0원
+2025-06-13 10:57:30,187 - INFO - 포트폴리오 동기화 완료 - 총 자산: 0원, 현금: 0원
+2025-06-13 10:57:30,187 - INFO - 보유 종목 수: 0개
+2025-06-13 10:57:30,188 - WARNING - ⚠️ 잔고 정보가 모두 0입니다. API 응답을 확인해주세요.
+2025-06-13 10:57:30,188 - WARNING - 원본 응답: {'ctx_area_fk100': '                                                                                                    ', 'ctx_area_nk100': '                                                                                                    ', 'output1': [{'pdno': '005930', 'prdt_name': '삼성전자', 'trad_dvsn_name': '현금', 'bfdy_buy_qty': '0', 'bfdy_sll_qty': '0', 'thdt_buyqty': '1', 'thdt_sll_qty': '0', 'hldg_qty': '1', 'ord_psbl_qty': '1', 'pchs_avg_pric': '58500.0000', 'pchs_amt': '58500', 'prpr': '58450', 'evlu_amt': '58450', 'evlu_pfls_amt': '-50', 'evlu_pfls_rt': '-0.09', 'evlu_erng_rt': '-0.08547009', 'loan_dt': '', 'loan_amt': '0', 'stln_slng_chgs': '0', 'expd_dt': '', 'fltt_rt': '-1.76000000', 'bfdy_cprs_icdc': '1050', 'item_mgna_rt_name': '20%', 'grta_rt_name': '', 'sbst_pric': '0', 'stck_loan_unpr': '0.0000'}], 'output2': [{'dnca_tot_amt': '500000000', 'nxdy_excc_amt': '500000000', 'prvs_rcdl_excc_amt': '499941500', 'cma_evlu_amt': '0', 'bfdy_buy_amt': '0', 'thdt_buy_amt': '58500', 'nxdy_auto_rdpt_amt': '0', 'bfdy_sll_amt': '0', 'thdt_sll_amt': '0', 'd2_auto_rdpt_amt': '0', 'bfdy_tlex_amt': '0', 'thdt_tlex_amt': '0', 'tot_loan_amt': '0', 'scts_evlu_amt': '58450', 'tot_evlu_amt': '499999950', 'nass_amt': '499999950', 'fncg_gld_auto_rdpt_yn': '', 'pchs_amt_smtl_amt': '58500', 'evlu_amt_smtl_amt': '58450', 'evlu_pfls_smtl_amt': '-50', 'tot_stln_slng_chgs': '0', 'bfdy_tot_asst_evlu_amt': '500000000', 'asst_icdc_amt': '-50', 'asst_icdc_erng_rt': '-0.00001000'}], 'rt_cd': '0', 'msg_cd': '20310000', 'msg1': '모의투자 조회가 완료되었습니다.                                                 '}
+2025-06-13 10:57:30,189 - INFO - 💰 현재 상태 - 총자산: 0원, 현금: 0원, 보유종목: 0개
+2025-06-13 10:57:30,189 - INFO - 🎖️ 척후병 전략 실행
+2025-06-13 10:57:30,190 - INFO - 🔍 척후병 전략을 시작합니다...
+2025-06-13 10:57:30,190 - INFO - 포트폴리오를 동기화합니다.
+2025-06-13 10:57:30,190 - INFO - 🌐 API 요청: GET https://openapivts.koreainvestment.com:29443/uapi/domestic-stock/v1/trading/inquire-balance
+2025-06-13 10:57:30,286 - INFO - 📥 응답 상태: 200
+2025-06-13 10:57:30,287 - INFO - 📥 응답 데이터: {"ctx_area_fk100":"                                                                                                    ","ctx_area_nk100":"                                                                                                    ","output1":[{"pdno":"005930","prdt_name":"삼성전자","trad_dvsn_name":"현금","bfdy_buy_qty":"0","bfdy_sll_qty":"0","thdt_buyqty":"1","thdt_sll_qty":"0","hldg_qty":"1","ord_psbl_qty":"1","pchs_avg_pric":"58500.0000","pchs_amt":"58500","prpr":"58450","evlu_amt":"58450","evlu_pfls_amt":"-50","evlu_pfls_rt":"-0.09","evlu_erng_rt":"-0.08547009","loan_dt":"","loan_amt":"0","stln_slng_chgs":"0","expd_dt":"","fltt_rt":"-1.76000000","bfdy_cprs_icdc":"1050","item_mgna_rt_name":"20%","grta_rt_name":"","sbst_pric":"0","stck_loan_unpr":"0.0000"}],"output2":[{"dnca_tot_amt":"500000000","nxdy_excc_amt":"500000000","prvs_rcdl_excc_amt":"499941500","cma_evlu_amt":"0","bfdy_buy_amt":"0","thdt_buy_amt":"58500","nxdy_auto_rdpt_amt":"0","bfdy_sll_amt":"0","thdt_sll_amt":"0","d2_auto_rdpt_amt":"0","bfdy_tlex_amt":"0","thdt_tlex_amt":"0","tot_loan_amt":"0","scts_evlu_amt":"58450","tot_evlu_amt":"499999950","nass_amt":"499999950","fncg_gld_auto_rdpt_yn":"","pchs_amt_smtl_amt":"58500","evlu_amt_smtl_amt":"58450","evlu_pfls_smtl_amt":"-50","tot_stln_slng_chgs":"0","bfdy_tot_asst_evlu_amt":"500000000","asst_icdc_amt":"-50","asst_icdc_erng_rt":"-0.00001000"}],"rt_cd":"0","msg_cd":"20310000","msg1":"모의투자 조회가 완료되었습니다.                                                 "}
+2025-06-13 10:57:30,290 - INFO - 📋 잔고 조회 결과: {'ctx_area_fk100': '                                                                                                    ', 'ctx_area_nk100': '                                                                                                    ', 'output1': [{'pdno': '005930', 'prdt_name': '삼성전자', 'trad_dvsn_name': '현금', 'bfdy_buy_qty': '0', 'bfdy_sll_qty': '0', 'thdt_buyqty': '1', 'thdt_sll_qty': '0', 'hldg_qty': '1', 'ord_psbl_qty': '1', 'pchs_avg_pric': '58500.0000', 'pchs_amt': '58500', 'prpr': '58450', 'evlu_amt': '58450', 'evlu_pfls_amt': '-50', 'evlu_pfls_rt': '-0.09', 'evlu_erng_rt': '-0.08547009', 'loan_dt': '', 'loan_amt': '0', 'stln_slng_chgs': '0', 'expd_dt': '', 'fltt_rt': '-1.76000000', 'bfdy_cprs_icdc': '1050', 'item_mgna_rt_name': '20%', 'grta_rt_name': '', 'sbst_pric': '0', 'stck_loan_unpr': '0.0000'}], 'output2': [{'dnca_tot_amt': '500000000', 'nxdy_excc_amt': '500000000', 'prvs_rcdl_excc_amt': '499941500', 'cma_evlu_amt': '0', 'bfdy_buy_amt': '0', 'thdt_buy_amt': '58500', 'nxdy_auto_rdpt_amt': '0', 'bfdy_sll_amt': '0', 'thdt_sll_amt': '0', 'd2_auto_rdpt_amt': '0', 'bfdy_tlex_amt': '0', 'thdt_tlex_amt': '0', 'tot_loan_amt': '0', 'scts_evlu_amt': '58450', 'tot_evlu_amt': '499999950', 'nass_amt': '499999950', 'fncg_gld_auto_rdpt_yn': '', 'pchs_amt_smtl_amt': '58500', 'evlu_amt_smtl_amt': '58450', 'evlu_pfls_smtl_amt': '-50', 'tot_stln_slng_chgs': '0', 'bfdy_tot_asst_evlu_amt': '500000000', 'asst_icdc_amt': '-50', 'asst_icdc_erng_rt': '-0.00001000'}], 'rt_cd': '0', 'msg_cd': '20310000', 'msg1': '모의투자 조회가 완료되었습니다.                                                 '}
+2025-06-13 10:57:30,291 - INFO - 💰 현금잔고: 0원
+2025-06-13 10:57:30,291 - INFO - 💎 총자산: 0원
+2025-06-13 10:57:30,292 - INFO - 포트폴리오 동기화 완료 - 총 자산: 0원, 현금: 0원
+2025-06-13 10:57:30,292 - INFO - 보유 종목 수: 0개
+2025-06-13 10:57:30,292 - WARNING - ⚠️ 잔고 정보가 모두 0입니다. API 응답을 확인해주세요.
+2025-06-13 10:57:30,293 - WARNING - 원본 응답: {'ctx_area_fk100': '                                                                                                    ', 'ctx_area_nk100': '                                                                                                    ', 'output1': [{'pdno': '005930', 'prdt_name': '삼성전자', 'trad_dvsn_name': '현금', 'bfdy_buy_qty': '0', 'bfdy_sll_qty': '0', 'thdt_buyqty': '1', 'thdt_sll_qty': '0', 'hldg_qty': '1', 'ord_psbl_qty': '1', 'pchs_avg_pric': '58500.0000', 'pchs_amt': '58500', 'prpr': '58450', 'evlu_amt': '58450', 'evlu_pfls_amt': '-50', 'evlu_pfls_rt': '-0.09', 'evlu_erng_rt': '-0.08547009', 'loan_dt': '', 'loan_amt': '0', 'stln_slng_chgs': '0', 'expd_dt': '', 'fltt_rt': '-1.76000000', 'bfdy_cprs_icdc': '1050', 'item_mgna_rt_name': '20%', 'grta_rt_name': '', 'sbst_pric': '0', 'stck_loan_unpr': '0.0000'}], 'output2': [{'dnca_tot_amt': '500000000', 'nxdy_excc_amt': '500000000', 'prvs_rcdl_excc_amt': '499941500', 'cma_evlu_amt': '0', 'bfdy_buy_amt': '0', 'thdt_buy_amt': '58500', 'nxdy_auto_rdpt_amt': '0', 'bfdy_sll_amt': '0', 'thdt_sll_amt': '0', 'd2_auto_rdpt_amt': '0', 'bfdy_tlex_amt': '0', 'thdt_tlex_amt': '0', 'tot_loan_amt': '0', 'scts_evlu_amt': '58450', 'tot_evlu_amt': '499999950', 'nass_amt': '499999950', 'fncg_gld_auto_rdpt_yn': '', 'pchs_amt_smtl_amt': '58500', 'evlu_amt_smtl_amt': '58450', 'evlu_pfls_smtl_amt': '-50', 'tot_stln_slng_chgs': '0', 'bfdy_tot_asst_evlu_amt': '500000000', 'asst_icdc_amt': '-50', 'asst_icdc_erng_rt': '-0.00001000'}], 'rt_cd': '0', 'msg_cd': '20310000', 'msg1': '모의투자 조회가 완료되었습니다.                                                 '}
+2025-06-13 10:57:30,294 - INFO - 💰 현재 현금잔고: 0원
+2025-06-13 10:57:30,294 - INFO - 💎 현재 총자산: 0원
+2025-06-13 10:57:30,294 - ERROR - ❌ 현금잔고가 0원입니다. 잔고 조회 API를 확인해주세요.
+2025-06-13 10:57:31,096 - INFO - 🌐 API 요청: GET https://openapivts.koreainvestment.com:29443/uapi/domestic-stock/v1/trading/inquire-balance
+2025-06-13 10:57:31,184 - INFO - 📥 응답 상태: 200
+2025-06-13 10:57:31,184 - INFO - 📥 응답 데이터: {"ctx_area_fk100":"                                                                                                    ","ctx_area_nk100":"                                                                                                    ","output1":[{"pdno":"005930","prdt_name":"삼성전자","trad_dvsn_name":"현금","bfdy_buy_qty":"0","bfdy_sll_qty":"0","thdt_buyqty":"1","thdt_sll_qty":"0","hldg_qty":"1","ord_psbl_qty":"1","pchs_avg_pric":"58500.0000","pchs_amt":"58500","prpr":"58450","evlu_amt":"58450","evlu_pfls_amt":"-50","evlu_pfls_rt":"-0.09","evlu_erng_rt":"-0.08547009","loan_dt":"","loan_amt":"0","stln_slng_chgs":"0","expd_dt":"","fltt_rt":"-1.76000000","bfdy_cprs_icdc":"1050","item_mgna_rt_name":"20%","grta_rt_name":"","sbst_pric":"0","stck_loan_unpr":"0.0000"}],"output2":[{"dnca_tot_amt":"500000000","nxdy_excc_amt":"500000000","prvs_rcdl_excc_amt":"499941500","cma_evlu_amt":"0","bfdy_buy_amt":"0","thdt_buy_amt":"58500","nxdy_auto_rdpt_amt":"0","bfdy_sll_amt":"0","thdt_sll_amt":"0","d2_auto_rdpt_amt":"0","bfdy_tlex_amt":"0","thdt_tlex_amt":"0","tot_loan_amt":"0","scts_evlu_amt":"58450","tot_evlu_amt":"499999950","nass_amt":"499999950","fncg_gld_auto_rdpt_yn":"","pchs_amt_smtl_amt":"58500","evlu_amt_smtl_amt":"58450","evlu_pfls_smtl_amt":"-50","tot_stln_slng_chgs":"0","bfdy_tot_asst_evlu_amt":"500000000","asst_icdc_amt":"-50","asst_icdc_erng_rt":"-0.00001000"}],"rt_cd":"0","msg_cd":"20310000","msg1":"모의투자 조회가 완료되었습니다.                                                 "}
+2025-06-13 10:57:31,186 - ERROR - 🔍 원본 잔고 응답: {'ctx_area_fk100': '                                                                                                    ', 'ctx_area_nk100': '                                                                                                    ', 'output1': [{'pdno': '005930', 'prdt_name': '삼성전자', 'trad_dvsn_name': '현금', 'bfdy_buy_qty': '0', 'bfdy_sll_qty': '0', 'thdt_buyqty': '1', 'thdt_sll_qty': '0', 'hldg_qty': '1', 'ord_psbl_qty': '1', 'pchs_avg_pric': '58500.0000', 'pchs_amt': '58500', 'prpr': '58450', 'evlu_amt': '58450', 'evlu_pfls_amt': '-50', 'evlu_pfls_rt': '-0.09', 'evlu_erng_rt': '-0.08547009', 'loan_dt': '', 'loan_amt': '0', 'stln_slng_chgs': '0', 'expd_dt': '', 'fltt_rt': '-1.76000000', 'bfdy_cprs_icdc': '1050', 'item_mgna_rt_name': '20%', 'grta_rt_name': '', 'sbst_pric': '0', 'stck_loan_unpr': '0.0000'}], 'output2': [{'dnca_tot_amt': '500000000', 'nxdy_excc_amt': '500000000', 'prvs_rcdl_excc_amt': '499941500', 'cma_evlu_amt': '0', 'bfdy_buy_amt': '0', 'thdt_buy_amt': '58500', 'nxdy_auto_rdpt_amt': '0', 'bfdy_sll_amt': '0', 'thdt_sll_amt': '0', 'd2_auto_rdpt_amt': '0', 'bfdy_tlex_amt': '0', 'thdt_tlex_amt': '0', 'tot_loan_amt': '0', 'scts_evlu_amt': '58450', 'tot_evlu_amt': '499999950', 'nass_amt': '499999950', 'fncg_gld_auto_rdpt_yn': '', 'pchs_amt_smtl_amt': '58500', 'evlu_amt_smtl_amt': '58450', 'evlu_pfls_smtl_amt': '-50', 'tot_stln_slng_chgs': '0', 'bfdy_tot_asst_evlu_amt': '500000000', 'asst_icdc_amt': '-50', 'asst_icdc_erng_rt': '-0.00001000'}], 'rt_cd': '0', 'msg_cd': '20310000', 'msg1': '모의투자 조회가 완료되었습니다.                                                 '}
+2025-06-13 10:57:32,057 - INFO - 📱 텔레그램 알림 전송 완료
+2025-06-13 10:57:32,058 - INFO - --- 사이클 종료, 5분 대기 ---
+2025-06-13 11:02:32,069 - INFO - --- AI 리밸런싱 사이클 시작 (주기: 5분) ---
+2025-06-13 11:02:32,070 - INFO - 🔄 AI 기반 포트폴리오 리밸런싱 시작
+2025-06-13 11:02:32,071 - INFO - 🧭 시장 체제 분석(Market Regime Analysis) 시작...
+2025-06-13 11:02:32,389 - ERROR - 시장 체제 분석 중 오류: 'MarketAnalyzer' object has no attribute 'logger'
+Traceback (most recent call last):
+  File "c:\Users\USER\Desktop\test_stock\market_analyzer.py", line 485, in _get_market_trend
+    if pd.isna(ma200) or pd.isna(ma50) or pd.isna(ma20):
+       ~~~~~~~^^^^^^^
+  File "C:\Users\USER\Desktop\test_stock\venv\Lib\site-packages\pandas\core\generic.py", line 1577, in __nonzero__
+    raise ValueError(
+    ...<2 lines>...
+    )
+ValueError: The truth value of a Series is ambiguous. Use a.empty, a.bool(), a.item(), a.any() or a.all().
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\USER\Desktop\test_stock\market_analyzer.py", line 442, in get_market_regime_analysis
+    market_trend = self._get_market_trend(kospi_index)
+  File "c:\Users\USER\Desktop\test_stock\market_analyzer.py", line 501, in _get_market_trend
+    self.logger.error(f"시장 트렌드 분석 중 오류: {e}")
+    ^^^^^^^^^^^
+AttributeError: 'MarketAnalyzer' object has no attribute 'logger'
+2025-06-13 11:02:32,394 - INFO - 🧭 현재 시장 체제: NEUTRAL
+2025-06-13 11:02:32,394 - INFO - 포트폴리오를 동기화합니다.
+2025-06-13 11:02:32,394 - INFO - 🌐 API 요청: GET https://openapivts.koreainvestment.com:29443/uapi/domestic-stock/v1/trading/inquire-balance
+2025-06-13 11:02:32,498 - INFO - 📥 응답 상태: 200
+2025-06-13 11:02:32,499 - INFO - 📥 응답 데이터: {"ctx_area_fk100":"                                                                                                    ","ctx_area_nk100":"                                                                                                    ","output1":[{"pdno":"005930","prdt_name":"삼성전자","trad_dvsn_name":"현금","bfdy_buy_qty":"0","bfdy_sll_qty":"0","thdt_buyqty":"1","thdt_sll_qty":"0","hldg_qty":"1","ord_psbl_qty":"1","pchs_avg_pric":"58500.0000","pchs_amt":"58500","prpr":"58500","evlu_amt":"58500","evlu_pfls_amt":"0","evlu_pfls_rt":"0.00","evlu_erng_rt":"0.00000000","loan_dt":"","loan_amt":"0","stln_slng_chgs":"0","expd_dt":"","fltt_rt":"-1.68000000","bfdy_cprs_icdc":"1000","item_mgna_rt_name":"20%","grta_rt_name":"","sbst_pric":"0","stck_loan_unpr":"0.0000"}],"output2":[{"dnca_tot_amt":"500000000","nxdy_excc_amt":"500000000","prvs_rcdl_excc_amt":"499941500","cma_evlu_amt":"0","bfdy_buy_amt":"0","thdt_buy_amt":"58500","nxdy_auto_rdpt_amt":"0","bfdy_sll_amt":"0","thdt_sll_amt":"0","d2_auto_rdpt_amt":"0","bfdy_tlex_amt":"0","thdt_tlex_amt":"0","tot_loan_amt":"0","scts_evlu_amt":"58400","tot_evlu_amt":"499999900","nass_amt":"499999900","fncg_gld_auto_rdpt_yn":"","pchs_amt_smtl_amt":"58500","evlu_amt_smtl_amt":"58400","evlu_pfls_smtl_amt":"-100","tot_stln_slng_chgs":"0","bfdy_tot_asst_evlu_amt":"500000000","asst_icdc_amt":"-100","asst_icdc_erng_rt":"-0.00002000"}],"rt_cd":"0","msg_cd":"20310000","msg1":"모의투자 조회가 완료되었습니다.                                                 "}
+2025-06-13 11:02:32,501 - INFO - 📋 잔고 조회 결과: {'ctx_area_fk100': '                                                                                                    ', 'ctx_area_nk100': '                                                                                                    ', 'output1': [{'pdno': '005930', 'prdt_name': '삼성전자', 'trad_dvsn_name': '현금', 'bfdy_buy_qty': '0', 'bfdy_sll_qty': '0', 'thdt_buyqty': '1', 'thdt_sll_qty': '0', 'hldg_qty': '1', 'ord_psbl_qty': '1', 'pchs_avg_pric': '58500.0000', 'pchs_amt': '58500', 'prpr': '58500', 'evlu_amt': '58500', 'evlu_pfls_amt': '0', 'evlu_pfls_rt': '0.00', 'evlu_erng_rt': '0.00000000', 'loan_dt': '', 'loan_amt': '0', 'stln_slng_chgs': '0', 'expd_dt': '', 'fltt_rt': '-1.68000000', 'bfdy_cprs_icdc': '1000', 'item_mgna_rt_name': '20%', 'grta_rt_name': '', 'sbst_pric': '0', 'stck_loan_unpr': '0.0000'}], 'output2': [{'dnca_tot_amt': '500000000', 'nxdy_excc_amt': '500000000', 'prvs_rcdl_excc_amt': '499941500', 'cma_evlu_amt': '0', 'bfdy_buy_amt': '0', 'thdt_buy_amt': '58500', 'nxdy_auto_rdpt_amt': '0', 'bfdy_sll_amt': '0', 'thdt_sll_amt': '0', 'd2_auto_rdpt_amt': '0', 'bfdy_tlex_amt': '0', 'thdt_tlex_amt': '0', 'tot_loan_amt': '0', 'scts_evlu_amt': '58400', 'tot_evlu_amt': '499999900', 'nass_amt': '499999900', 'fncg_gld_auto_rdpt_yn': '', 'pchs_amt_smtl_amt': '58500', 'evlu_amt_smtl_amt': '58400', 'evlu_pfls_smtl_amt': '-100', 'tot_stln_slng_chgs': '0', 'bfdy_tot_asst_evlu_amt': '500000000', 'asst_icdc_amt': '-100', 'asst_icdc_erng_rt': '-0.00002000'}], 'rt_cd': '0', 'msg_cd': '20310000', 'msg1': '모의투자 조회가 완료되었습니다.                                                 '}
+2025-06-13 11:02:32,503 - INFO - 💰 현금잔고: 0원
+2025-06-13 11:02:32,503 - INFO - 💎 총자산: 0원
+2025-06-13 11:02:32,504 - INFO - 포트폴리오 동기화 완료 - 총 자산: 0원, 현금: 0원
+2025-06-13 11:02:32,505 - INFO - 보유 종목 수: 0개
+2025-06-13 11:02:32,505 - WARNING - ⚠️ 잔고 정보가 모두 0입니다. API 응답을 확인해주세요.
+2025-06-13 11:02:32,505 - WARNING - 원본 응답: {'ctx_area_fk100': '                                                                                                    ', 'ctx_area_nk100': '                                                                                                    ', 'output1': [{'pdno': '005930', 'prdt_name': '삼성전자', 'trad_dvsn_name': '현금', 'bfdy_buy_qty': '0', 'bfdy_sll_qty': '0', 'thdt_buyqty': '1', 'thdt_sll_qty': '0', 'hldg_qty': '1', 'ord_psbl_qty': '1', 'pchs_avg_pric': '58500.0000', 'pchs_amt': '58500', 'prpr': '58500', 'evlu_amt': '58500', 'evlu_pfls_amt': '0', 'evlu_pfls_rt': '0.00', 'evlu_erng_rt': '0.00000000', 'loan_dt': '', 'loan_amt': '0', 'stln_slng_chgs': '0', 'expd_dt': '', 'fltt_rt': '-1.68000000', 'bfdy_cprs_icdc': '1000', 'item_mgna_rt_name': '20%', 'grta_rt_name': '', 'sbst_pric': '0', 'stck_loan_unpr': '0.0000'}], 'output2': [{'dnca_tot_amt': '500000000', 'nxdy_excc_amt': '500000000', 'prvs_rcdl_excc_amt': '499941500', 'cma_evlu_amt': '0', 'bfdy_buy_amt': '0', 'thdt_buy_amt': '58500', 'nxdy_auto_rdpt_amt': '0', 'bfdy_sll_amt': '0', 'thdt_sll_amt': '0', 'd2_auto_rdpt_amt': '0', 'bfdy_tlex_amt': '0', 'thdt_tlex_amt': '0', 'tot_loan_amt': '0', 'scts_evlu_amt': '58400', 'tot_evlu_amt': '499999900', 'nass_amt': '499999900', 'fncg_gld_auto_rdpt_yn': '', 'pchs_amt_smtl_amt': '58500', 'evlu_amt_smtl_amt': '58400', 'evlu_pfls_smtl_amt': '-100', 'tot_stln_slng_chgs': '0', 'bfdy_tot_asst_evlu_amt': '500000000', 'asst_icdc_amt': '-100', 'asst_icdc_erng_rt': '-0.00002000'}], 'rt_cd': '0', 'msg_cd': '20310000', 'msg1': '모의투자 조회가 완료되었습니다.                                                 '}
+2025-06-13 11:02:32,507 - INFO - 💰 현재 상태 - 총자산: 0원, 현금: 0원, 보유종목: 0개
+2025-06-13 11:02:32,508 - INFO - 🎖️ 척후병 전략 실행
+2025-06-13 11:02:32,508 - INFO - 🔍 척후병 전략을 시작합니다...
+2025-06-13 11:02:32,508 - INFO - 포트폴리오를 동기화합니다.
+2025-06-13 11:02:32,509 - INFO - 🌐 API 요청: GET https://openapivts.koreainvestment.com:29443/uapi/domestic-stock/v1/trading/inquire-balance
+2025-06-13 11:02:32,587 - INFO - 📥 응답 상태: 200
+2025-06-13 11:02:32,589 - INFO - 📥 응답 데이터: {"ctx_area_fk100":"                                                                                                    ","ctx_area_nk100":"                                                                                                    ","output1":[{"pdno":"005930","prdt_name":"삼성전자","trad_dvsn_name":"현금","bfdy_buy_qty":"0","bfdy_sll_qty":"0","thdt_buyqty":"1","thdt_sll_qty":"0","hldg_qty":"1","ord_psbl_qty":"1","pchs_avg_pric":"58500.0000","pchs_amt":"58500","prpr":"58400","evlu_amt":"58400","evlu_pfls_amt":"-100","evlu_pfls_rt":"-0.17","evlu_erng_rt":"-0.17094017","loan_dt":"","loan_amt":"0","stln_slng_chgs":"0","expd_dt":"","fltt_rt":"-1.85000000","bfdy_cprs_icdc":"1100","item_mgna_rt_name":"20%","grta_rt_name":"","sbst_pric":"0","stck_loan_unpr":"0.0000"}],"output2":[{"dnca_tot_amt":"500000000","nxdy_excc_amt":"500000000","prvs_rcdl_excc_amt":"499941500","cma_evlu_amt":"0","bfdy_buy_amt":"0","thdt_buy_amt":"58500","nxdy_auto_rdpt_amt":"0","bfdy_sll_amt":"0","thdt_sll_amt":"0","d2_auto_rdpt_amt":"0","bfdy_tlex_amt":"0","thdt_tlex_amt":"0","tot_loan_amt":"0","scts_evlu_amt":"58500","tot_evlu_amt":"500000000","nass_amt":"500000000","fncg_gld_auto_rdpt_yn":"","pchs_amt_smtl_amt":"58500","evlu_amt_smtl_amt":"58500","evlu_pfls_smtl_amt":"0","tot_stln_slng_chgs":"0","bfdy_tot_asst_evlu_amt":"500000000","asst_icdc_amt":"0","asst_icdc_erng_rt":"0.00000000"}],"rt_cd":"0","msg_cd":"20310000","msg1":"모의투자 조회가 완료되었습니다.                                                 "}
+2025-06-13 11:02:32,590 - INFO - 📋 잔고 조회 결과: {'ctx_area_fk100': '                                                                                                    ', 'ctx_area_nk100': '                                                                                                    ', 'output1': [{'pdno': '005930', 'prdt_name': '삼성전자', 'trad_dvsn_name': '현금', 'bfdy_buy_qty': '0', 'bfdy_sll_qty': '0', 'thdt_buyqty': '1', 'thdt_sll_qty': '0', 'hldg_qty': '1', 'ord_psbl_qty': '1', 'pchs_avg_pric': '58500.0000', 'pchs_amt': '58500', 'prpr': '58400', 'evlu_amt': '58400', 'evlu_pfls_amt': '-100', 'evlu_pfls_rt': '-0.17', 'evlu_erng_rt': '-0.17094017', 'loan_dt': '', 'loan_amt': '0', 'stln_slng_chgs': '0', 'expd_dt': '', 'fltt_rt': '-1.85000000', 'bfdy_cprs_icdc': '1100', 'item_mgna_rt_name': '20%', 'grta_rt_name': '', 'sbst_pric': '0', 'stck_loan_unpr': '0.0000'}], 'output2': [{'dnca_tot_amt': '500000000', 'nxdy_excc_amt': '500000000', 'prvs_rcdl_excc_amt': '499941500', 'cma_evlu_amt': '0', 'bfdy_buy_amt': '0', 'thdt_buy_amt': '58500', 'nxdy_auto_rdpt_amt': '0', 'bfdy_sll_amt': '0', 'thdt_sll_amt': '0', 'd2_auto_rdpt_amt': '0', 'bfdy_tlex_amt': '0', 'thdt_tlex_amt': '0', 'tot_loan_amt': '0', 'scts_evlu_amt': '58500', 'tot_evlu_amt': '500000000', 'nass_amt': '500000000', 'fncg_gld_auto_rdpt_yn': '', 'pchs_amt_smtl_amt': '58500', 'evlu_amt_smtl_amt': '58500', 'evlu_pfls_smtl_amt': '0', 'tot_stln_slng_chgs': '0', 'bfdy_tot_asst_evlu_amt': '500000000', 'asst_icdc_amt': '0', 'asst_icdc_erng_rt': '0.00000000'}], 'rt_cd': '0', 'msg_cd': '20310000', 'msg1': '모의투자 조회가 완료되었습니다.                                                 '}
+2025-06-13 11:02:32,591 - INFO - 💰 현금잔고: 0원
+2025-06-13 11:02:32,592 - INFO - 💎 총자산: 0원
+2025-06-13 11:02:32,592 - INFO - 포트폴리오 동기화 완료 - 총 자산: 0원, 현금: 0원
+2025-06-13 11:02:32,592 - INFO - 보유 종목 수: 0개
+2025-06-13 11:02:32,592 - WARNING - ⚠️ 잔고 정보가 모두 0입니다. API 응답을 확인해주세요.
+2025-06-13 11:02:32,593 - WARNING - 원본 응답: {'ctx_area_fk100': '                                                                                                    ', 'ctx_area_nk100': '                                                                                                    ', 'output1': [{'pdno': '005930', 'prdt_name': '삼성전자', 'trad_dvsn_name': '현금', 'bfdy_buy_qty': '0', 'bfdy_sll_qty': '0', 'thdt_buyqty': '1', 'thdt_sll_qty': '0', 'hldg_qty': '1', 'ord_psbl_qty': '1', 'pchs_avg_pric': '58500.0000', 'pchs_amt': '58500', 'prpr': '58400', 'evlu_amt': '58400', 'evlu_pfls_amt': '-100', 'evlu_pfls_rt': '-0.17', 'evlu_erng_rt': '-0.17094017', 'loan_dt': '', 'loan_amt': '0', 'stln_slng_chgs': '0', 'expd_dt': '', 'fltt_rt': '-1.85000000', 'bfdy_cprs_icdc': '1100', 'item_mgna_rt_name': '20%', 'grta_rt_name': '', 'sbst_pric': '0', 'stck_loan_unpr': '0.0000'}], 'output2': [{'dnca_tot_amt': '500000000', 'nxdy_excc_amt': '500000000', 'prvs_rcdl_excc_amt': '499941500', 'cma_evlu_amt': '0', 'bfdy_buy_amt': '0', 'thdt_buy_amt': '58500', 'nxdy_auto_rdpt_amt': '0', 'bfdy_sll_amt': '0', 'thdt_sll_amt': '0', 'd2_auto_rdpt_amt': '0', 'bfdy_tlex_amt': '0', 'thdt_tlex_amt': '0', 'tot_loan_amt': '0', 'scts_evlu_amt': '58500', 'tot_evlu_amt': '500000000', 'nass_amt': '500000000', 'fncg_gld_auto_rdpt_yn': '', 'pchs_amt_smtl_amt': '58500', 'evlu_amt_smtl_amt': '58500', 'evlu_pfls_smtl_amt': '0', 'tot_stln_slng_chgs': '0', 'bfdy_tot_asst_evlu_amt': '500000000', 'asst_icdc_amt': '0', 'asst_icdc_erng_rt': '0.00000000'}], 'rt_cd': '0', 'msg_cd': '20310000', 'msg1': '모의투자 조회가 완료되었습니다.                                                 '}
+2025-06-13 11:02:32,594 - INFO - 💰 현재 현금잔고: 0원
+2025-06-13 11:02:32,594 - INFO - 💎 현재 총자산: 0원
+2025-06-13 11:02:32,594 - ERROR - ❌ 현금잔고가 0원입니다. 잔고 조회 API를 확인해주세요.
+2025-06-13 11:02:33,395 - INFO - 🌐 API 요청: GET https://openapivts.koreainvestment.com:29443/uapi/domestic-stock/v1/trading/inquire-balance
+2025-06-13 11:02:33,490 - INFO - 📥 응답 상태: 200
+2025-06-13 11:02:33,490 - INFO - 📥 응답 데이터: {"ctx_area_fk100":"                                                                                                    ","ctx_area_nk100":"                                                                                                    ","output1":[{"pdno":"005930","prdt_name":"삼성전자","trad_dvsn_name":"현금","bfdy_buy_qty":"0","bfdy_sll_qty":"0","thdt_buyqty":"1","thdt_sll_qty":"0","hldg_qty":"1","ord_psbl_qty":"1","pchs_avg_pric":"58500.0000","pchs_amt":"58500","prpr":"58500","evlu_amt":"58500","evlu_pfls_amt":"0","evlu_pfls_rt":"0.00","evlu_erng_rt":"0.00000000","loan_dt":"","loan_amt":"0","stln_slng_chgs":"0","expd_dt":"","fltt_rt":"-1.68000000","bfdy_cprs_icdc":"1000","item_mgna_rt_name":"20%","grta_rt_name":"","sbst_pric":"0","stck_loan_unpr":"0.0000"}],"output2":[{"dnca_tot_amt":"500000000","nxdy_excc_amt":"500000000","prvs_rcdl_excc_amt":"499941500","cma_evlu_amt":"0","bfdy_buy_amt":"0","thdt_buy_amt":"58500","nxdy_auto_rdpt_amt":"0","bfdy_sll_amt":"0","thdt_sll_amt":"0","d2_auto_rdpt_amt":"0","bfdy_tlex_amt":"0","thdt_tlex_amt":"0","tot_loan_amt":"0","scts_evlu_amt":"58500","tot_evlu_amt":"500000000","nass_amt":"500000000","fncg_gld_auto_rdpt_yn":"","pchs_amt_smtl_amt":"58500","evlu_amt_smtl_amt":"58500","evlu_pfls_smtl_amt":"0","tot_stln_slng_chgs":"0","bfdy_tot_asst_evlu_amt":"500000000","asst_icdc_amt":"0","asst_icdc_erng_rt":"0.00000000"}],"rt_cd":"0","msg_cd":"20310000","msg1":"모의투자 조회가 완료되었습니다.                                                 "}
+2025-06-13 11:02:33,492 - ERROR - 🔍 원본 잔고 응답: {'ctx_area_fk100': '                                                                                                    ', 'ctx_area_nk100': '                                                                                                    ', 'output1': [{'pdno': '005930', 'prdt_name': '삼성전자', 'trad_dvsn_name': '현금', 'bfdy_buy_qty': '0', 'bfdy_sll_qty': '0', 'thdt_buyqty': '1', 'thdt_sll_qty': '0', 'hldg_qty': '1', 'ord_psbl_qty': '1', 'pchs_avg_pric': '58500.0000', 'pchs_amt': '58500', 'prpr': '58500', 'evlu_amt': '58500', 'evlu_pfls_amt': '0', 'evlu_pfls_rt': '0.00', 'evlu_erng_rt': '0.00000000', 'loan_dt': '', 'loan_amt': '0', 'stln_slng_chgs': '0', 'expd_dt': '', 'fltt_rt': '-1.68000000', 'bfdy_cprs_icdc': '1000', 'item_mgna_rt_name': '20%', 'grta_rt_name': '', 'sbst_pric': '0', 'stck_loan_unpr': '0.0000'}], 'output2': [{'dnca_tot_amt': '500000000', 'nxdy_excc_amt': '500000000', 'prvs_rcdl_excc_amt': '499941500', 'cma_evlu_amt': '0', 'bfdy_buy_amt': '0', 'thdt_buy_amt': '58500', 'nxdy_auto_rdpt_amt': '0', 'bfdy_sll_amt': '0', 'thdt_sll_amt': '0', 'd2_auto_rdpt_amt': '0', 'bfdy_tlex_amt': '0', 'thdt_tlex_amt': '0', 'tot_loan_amt': '0', 'scts_evlu_amt': '58500', 'tot_evlu_amt': '500000000', 'nass_amt': '500000000', 'fncg_gld_auto_rdpt_yn': '', 'pchs_amt_smtl_amt': '58500', 'evlu_amt_smtl_amt': '58500', 'evlu_pfls_smtl_amt': '0', 'tot_stln_slng_chgs': '0', 'bfdy_tot_asst_evlu_amt': '500000000', 'asst_icdc_amt': '0', 'asst_icdc_erng_rt': '0.00000000'}], 'rt_cd': '0', 'msg_cd': '20310000', 'msg1': '모의투자 조회가 완료되었습니다.                                                 '}
+2025-06-13 11:02:34,426 - INFO - 📱 텔레그램 알림 전송 완료
+2025-06-13 11:02:34,427 - INFO - --- 사이클 종료, 5분 대기 ---

@@ -1,0 +1,1044 @@
+{
+  "timestamp": "2025-06-16T10:19:13.104405",
+  "overall_score": 0,
+  "file_metrics": [
+    {
+      "file_path": "advanced_trader.py",
+      "lines_of_code": 58,
+      "complexity": 2,
+      "maintainability_index": 90.2,
+      "test_coverage": 0.0,
+      "code_smells": [],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "analyze.py",
+      "lines_of_code": 20,
+      "complexity": 3,
+      "maintainability_index": 92.0,
+      "test_coverage": 0.0,
+      "code_smells": [],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "auto.py",
+      "lines_of_code": 10,
+      "complexity": 2,
+      "maintainability_index": 95.0,
+      "test_coverage": 0.0,
+      "code_smells": [],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "auto_backtest.py",
+      "lines_of_code": 149,
+      "complexity": 16,
+      "maintainability_index": 53.1,
+      "test_coverage": 0.0,
+      "code_smells": [
+        "매직 넘버 과다 사용 (10개)"
+      ],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "backtest.py",
+      "lines_of_code": 195,
+      "complexity": 24,
+      "maintainability_index": 32.5,
+      "test_coverage": 0.0,
+      "code_smells": [
+        "매직 넘버 과다 사용 (28개)"
+      ],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "backtest_mixed.py",
+      "lines_of_code": 47,
+      "complexity": 5,
+      "maintainability_index": 85.3,
+      "test_coverage": 0.0,
+      "code_smells": [
+        "매직 넘버 과다 사용 (6개)"
+      ],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "buffett_screener.py",
+      "lines_of_code": 77,
+      "complexity": 8,
+      "maintainability_index": 76.3,
+      "test_coverage": 0.0,
+      "code_smells": [],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "buy.py",
+      "lines_of_code": 54,
+      "complexity": 6,
+      "maintainability_index": 82.6,
+      "test_coverage": 0.0,
+      "code_smells": [],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "config.py",
+      "lines_of_code": 71,
+      "complexity": 3,
+      "maintainability_index": 86.9,
+      "test_coverage": 0.0,
+      "code_smells": [
+        "매직 넘버 과다 사용 (7개)"
+      ],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "cycle.py",
+      "lines_of_code": 62,
+      "complexity": 15,
+      "maintainability_index": 63.8,
+      "test_coverage": 0.0,
+      "code_smells": [
+        "매직 넘버 과다 사용 (6개)"
+      ],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "daytrader_screener.py",
+      "lines_of_code": 62,
+      "complexity": 10,
+      "maintainability_index": 73.8,
+      "test_coverage": 0.0,
+      "code_smells": [],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "fetch_and_backtest.py",
+      "lines_of_code": 49,
+      "complexity": 4,
+      "maintainability_index": 87.1,
+      "test_coverage": 0.0,
+      "code_smells": [
+        "매직 넘버 과다 사용 (9개)"
+      ],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "full_cycle_test.py",
+      "lines_of_code": 244,
+      "complexity": 31,
+      "maintainability_index": 13.6,
+      "test_coverage": 0.0,
+      "code_smells": [
+        "매직 넘버 과다 사용 (8개)"
+      ],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "kis_api.py",
+      "lines_of_code": 564,
+      "complexity": 64,
+      "maintainability_index": 0,
+      "test_coverage": 0.0,
+      "code_smells": [
+        "매직 넘버 과다 사용 (13개)"
+      ],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "kis_api_client.py",
+      "lines_of_code": 155,
+      "complexity": 10,
+      "maintainability_index": 64.5,
+      "test_coverage": 0.0,
+      "code_smells": [
+        "매직 넘버 과다 사용 (9개)"
+      ],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "kis_trading_system.py",
+      "lines_of_code": 68,
+      "complexity": 9,
+      "maintainability_index": 75.2,
+      "test_coverage": 0.0,
+      "code_smells": [],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "main.py",
+      "lines_of_code": 58,
+      "complexity": 9,
+      "maintainability_index": 76.2,
+      "test_coverage": 0.0,
+      "code_smells": [],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "market_analyzer.py",
+      "lines_of_code": 455,
+      "complexity": 61,
+      "maintainability_index": 0,
+      "test_coverage": 0.0,
+      "code_smells": [
+        "매직 넘버 과다 사용 (26개)"
+      ],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "minervini_screener.py",
+      "lines_of_code": 82,
+      "complexity": 7,
+      "maintainability_index": 77.8,
+      "test_coverage": 0.0,
+      "code_smells": [],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "monday_auto.py",
+      "lines_of_code": 26,
+      "complexity": 4,
+      "maintainability_index": 89.4,
+      "test_coverage": 0.0,
+      "code_smells": [],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "oneil_scanner.py",
+      "lines_of_code": 275,
+      "complexity": 37,
+      "maintainability_index": 0,
+      "test_coverage": 0.0,
+      "code_smells": [
+        "매직 넘버 과다 사용 (8개)"
+      ],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "portfolio.py",
+      "lines_of_code": 156,
+      "complexity": 14,
+      "maintainability_index": 56.4,
+      "test_coverage": 0.0,
+      "code_smells": [],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "quality_analyzer.py",
+      "lines_of_code": 397,
+      "complexity": 56,
+      "maintainability_index": 0,
+      "test_coverage": 0.0,
+      "code_smells": [
+        "긴 함수 발견 (50줄 초과)",
+        "중복된 메인 블록"
+      ],
+      "security_issues": [
+        "SQL 인젝션 위험 가능성",
+        "eval() 함수 사용으로 인한 보안 위험"
+      ],
+      "performance_issues": []
+    },
+    {
+      "file_path": "run.py",
+      "lines_of_code": 21,
+      "complexity": 4,
+      "maintainability_index": 89.9,
+      "test_coverage": 0.0,
+      "code_smells": [],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "run_analysis.py",
+      "lines_of_code": 96,
+      "complexity": 26,
+      "maintainability_index": 38.4,
+      "test_coverage": 0.0,
+      "code_smells": [
+        "매직 넘버 과다 사용 (9개)"
+      ],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "run_quality_check.py",
+      "lines_of_code": 45,
+      "complexity": 6,
+      "maintainability_index": 83.5,
+      "test_coverage": 0.0,
+      "code_smells": [],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "run_test_now.py",
+      "lines_of_code": 37,
+      "complexity": 4,
+      "maintainability_index": 88.3,
+      "test_coverage": 0.0,
+      "code_smells": [],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "scalping_trader.py",
+      "lines_of_code": 215,
+      "complexity": 40,
+      "maintainability_index": 0,
+      "test_coverage": 0.0,
+      "code_smells": [
+        "매직 넘버 과다 사용 (10개)"
+      ],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "secure_config.py",
+      "lines_of_code": 21,
+      "complexity": 2,
+      "maintainability_index": 93.9,
+      "test_coverage": 0.0,
+      "code_smells": [],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "sell.py",
+      "lines_of_code": 90,
+      "complexity": 13,
+      "maintainability_index": 65.0,
+      "test_coverage": 0.0,
+      "code_smells": [
+        "매직 넘버 과다 사용 (6개)"
+      ],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "simple_test.py",
+      "lines_of_code": 105,
+      "complexity": 13,
+      "maintainability_index": 63.5,
+      "test_coverage": 0.0,
+      "code_smells": [],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "system_check.py",
+      "lines_of_code": 19,
+      "complexity": 2,
+      "maintainability_index": 94.1,
+      "test_coverage": 0.0,
+      "code_smells": [],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "test.py",
+      "lines_of_code": 41,
+      "complexity": 4,
+      "maintainability_index": 87.9,
+      "test_coverage": 0.0,
+      "code_smells": [
+        "매직 넘버 과다 사용 (13개)"
+      ],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "test_buy.py",
+      "lines_of_code": 30,
+      "complexity": 4,
+      "maintainability_index": 89.0,
+      "test_coverage": 0.0,
+      "code_smells": [],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "test_improved.py",
+      "lines_of_code": 750,
+      "complexity": 75,
+      "maintainability_index": 0,
+      "test_coverage": 0.0,
+      "code_smells": [
+        "매직 넘버 과다 사용 (65개)"
+      ],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "test_sell.py",
+      "lines_of_code": 114,
+      "complexity": 14,
+      "maintainability_index": 60.6,
+      "test_coverage": 0.0,
+      "code_smells": [
+        "매직 넘버 과다 사용 (6개)"
+      ],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "test_simple.py",
+      "lines_of_code": 140,
+      "complexity": 19,
+      "maintainability_index": 48.0,
+      "test_coverage": 0.0,
+      "code_smells": [
+        "매직 넘버 과다 사용 (38개)"
+      ],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "trade.py",
+      "lines_of_code": 337,
+      "complexity": 27,
+      "maintainability_index": 12.3,
+      "test_coverage": 0.0,
+      "code_smells": [
+        "긴 함수 발견 (50줄 초과)",
+        "긴 함수 발견 (50줄 초과)",
+        "매직 넘버 과다 사용 (14개)"
+      ],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "trader.py",
+      "lines_of_code": 982,
+      "complexity": 174,
+      "maintainability_index": 0,
+      "test_coverage": 0.0,
+      "code_smells": [
+        "매직 넘버 과다 사용 (49개)"
+      ],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "zapier_mcp_server.py",
+      "lines_of_code": 14,
+      "complexity": 2,
+      "maintainability_index": 94.6,
+      "test_coverage": 0.0,
+      "code_smells": [],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "analysis\\gemini_analyzer.py",
+      "lines_of_code": 107,
+      "complexity": 9,
+      "maintainability_index": 71.3,
+      "test_coverage": 0.0,
+      "code_smells": [],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "analysis\\market_analyzer.py",
+      "lines_of_code": 129,
+      "complexity": 22,
+      "maintainability_index": 43.1,
+      "test_coverage": 0.0,
+      "code_smells": [
+        "매직 넘버 과다 사용 (7개)"
+      ],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "analysis\\__init__.py",
+      "lines_of_code": 0,
+      "complexity": 1,
+      "maintainability_index": 0.0,
+      "test_coverage": 0.0,
+      "code_smells": [],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "data\\fetcher.py",
+      "lines_of_code": 364,
+      "complexity": 62,
+      "maintainability_index": 0,
+      "test_coverage": 0.0,
+      "code_smells": [
+        "매직 넘버 과다 사용 (51개)"
+      ],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "data\\preprocess.py",
+      "lines_of_code": 9,
+      "complexity": 1,
+      "maintainability_index": 97.1,
+      "test_coverage": 0.0,
+      "code_smells": [],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "data\\__init__.py",
+      "lines_of_code": 0,
+      "complexity": 1,
+      "maintainability_index": 0.0,
+      "test_coverage": 0.0,
+      "code_smells": [],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "reporting\\reporter.py",
+      "lines_of_code": 148,
+      "complexity": 21,
+      "maintainability_index": 43.2,
+      "test_coverage": 0.0,
+      "code_smells": [
+        "매직 넘버 과다 사용 (16개)"
+      ],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "src\\config.py",
+      "lines_of_code": 46,
+      "complexity": 3,
+      "maintainability_index": 89.4,
+      "test_coverage": 0.0,
+      "code_smells": [],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "src\\main.py",
+      "lines_of_code": 71,
+      "complexity": 10,
+      "maintainability_index": 72.9,
+      "test_coverage": 0.0,
+      "code_smells": [],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "src\\simple_trader.py",
+      "lines_of_code": 92,
+      "complexity": 10,
+      "maintainability_index": 70.8,
+      "test_coverage": 0.0,
+      "code_smells": [],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "strategies\\base_strategy.py",
+      "lines_of_code": 65,
+      "complexity": 6,
+      "maintainability_index": 81.5,
+      "test_coverage": 0.0,
+      "code_smells": [],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "strategies\\fibonacci_strategy.py",
+      "lines_of_code": 199,
+      "complexity": 29,
+      "maintainability_index": 22.1,
+      "test_coverage": 0.0,
+      "code_smells": [],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "strategies\\scout_strategy.py",
+      "lines_of_code": 180,
+      "complexity": 24,
+      "maintainability_index": 34.0,
+      "test_coverage": 0.0,
+      "code_smells": [
+        "매직 넘버 과다 사용 (11개)"
+      ],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "strategies\\strategy_executor.py",
+      "lines_of_code": 253,
+      "complexity": 32,
+      "maintainability_index": 10.7,
+      "test_coverage": 0.0,
+      "code_smells": [],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "strategies\\technical_analyzer.py",
+      "lines_of_code": 136,
+      "complexity": 30,
+      "maintainability_index": 26.4,
+      "test_coverage": 0.0,
+      "code_smells": [
+        "매직 넘버 과다 사용 (7개)"
+      ],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "strategies\\__init__.py",
+      "lines_of_code": 16,
+      "complexity": 1,
+      "maintainability_index": 96.4,
+      "test_coverage": 0.0,
+      "code_smells": [],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "strategy\\gemini_signal.py",
+      "lines_of_code": 52,
+      "complexity": 7,
+      "maintainability_index": 80.8,
+      "test_coverage": 0.0,
+      "code_smells": [],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "strategy\\long_term_scanner.py",
+      "lines_of_code": 38,
+      "complexity": 9,
+      "maintainability_index": 78.2,
+      "test_coverage": 0.0,
+      "code_smells": [],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "strategy\\long_term_strategy.py",
+      "lines_of_code": 56,
+      "complexity": 12,
+      "maintainability_index": 70.4,
+      "test_coverage": 0.0,
+      "code_smells": [],
+      "security_issues": [
+        "SQL 인젝션 위험 가능성"
+      ],
+      "performance_issues": []
+    },
+    {
+      "file_path": "strategy\\prompts.py",
+      "lines_of_code": 35,
+      "complexity": 2,
+      "maintainability_index": 92.5,
+      "test_coverage": 0.0,
+      "code_smells": [],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "strategy\\short_term_scanner.py",
+      "lines_of_code": 34,
+      "complexity": 7,
+      "maintainability_index": 82.6,
+      "test_coverage": 0.0,
+      "code_smells": [],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "strategy\\short_term_strategy.py",
+      "lines_of_code": 79,
+      "complexity": 18,
+      "maintainability_index": 56.1,
+      "test_coverage": 0.0,
+      "code_smells": [],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "strategy\\__init__.py",
+      "lines_of_code": 0,
+      "complexity": 1,
+      "maintainability_index": 0.0,
+      "test_coverage": 0.0,
+      "code_smells": [],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "tests\\performance_analyzer.py",
+      "lines_of_code": 140,
+      "complexity": 13,
+      "maintainability_index": 60.0,
+      "test_coverage": 0.0,
+      "code_smells": [
+        "매직 넘버 과다 사용 (8개)"
+      ],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "tests\\run_backtest.py",
+      "lines_of_code": 227,
+      "complexity": 39,
+      "maintainability_index": 0,
+      "test_coverage": 0.0,
+      "code_smells": [
+        "매직 넘버 과다 사용 (9개)"
+      ],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "trading\\executor.py",
+      "lines_of_code": 81,
+      "complexity": 8,
+      "maintainability_index": 75.9,
+      "test_coverage": 0.0,
+      "code_smells": [],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "trading\\kis_api.py",
+      "lines_of_code": 190,
+      "complexity": 25,
+      "maintainability_index": 31.0,
+      "test_coverage": 0.0,
+      "code_smells": [],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "trading\\trader.py",
+      "lines_of_code": 169,
+      "complexity": 36,
+      "maintainability_index": 11.1,
+      "test_coverage": 0.0,
+      "code_smells": [],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "trading\\__init__.py",
+      "lines_of_code": 0,
+      "complexity": 1,
+      "maintainability_index": 0.0,
+      "test_coverage": 0.0,
+      "code_smells": [],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "utils\\chart_generator.py",
+      "lines_of_code": 79,
+      "complexity": 9,
+      "maintainability_index": 74.1,
+      "test_coverage": 0.0,
+      "code_smells": [],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "utils\\gspread_client.py",
+      "lines_of_code": 88,
+      "complexity": 12,
+      "maintainability_index": 67.2,
+      "test_coverage": 0.0,
+      "code_smells": [],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "utils\\logger.py",
+      "lines_of_code": 42,
+      "complexity": 9,
+      "maintainability_index": 77.8,
+      "test_coverage": 0.0,
+      "code_smells": [],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "utils\\parser.py",
+      "lines_of_code": 21,
+      "complexity": 3,
+      "maintainability_index": 91.9,
+      "test_coverage": 0.0,
+      "code_smells": [],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "utils\\system_utils.py",
+      "lines_of_code": 12,
+      "complexity": 2,
+      "maintainability_index": 94.8,
+      "test_coverage": 0.0,
+      "code_smells": [],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "utils\\telegram_bot.py",
+      "lines_of_code": 72,
+      "complexity": 15,
+      "maintainability_index": 62.8,
+      "test_coverage": 0.0,
+      "code_smells": [],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "utils\\throttle.py",
+      "lines_of_code": 16,
+      "complexity": 2,
+      "maintainability_index": 94.4,
+      "test_coverage": 0.0,
+      "code_smells": [],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "utils\\__init__.py",
+      "lines_of_code": 0,
+      "complexity": 1,
+      "maintainability_index": 0.0,
+      "test_coverage": 0.0,
+      "code_smells": [],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "src\\core\\data_manager.py",
+      "lines_of_code": 46,
+      "complexity": 4,
+      "maintainability_index": 87.4,
+      "test_coverage": 0.0,
+      "code_smells": [
+        "매직 넘버 과다 사용 (12개)"
+      ],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "src\\core\\notifier.py",
+      "lines_of_code": 68,
+      "complexity": 12,
+      "maintainability_index": 69.2,
+      "test_coverage": 0.0,
+      "code_smells": [],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "src\\core\\order_executor.py",
+      "lines_of_code": 256,
+      "complexity": 28,
+      "maintainability_index": 18.4,
+      "test_coverage": 0.0,
+      "code_smells": [
+        "매직 넘버 과다 사용 (11개)"
+      ],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "src\\core\\trader.py",
+      "lines_of_code": 321,
+      "complexity": 61,
+      "maintainability_index": 0,
+      "test_coverage": 0.0,
+      "code_smells": [],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "src\\core\\__init__.py",
+      "lines_of_code": 8,
+      "complexity": 1,
+      "maintainability_index": 97.2,
+      "test_coverage": 0.0,
+      "code_smells": [],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "src\\monitoring\\advanced_monitor.py",
+      "lines_of_code": 68,
+      "complexity": 9,
+      "maintainability_index": 75.2,
+      "test_coverage": 0.0,
+      "code_smells": [],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "src\\strategies\\fibonacci_strategy.py",
+      "lines_of_code": 32,
+      "complexity": 5,
+      "maintainability_index": 86.8,
+      "test_coverage": 0.0,
+      "code_smells": [],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "src\\strategies\\scout_strategy.py",
+      "lines_of_code": 68,
+      "complexity": 9,
+      "maintainability_index": 75.2,
+      "test_coverage": 0.0,
+      "code_smells": [
+        "매직 넘버 과다 사용 (21개)"
+      ],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "src\\strategies\\technical_analyzer.py",
+      "lines_of_code": 74,
+      "complexity": 6,
+      "maintainability_index": 80.6,
+      "test_coverage": 0.0,
+      "code_smells": [],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "src\\strategies\\__init__.py",
+      "lines_of_code": 7,
+      "complexity": 1,
+      "maintainability_index": 97.3,
+      "test_coverage": 0.0,
+      "code_smells": [],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "src\\utils\\helpers.py",
+      "lines_of_code": 11,
+      "complexity": 2,
+      "maintainability_index": 94.9,
+      "test_coverage": 0.0,
+      "code_smells": [],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "src\\utils\\logger.py",
+      "lines_of_code": 53,
+      "complexity": 5,
+      "maintainability_index": 84.7,
+      "test_coverage": 0.0,
+      "code_smells": [],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": "src\\utils\\__init__.py",
+      "lines_of_code": 6,
+      "complexity": 1,
+      "maintainability_index": 97.4,
+      "test_coverage": 0.0,
+      "code_smells": [],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": ".github\\scripts\\advanced_ai_reviewer.py",
+      "lines_of_code": 280,
+      "complexity": 43,
+      "maintainability_index": 0,
+      "test_coverage": 0.0,
+      "code_smells": [],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": ".github\\scripts\\ai_code_analyzer.py",
+      "lines_of_code": 134,
+      "complexity": 25,
+      "maintainability_index": 36.6,
+      "test_coverage": 0.0,
+      "code_smells": [],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": ".github\\scripts\\ai_reviewer.py",
+      "lines_of_code": 0,
+      "complexity": 1,
+      "maintainability_index": 0.0,
+      "test_coverage": 0.0,
+      "code_smells": [],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": ".github\\scripts\\auto_refactor.py",
+      "lines_of_code": 158,
+      "complexity": 31,
+      "maintainability_index": 22.2,
+      "test_coverage": 0.0,
+      "code_smells": [],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": ".github\\scripts\\code_structure_analyzer.py",
+      "lines_of_code": 279,
+      "complexity": 34,
+      "maintainability_index": 4.1,
+      "test_coverage": 0.0,
+      "code_smells": [],
+      "security_issues": [],
+      "performance_issues": []
+    },
+    {
+      "file_path": ".github\\scripts\\quality_check.py",
+      "lines_of_code": 0,
+      "complexity": 1,
+      "maintainability_index": 0.0,
+      "test_coverage": 0.0,
+      "code_smells": [],
+      "security_issues": [],
+      "performance_issues": []
+    }
+  ],
+  "gemini_analysis": "Gemini 분석 중 오류 발생: 404 models/gemini-pro is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.",
+  "recommendations": [
+    "높은 복잡도 파일 40개 리팩토링 필요",
+    "총 34개의 코드 스멜 해결 필요",
+    "총 3개의 보안 이슈 해결 필요",
+    "낮은 유지보수성 파일 35개 개선 필요"
+  ],
+  "trend_analysis": "트렌드 분석을 위한 충분한 데이터가 없습니다."
+}

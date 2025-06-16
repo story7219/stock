@@ -1,0 +1,227 @@
+name: 📈 실매매 모니터링 시스템
+
+on:
+  schedule:
+    - cron: '30 0 * * 1-5'    # 평일 오전 9시 30분 (장 시작)
+    - cron: '30 6 * * 1-5'    # 평일 오후 3시 30분 (장 마감)
+    - cron: '*/15 9-15 * * 1-5' # 평일 장중 15분마다
+  workflow_dispatch:
+    inputs:
+      trading_mode:
+        description: '매매 모드'
+        required: true
+        default: 'paper'
+        type: choice
+        options:
+        - paper
+        - live
+      force_rebalance:
+        description: '강제 리밸런싱'
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  pre-market-check:
+    name: 🌅 장전 시스템 점검
+    runs-on: ubuntu-latest
+    if: github.event.schedule == '30 0 * * 1-5' || github.event_name == 'workflow_dispatch'
+    
+    steps:
+    - name: 📥 코드 체크아웃
+      uses: actions/checkout@v4
+    
+    - name: 🐍 Python 환경 설정
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: 📦 의존성 설치
+      run: |
+        pip install -r requirements.txt
+    
+    - name: 🔍 시스템 상태 점검
+      env:
+        MOCK_KIS_APP_KEY: ${{ secrets.MOCK_KIS_APP_KEY }}
+        MOCK_KIS_APP_SECRET: ${{ secrets.MOCK_KIS_APP_SECRET }}
+        MOCK_KIS_ACCOUNT_NUMBER: ${{ secrets.MOCK_KIS_ACCOUNT_NUMBER }}
+        LIVE_KIS_APP_KEY: ${{ secrets.LIVE_KIS_APP_KEY }}
+        LIVE_KIS_APP_SECRET: ${{ secrets.LIVE_KIS_APP_SECRET }}
+        LIVE_KIS_ACCOUNT_NUMBER: ${{ secrets.LIVE_KIS_ACCOUNT_NUMBER }}
+        GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      run: |
+        python .github/scripts/pre_market_check.py
+    
+    - name: 📊 시장 상황 분석
+      env:
+        GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      run: |
+        python .github/scripts/market_analysis.py
+    
+    - name: 📋 점검 결과 업로드
+      uses: actions/upload-artifact@v3
+      with:
+        name: pre-market-check
+        path: |
+          system_status.json
+          market_analysis.json
+          pre_market_report.md
+
+  live-trading-execution:
+    name: 🚀 실매매 실행
+    runs-on: ubuntu-latest
+    needs: pre-market-check
+    if: github.event.schedule == '*/15 9-15 * * 1-5' || (github.event_name == 'workflow_dispatch' && github.event.inputs.trading_mode == 'live')
+    
+    steps:
+    - name: 📥 코드 체크아웃
+      uses: actions/checkout@v4
+    
+    - name: 🐍 Python 환경 설정
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: 📦 의존성 설치
+      run: |
+        pip install -r requirements.txt
+    
+    - name: 🚀 실매매 실행
+      env:
+        LIVE_KIS_APP_KEY: ${{ secrets.LIVE_KIS_APP_KEY }}
+        LIVE_KIS_APP_SECRET: ${{ secrets.LIVE_KIS_APP_SECRET }}
+        LIVE_KIS_ACCOUNT_NUMBER: ${{ secrets.LIVE_KIS_ACCOUNT_NUMBER }}
+        GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        IS_MOCK: 'false'
+        FORCE_REBALANCE: ${{ github.event.inputs.force_rebalance || 'false' }}
+      run: |
+        python .github/scripts/live_trading_executor.py
+    
+    - name: 📊 거래 결과 분석
+      run: |
+        python .github/scripts/trading_result_analyzer.py
+    
+    - name: 📋 거래 로그 업로드
+      uses: actions/upload-artifact@v3
+      with:
+        name: trading-logs-${{ github.run_number }}
+        path: |
+          trading_logs/
+          trading_results.json
+          performance_metrics.json
+
+  paper-trading-simulation:
+    name: 📝 모의매매 시뮬레이션
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.trading_mode == 'paper'
+    
+    steps:
+    - name: 📥 코드 체크아웃
+      uses: actions/checkout@v4
+    
+    - name: 🐍 Python 환경 설정
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: 📦 의존성 설치
+      run: |
+        pip install -r requirements.txt
+    
+    - name: 📝 모의매매 실행
+      env:
+        MOCK_KIS_APP_KEY: ${{ secrets.MOCK_KIS_APP_KEY }}
+        MOCK_KIS_APP_SECRET: ${{ secrets.MOCK_KIS_APP_SECRET }}
+        MOCK_KIS_ACCOUNT_NUMBER: ${{ secrets.MOCK_KIS_ACCOUNT_NUMBER }}
+        GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        IS_MOCK: 'true'
+      run: |
+        python .github/scripts/paper_trading_executor.py
+
+  anomaly-detection:
+    name: 🚨 이상 징후 탐지
+    runs-on: ubuntu-latest
+    needs: [live-trading-execution]
+    if: always()
+    
+    steps:
+    - name: 📥 코드 체크아웃
+      uses: actions/checkout@v4
+    
+    - name: 📥 거래 로그 다운로드
+      uses: actions/download-artifact@v3
+      with:
+        name: trading-logs-${{ github.run_number }}
+    
+    - name: 🐍 Python 환경 설정
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: 📦 이상 탐지 도구 설치
+      run: |
+        pip install -r requirements.txt
+        pip install scikit-learn isolation-forest
+    
+    - name: 🚨 이상 징후 분석
+      env:
+        TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      run: |
+        python .github/scripts/anomaly_detector.py
+    
+    - name: 📊 이상 탐지 결과 업로드
+      uses: actions/upload-artifact@v3
+      with:
+        name: anomaly-detection-results
+        path: |
+          anomaly_report.json
+          alert_logs.txt
+
+  post-market-analysis:
+    name: 🌆 장후 분석
+    runs-on: ubuntu-latest
+    if: github.event.schedule == '30 6 * * 1-5'
+    
+    steps:
+    - name: 📥 코드 체크아웃
+      uses: actions/checkout@v4
+    
+    - name: 🐍 Python 환경 설정
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: 📦 의존성 설치
+      run: |
+        pip install -r requirements.txt
+    
+    - name: 📊 일일 성과 분석
+      env:
+        LIVE_KIS_APP_KEY: ${{ secrets.LIVE_KIS_APP_KEY }}
+        LIVE_KIS_APP_SECRET: ${{ secrets.LIVE_KIS_APP_SECRET }}
+        LIVE_KIS_ACCOUNT_NUMBER: ${{ secrets.LIVE_KIS_ACCOUNT_NUMBER }}
+        GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      run: |
+        python .github/scripts/daily_performance_analysis.py
+    
+    - name: 📈 성과 리포트 생성
+      run: |
+        python .github/scripts/generate_daily_report.py
+    
+    - name: 📋 일일 리포트 업로드
+      uses: actions/upload-artifact@v3
+      with:
+        name: daily-report-${{ github.run_number }}
+        path: |
+          daily_report.html
+          performance_charts/
+          risk_metrics.json 

@@ -1,0 +1,75 @@
+2025-06-16 10:19:11,176 - INFO - Gemini API 설정 완료
+2025-06-16 10:19:11,177 - INFO - 코드 품질 분석 시작
+2025-06-16 10:19:11,178 - INFO - 파일 메트릭 분석 중...
+2025-06-16 10:19:12,695 - INFO - Gemini AI 분석 중...
+2025-06-16 10:19:13,103 - ERROR - Gemini 분석 실패: 404 models/gemini-pro is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.
+2025-06-16 10:19:13,108 - INFO - 보고서 저장 완료: C:\Users\USER\Desktop\test_stock\quality_reports\quality_report_20250616_101913.json
+2025-06-16 10:19:13,110 - INFO - HTML 보고서 생성 완료: C:\Users\USER\Desktop\test_stock\quality_reports\quality_report_20250616_101913.html
+2025-06-16 10:19:13,111 - INFO - 품질 분석 완료 - 전체 점수: 0.00
+2025-06-16 10:19:46,113 - INFO - Gemini API 설정 완료
+2025-06-16 10:19:46,114 - INFO - 품질 검사 스케줄러 시작 - 매일 오전 7시 실행
+2025-06-16 10:23:10,999 - INFO - ✅ Windows 작업 스케줄러에 등록 완료
+2025-06-16 10:23:11,000 - INFO - 📅 매일 오전 7시에 자동으로 실행됩니다
+2025-06-16 10:28:03,718 - INFO - ✅ Windows 작업 스케줄러에 등록 완료
+2025-06-16 10:28:03,719 - INFO - 📅 매일 오전 7시에 자동으로 실행됩니다
+2025-06-16 10:33:08,788 - INFO - Gemini API 설정 완료
+2025-06-16 10:33:08,791 - INFO - 🚀 자동 품질 분석 시작
+2025-06-16 10:33:08,791 - INFO - 코드 품질 분석 시작
+2025-06-16 10:33:08,791 - INFO - 파일 메트릭 분석 중...
+2025-06-16 10:33:09,980 - INFO - Gemini AI 분석 중...
+2025-06-16 10:33:10,352 - ERROR - Gemini 분석 실패: 404 models/gemini-pro is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.
+2025-06-16 10:33:10,357 - INFO - 보고서 저장 완료: C:\Users\USER\Desktop\test_stock\quality_reports\quality_report_20250616_103310.json
+2025-06-16 10:33:10,359 - INFO - HTML 보고서 생성 완료: C:\Users\USER\Desktop\test_stock\quality_reports\quality_report_20250616_103310.html
+2025-06-16 10:33:10,360 - INFO - 품질 분석 완료 - 전체 점수: 0.00
+2025-06-16 10:33:10,362 - INFO - ✅ 품질 분석 완료!
+2025-06-16 10:33:10,362 - INFO - 📊 전체 점수: 0/100
+2025-06-16 10:33:10,362 - INFO - 📁 분석된 파일 수: 97
+2025-06-16 10:33:10,363 - INFO - 💡 권장사항 수: 4
+2025-06-16 10:33:10,363 - WARNING - ⚠️ 품질 점수가 낮습니다: 0/100
+2025-06-16 10:33:20,705 - WARNING - ⚠️ 총 37개의 이슈가 발견되었습니다
+2025-06-16 10:33:30,731 - INFO - 🎉 일일 품질 분석 완료
+2025-06-16 10:34:28,712 - INFO - Gemini API 설정 완료
+2025-06-16 10:34:28,715 - INFO - 🚀 자동 품질 분석 시작
+2025-06-16 10:34:28,715 - INFO - 코드 품질 분석 시작
+2025-06-16 10:34:28,715 - INFO - 파일 메트릭 분석 중...
+2025-06-16 10:34:29,857 - INFO - Gemini AI 분석 중...
+2025-06-16 10:34:30,243 - ERROR - Gemini 분석 실패: 404 models/gemini-pro is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.
+2025-06-16 10:34:30,251 - INFO - 보고서 저장 완료: C:\Users\USER\Desktop\test_stock\quality_reports\quality_report_20250616_103430.json
+2025-06-16 10:34:30,253 - INFO - HTML 보고서 생성 완료: C:\Users\USER\Desktop\test_stock\quality_reports\quality_report_20250616_103430.html
+2025-06-16 10:34:30,254 - INFO - 품질 분석 완료 - 전체 점수: 0.00
+2025-06-16 10:34:30,256 - INFO - ✅ 품질 분석 완료!
+2025-06-16 10:34:30,256 - INFO - 📊 전체 점수: 0/100
+2025-06-16 10:34:30,257 - INFO - 📁 분석된 파일 수: 97
+2025-06-16 10:34:30,257 - INFO - 💡 권장사항 수: 4
+2025-06-16 10:34:30,257 - WARNING - ⚠️ 품질 점수가 낮습니다: 0/100
+2025-06-16 10:34:40,586 - WARNING - ⚠️ 총 37개의 이슈가 발견되었습니다
+2025-06-16 10:34:50,621 - INFO - 🎉 일일 품질 분석 완료
+2025-06-16 10:39:03,443 - INFO - 사용 가능한 모델들: ['models/embedding-gecko-001', 'models/gemini-1.0-pro-vision-latest', 'models/gemini-pro-vision', 'models/gemini-1.5-pro-latest', 'models/gemini-1.5-pro-002', 'models/gemini-1.5-pro', 'models/gemini-1.5-flash-latest', 'models/gemini-1.5-flash', 'models/gemini-1.5-flash-002', 'models/gemini-1.5-flash-8b', 'models/gemini-1.5-flash-8b-001', 'models/gemini-1.5-flash-8b-latest', 'models/gemini-2.5-pro-exp-03-25', 'models/gemini-2.5-pro-preview-03-25', 'models/gemini-2.5-flash-preview-04-17', 'models/gemini-2.5-flash-preview-05-20', 'models/gemini-2.5-flash-preview-04-17-thinking', 'models/gemini-2.5-pro-preview-05-06', 'models/gemini-2.5-pro-preview-06-05', 'models/gemini-2.0-flash-exp', 'models/gemini-2.0-flash', 'models/gemini-2.0-flash-001', 'models/gemini-2.0-flash-exp-image-generation', 'models/gemini-2.0-flash-lite-001', 'models/gemini-2.0-flash-lite', 'models/gemini-2.0-flash-preview-image-generation', 'models/gemini-2.0-flash-lite-preview-02-05', 'models/gemini-2.0-flash-lite-preview', 'models/gemini-2.0-pro-exp', 'models/gemini-2.0-pro-exp-02-05', 'models/gemini-exp-1206', 'models/gemini-2.0-flash-thinking-exp-01-21', 'models/gemini-2.0-flash-thinking-exp', 'models/gemini-2.0-flash-thinking-exp-1219', 'models/gemini-2.5-flash-preview-tts', 'models/gemini-2.5-pro-preview-tts', 'models/learnlm-2.0-flash-experimental', 'models/gemma-3-1b-it', 'models/gemma-3-4b-it', 'models/gemma-3-12b-it', 'models/gemma-3-27b-it', 'models/gemma-3n-e4b-it', 'models/embedding-001', 'models/text-embedding-004', 'models/gemini-embedding-exp-03-07', 'models/gemini-embedding-exp', 'models/aqa', 'models/imagen-3.0-generate-002', 'models/veo-2.0-generate-001', 'models/gemini-2.5-flash-preview-native-audio-dialog', 'models/gemini-2.5-flash-preview-native-audio-dialog-rai-v3', 'models/gemini-2.5-flash-exp-native-audio-thinking-dialog', 'models/gemini-2.0-flash-live-001']
+2025-06-16 10:39:03,963 - INFO - ✅ 사용할 모델: gemini-1.5-flash
+2025-06-16 10:39:03,963 - INFO - Gemini API 설정 완료
+2025-06-16 10:39:03,966 - INFO - 🚀 자동 품질 분석 시작
+2025-06-16 10:39:03,966 - INFO - 코드 품질 분석 시작
+2025-06-16 10:39:03,967 - INFO - 파일 메트릭 분석 중...
+2025-06-16 10:39:05,124 - INFO - Gemini AI 분석 중...
+2025-06-16 10:39:15,726 - INFO - 보고서 저장 완료: C:\Users\USER\Desktop\test_stock\quality_reports\quality_report_20250616_103915.json
+2025-06-16 10:39:15,728 - INFO - HTML 보고서 생성 완료: C:\Users\USER\Desktop\test_stock\quality_reports\quality_report_20250616_103915.html
+2025-06-16 10:39:15,728 - INFO - 품질 분석 완료 - 전체 점수: 5.62
+2025-06-16 10:39:15,730 - INFO - ✅ 품질 분석 완료!
+2025-06-16 10:39:15,731 - INFO - 📊 전체 점수: 5.62/100
+2025-06-16 10:39:15,731 - INFO - 📁 분석된 파일 수: 98
+2025-06-16 10:39:15,731 - INFO - 💡 권장사항 수: 4
+2025-06-16 10:39:15,731 - WARNING - ⚠️ 품질 점수가 낮습니다: 5.62/100
+2025-06-16 10:39:26,030 - WARNING - ⚠️ 총 36개의 이슈가 발견되었습니다
+2025-06-16 10:39:36,056 - INFO - 🎉 일일 품질 분석 완료
+2025-06-16 10:54:40,223 - INFO - ✅ 사용할 모델: gemini-2.0-flash
+2025-06-16 10:54:40,224 - INFO - Gemini API 설정 완료
+2025-06-16 10:54:40,225 - INFO - 코드 품질 분석 시작
+2025-06-16 10:54:40,225 - INFO - 파일 메트릭 분석 중...
+2025-06-16 10:54:41,597 - INFO - Gemini AI 분석 중...
+2025-06-16 10:54:51,724 - INFO - 보고서 저장 완료: C:\Users\USER\Desktop\test_stock\quality_reports\quality_report_20250616_105451.json
+2025-06-16 10:54:51,726 - INFO - HTML 보고서 생성 완료: C:\Users\USER\Desktop\test_stock\quality_reports\quality_report_20250616_105451.html
+2025-06-16 10:54:51,727 - INFO - 품질 분석 완료 - 전체 점수: 4.94
+2025-06-16 10:54:53,147 - INFO - ✅ 사용할 모델: gemini-2.0-flash
+2025-06-16 10:54:53,147 - INFO - Gemini API 설정 완료
+2025-06-16 10:54:53,150 - INFO - 리팩토링용 Gemini API 설정 완료
+2025-06-16 10:54:53,151 - INFO - === 반자동 리팩토링 시작 ===

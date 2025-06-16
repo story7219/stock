@@ -1,0 +1,831 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>코드 품질 분석 보고서 - 20250616_105451</title>
+    <style>
+        body { font-family: 'Malgun Gothic', sans-serif; margin: 20px; }
+        .header { background: #2c3e50; color: white; padding: 20px; border-radius: 8px; }
+        .score { font-size: 2em; font-weight: bold; color: #e74c3c; }
+        .section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 8px; }
+        .file-metric { background: #f8f9fa; margin: 10px 0; padding: 10px; border-radius: 4px; }
+        .issue { color: #e74c3c; font-weight: bold; }
+        .recommendation { background: #d4edda; padding: 10px; margin: 5px 0; border-radius: 4px; }
+        .gemini-analysis { background: #e3f2fd; padding: 15px; border-radius: 8px; white-space: pre-wrap; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>코드 품질 분석 보고서</h1>
+        <p>분석 시간: 2025-06-16T10:54:51.721580</p>
+        <div class="score">전체 점수: 4.94/100</div>
+    </div>
+    
+    <div class="section">
+        <h2>📊 파일별 메트릭</h2>
+        
+        <div class="file-metric">
+            <h3>advanced_trader.py</h3>
+            <p>코드 라인: 58 | 복잡도: 2 | 유지보수성: 90.2</p>
+            
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>analyze.py</h3>
+            <p>코드 라인: 20 | 복잡도: 3 | 유지보수성: 92.0</p>
+            
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>auto.py</h3>
+            <p>코드 라인: 10 | 복잡도: 2 | 유지보수성: 95.0</p>
+            
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>auto_backtest.py</h3>
+            <p>코드 라인: 149 | 복잡도: 16 | 유지보수성: 53.1</p>
+            <p class="issue">코드 스멜: 매직 넘버 과다 사용 (10개)</p>
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>auto_quality_service.py</h3>
+            <p>코드 라인: 353 | 복잡도: 39 | 유지보수성: 0</p>
+            
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>auto_refactoring_system.py</h3>
+            <p>코드 라인: 542 | 복잡도: 39 | 유지보수성: 0</p>
+            <p class="issue">코드 스멜: 매직 넘버 과다 사용 (10개)</p>
+            <p class="issue">보안 이슈: SQL 인젝션 위험 가능성</p>
+        </div>
+        
+        <div class="file-metric">
+            <h3>backtest.py</h3>
+            <p>코드 라인: 195 | 복잡도: 24 | 유지보수성: 32.5</p>
+            <p class="issue">코드 스멜: 매직 넘버 과다 사용 (28개)</p>
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>backtest_mixed.py</h3>
+            <p>코드 라인: 47 | 복잡도: 5 | 유지보수성: 85.3</p>
+            <p class="issue">코드 스멜: 매직 넘버 과다 사용 (6개)</p>
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>buffett_screener.py</h3>
+            <p>코드 라인: 77 | 복잡도: 8 | 유지보수성: 76.3</p>
+            
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>buy.py</h3>
+            <p>코드 라인: 54 | 복잡도: 6 | 유지보수성: 82.6</p>
+            
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>config.py</h3>
+            <p>코드 라인: 71 | 복잡도: 3 | 유지보수성: 86.9</p>
+            <p class="issue">코드 스멜: 매직 넘버 과다 사용 (7개)</p>
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>cycle.py</h3>
+            <p>코드 라인: 62 | 복잡도: 15 | 유지보수성: 63.8</p>
+            <p class="issue">코드 스멜: 매직 넘버 과다 사용 (6개)</p>
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>daytrader_screener.py</h3>
+            <p>코드 라인: 62 | 복잡도: 10 | 유지보수성: 73.8</p>
+            
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>debug_gemini.py</h3>
+            <p>코드 라인: 36 | 복잡도: 7 | 유지보수성: 82.4</p>
+            
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>fetch_and_backtest.py</h3>
+            <p>코드 라인: 49 | 복잡도: 4 | 유지보수성: 87.1</p>
+            <p class="issue">코드 스멜: 매직 넘버 과다 사용 (9개)</p>
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>full_cycle_test.py</h3>
+            <p>코드 라인: 244 | 복잡도: 31 | 유지보수성: 13.6</p>
+            <p class="issue">코드 스멜: 매직 넘버 과다 사용 (8개)</p>
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>google_sheets_integration.py</h3>
+            <p>코드 라인: 326 | 복잡도: 46 | 유지보수성: 0</p>
+            <p class="issue">코드 스멜: 매직 넘버 과다 사용 (10개)</p>
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>kis_api.py</h3>
+            <p>코드 라인: 564 | 복잡도: 64 | 유지보수성: 0</p>
+            <p class="issue">코드 스멜: 매직 넘버 과다 사용 (13개)</p>
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>kis_api_client.py</h3>
+            <p>코드 라인: 155 | 복잡도: 10 | 유지보수성: 64.5</p>
+            <p class="issue">코드 스멜: 매직 넘버 과다 사용 (9개)</p>
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>kis_trading_system.py</h3>
+            <p>코드 라인: 68 | 복잡도: 9 | 유지보수성: 75.2</p>
+            
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>main.py</h3>
+            <p>코드 라인: 58 | 복잡도: 9 | 유지보수성: 76.2</p>
+            
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>market_analyzer.py</h3>
+            <p>코드 라인: 455 | 복잡도: 61 | 유지보수성: 0</p>
+            <p class="issue">코드 스멜: 매직 넘버 과다 사용 (26개)</p>
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>minervini_screener.py</h3>
+            <p>코드 라인: 82 | 복잡도: 7 | 유지보수성: 77.8</p>
+            
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>monday_auto.py</h3>
+            <p>코드 라인: 26 | 복잡도: 4 | 유지보수성: 89.4</p>
+            
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>oneil_scanner.py</h3>
+            <p>코드 라인: 275 | 복잡도: 37 | 유지보수성: 0</p>
+            <p class="issue">코드 스멜: 매직 넘버 과다 사용 (8개)</p>
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>portfolio.py</h3>
+            <p>코드 라인: 156 | 복잡도: 14 | 유지보수성: 56.4</p>
+            
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>quality_analyzer.py</h3>
+            <p>코드 라인: 476 | 복잡도: 68 | 유지보수성: 0</p>
+            <p class="issue">코드 스멜: 중복된 메인 블록</p>
+            <p class="issue">보안 이슈: SQL 인젝션 위험 가능성, eval() 함수 사용으로 인한 보안 위험</p>
+        </div>
+        
+        <div class="file-metric">
+            <h3>quick_test.py</h3>
+            <p>코드 라인: 46 | 복잡도: 7 | 유지보수성: 81.4</p>
+            
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>run.py</h3>
+            <p>코드 라인: 21 | 복잡도: 4 | 유지보수성: 89.9</p>
+            
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>run_analysis.py</h3>
+            <p>코드 라인: 96 | 복잡도: 26 | 유지보수성: 38.4</p>
+            <p class="issue">코드 스멜: 매직 넘버 과다 사용 (9개)</p>
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>run_quality_check.py</h3>
+            <p>코드 라인: 45 | 복잡도: 6 | 유지보수성: 83.5</p>
+            
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>run_test_now.py</h3>
+            <p>코드 라인: 37 | 복잡도: 4 | 유지보수성: 88.3</p>
+            
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>scalping_trader.py</h3>
+            <p>코드 라인: 215 | 복잡도: 40 | 유지보수성: 0</p>
+            <p class="issue">코드 스멜: 매직 넘버 과다 사용 (10개)</p>
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>secure_config.py</h3>
+            <p>코드 라인: 21 | 복잡도: 2 | 유지보수성: 93.9</p>
+            
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>sell.py</h3>
+            <p>코드 라인: 90 | 복잡도: 13 | 유지보수성: 65.0</p>
+            <p class="issue">코드 스멜: 매직 넘버 과다 사용 (6개)</p>
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>simple_test.py</h3>
+            <p>코드 라인: 105 | 복잡도: 13 | 유지보수성: 63.5</p>
+            
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>system_check.py</h3>
+            <p>코드 라인: 19 | 복잡도: 2 | 유지보수성: 94.1</p>
+            
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>test.py</h3>
+            <p>코드 라인: 41 | 복잡도: 4 | 유지보수성: 87.9</p>
+            <p class="issue">코드 스멜: 매직 넘버 과다 사용 (13개)</p>
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>test_buy.py</h3>
+            <p>코드 라인: 30 | 복잡도: 4 | 유지보수성: 89.0</p>
+            
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>test_google_sheets.py</h3>
+            <p>코드 라인: 178 | 복잡도: 15 | 유지보수성: 52.2</p>
+            <p class="issue">코드 스멜: 매직 넘버 과다 사용 (7개)</p>
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>test_improved.py</h3>
+            <p>코드 라인: 750 | 복잡도: 75 | 유지보수성: 0</p>
+            <p class="issue">코드 스멜: 매직 넘버 과다 사용 (65개)</p>
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>test_sell.py</h3>
+            <p>코드 라인: 114 | 복잡도: 14 | 유지보수성: 60.6</p>
+            <p class="issue">코드 스멜: 매직 넘버 과다 사용 (6개)</p>
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>test_setup.py</h3>
+            <p>코드 라인: 73 | 복잡도: 9 | 유지보수성: 74.7</p>
+            
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>test_simple.py</h3>
+            <p>코드 라인: 140 | 복잡도: 19 | 유지보수성: 48.0</p>
+            <p class="issue">코드 스멜: 매직 넘버 과다 사용 (38개)</p>
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>trade.py</h3>
+            <p>코드 라인: 337 | 복잡도: 27 | 유지보수성: 12.3</p>
+            <p class="issue">코드 스멜: 긴 함수 발견 (50줄 초과), 긴 함수 발견 (50줄 초과), 매직 넘버 과다 사용 (14개)</p>
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>trader.py</h3>
+            <p>코드 라인: 982 | 복잡도: 174 | 유지보수성: 0</p>
+            <p class="issue">코드 스멜: 매직 넘버 과다 사용 (49개)</p>
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>zapier_mcp_server.py</h3>
+            <p>코드 라인: 14 | 복잡도: 2 | 유지보수성: 94.6</p>
+            
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>analysis\gemini_analyzer.py</h3>
+            <p>코드 라인: 107 | 복잡도: 9 | 유지보수성: 71.3</p>
+            
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>analysis\market_analyzer.py</h3>
+            <p>코드 라인: 129 | 복잡도: 22 | 유지보수성: 43.1</p>
+            <p class="issue">코드 스멜: 매직 넘버 과다 사용 (7개)</p>
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>analysis\__init__.py</h3>
+            <p>코드 라인: 0 | 복잡도: 1 | 유지보수성: 0.0</p>
+            
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>data\fetcher.py</h3>
+            <p>코드 라인: 364 | 복잡도: 62 | 유지보수성: 0</p>
+            <p class="issue">코드 스멜: 매직 넘버 과다 사용 (51개)</p>
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>data\preprocess.py</h3>
+            <p>코드 라인: 9 | 복잡도: 1 | 유지보수성: 97.1</p>
+            
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>data\__init__.py</h3>
+            <p>코드 라인: 0 | 복잡도: 1 | 유지보수성: 0.0</p>
+            
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>reporting\reporter.py</h3>
+            <p>코드 라인: 148 | 복잡도: 21 | 유지보수성: 43.2</p>
+            <p class="issue">코드 스멜: 매직 넘버 과다 사용 (16개)</p>
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>src\config.py</h3>
+            <p>코드 라인: 46 | 복잡도: 3 | 유지보수성: 89.4</p>
+            
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>src\main.py</h3>
+            <p>코드 라인: 71 | 복잡도: 10 | 유지보수성: 72.9</p>
+            
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>src\simple_trader.py</h3>
+            <p>코드 라인: 92 | 복잡도: 10 | 유지보수성: 70.8</p>
+            
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>strategies\base_strategy.py</h3>
+            <p>코드 라인: 65 | 복잡도: 6 | 유지보수성: 81.5</p>
+            
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>strategies\fibonacci_strategy.py</h3>
+            <p>코드 라인: 199 | 복잡도: 29 | 유지보수성: 22.1</p>
+            
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>strategies\scout_strategy.py</h3>
+            <p>코드 라인: 180 | 복잡도: 24 | 유지보수성: 34.0</p>
+            <p class="issue">코드 스멜: 매직 넘버 과다 사용 (11개)</p>
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>strategies\strategy_executor.py</h3>
+            <p>코드 라인: 253 | 복잡도: 32 | 유지보수성: 10.7</p>
+            
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>strategies\technical_analyzer.py</h3>
+            <p>코드 라인: 136 | 복잡도: 30 | 유지보수성: 26.4</p>
+            <p class="issue">코드 스멜: 매직 넘버 과다 사용 (7개)</p>
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>strategies\__init__.py</h3>
+            <p>코드 라인: 16 | 복잡도: 1 | 유지보수성: 96.4</p>
+            
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>strategy\gemini_signal.py</h3>
+            <p>코드 라인: 52 | 복잡도: 7 | 유지보수성: 80.8</p>
+            
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>strategy\long_term_scanner.py</h3>
+            <p>코드 라인: 38 | 복잡도: 9 | 유지보수성: 78.2</p>
+            
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>strategy\long_term_strategy.py</h3>
+            <p>코드 라인: 56 | 복잡도: 12 | 유지보수성: 70.4</p>
+            
+            <p class="issue">보안 이슈: SQL 인젝션 위험 가능성</p>
+        </div>
+        
+        <div class="file-metric">
+            <h3>strategy\prompts.py</h3>
+            <p>코드 라인: 35 | 복잡도: 2 | 유지보수성: 92.5</p>
+            
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>strategy\short_term_scanner.py</h3>
+            <p>코드 라인: 34 | 복잡도: 7 | 유지보수성: 82.6</p>
+            
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>strategy\short_term_strategy.py</h3>
+            <p>코드 라인: 79 | 복잡도: 18 | 유지보수성: 56.1</p>
+            
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>strategy\__init__.py</h3>
+            <p>코드 라인: 0 | 복잡도: 1 | 유지보수성: 0.0</p>
+            
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>tests\performance_analyzer.py</h3>
+            <p>코드 라인: 140 | 복잡도: 13 | 유지보수성: 60.0</p>
+            <p class="issue">코드 스멜: 매직 넘버 과다 사용 (8개)</p>
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>tests\run_backtest.py</h3>
+            <p>코드 라인: 227 | 복잡도: 39 | 유지보수성: 0</p>
+            <p class="issue">코드 스멜: 매직 넘버 과다 사용 (9개)</p>
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>trading\executor.py</h3>
+            <p>코드 라인: 81 | 복잡도: 8 | 유지보수성: 75.9</p>
+            
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>trading\kis_api.py</h3>
+            <p>코드 라인: 190 | 복잡도: 25 | 유지보수성: 31.0</p>
+            
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>trading\trader.py</h3>
+            <p>코드 라인: 169 | 복잡도: 36 | 유지보수성: 11.1</p>
+            
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>trading\__init__.py</h3>
+            <p>코드 라인: 0 | 복잡도: 1 | 유지보수성: 0.0</p>
+            
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>utils\chart_generator.py</h3>
+            <p>코드 라인: 79 | 복잡도: 9 | 유지보수성: 74.1</p>
+            
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>utils\gspread_client.py</h3>
+            <p>코드 라인: 88 | 복잡도: 12 | 유지보수성: 67.2</p>
+            
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>utils\logger.py</h3>
+            <p>코드 라인: 42 | 복잡도: 9 | 유지보수성: 77.8</p>
+            
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>utils\parser.py</h3>
+            <p>코드 라인: 21 | 복잡도: 3 | 유지보수성: 91.9</p>
+            
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>utils\system_utils.py</h3>
+            <p>코드 라인: 12 | 복잡도: 2 | 유지보수성: 94.8</p>
+            
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>utils\telegram_bot.py</h3>
+            <p>코드 라인: 72 | 복잡도: 15 | 유지보수성: 62.8</p>
+            
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>utils\throttle.py</h3>
+            <p>코드 라인: 16 | 복잡도: 2 | 유지보수성: 94.4</p>
+            
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>utils\__init__.py</h3>
+            <p>코드 라인: 0 | 복잡도: 1 | 유지보수성: 0.0</p>
+            
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>src\core\data_manager.py</h3>
+            <p>코드 라인: 46 | 복잡도: 4 | 유지보수성: 87.4</p>
+            <p class="issue">코드 스멜: 매직 넘버 과다 사용 (12개)</p>
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>src\core\notifier.py</h3>
+            <p>코드 라인: 68 | 복잡도: 12 | 유지보수성: 69.2</p>
+            
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>src\core\order_executor.py</h3>
+            <p>코드 라인: 256 | 복잡도: 28 | 유지보수성: 18.4</p>
+            <p class="issue">코드 스멜: 매직 넘버 과다 사용 (11개)</p>
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>src\core\trader.py</h3>
+            <p>코드 라인: 321 | 복잡도: 61 | 유지보수성: 0</p>
+            
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>src\core\__init__.py</h3>
+            <p>코드 라인: 8 | 복잡도: 1 | 유지보수성: 97.2</p>
+            
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>src\monitoring\advanced_monitor.py</h3>
+            <p>코드 라인: 68 | 복잡도: 9 | 유지보수성: 75.2</p>
+            
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>src\strategies\fibonacci_strategy.py</h3>
+            <p>코드 라인: 32 | 복잡도: 5 | 유지보수성: 86.8</p>
+            
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>src\strategies\scout_strategy.py</h3>
+            <p>코드 라인: 68 | 복잡도: 9 | 유지보수성: 75.2</p>
+            <p class="issue">코드 스멜: 매직 넘버 과다 사용 (21개)</p>
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>src\strategies\technical_analyzer.py</h3>
+            <p>코드 라인: 74 | 복잡도: 6 | 유지보수성: 80.6</p>
+            
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>src\strategies\__init__.py</h3>
+            <p>코드 라인: 7 | 복잡도: 1 | 유지보수성: 97.3</p>
+            
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>src\utils\helpers.py</h3>
+            <p>코드 라인: 11 | 복잡도: 2 | 유지보수성: 94.9</p>
+            
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>src\utils\logger.py</h3>
+            <p>코드 라인: 53 | 복잡도: 5 | 유지보수성: 84.7</p>
+            
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>src\utils\__init__.py</h3>
+            <p>코드 라인: 6 | 복잡도: 1 | 유지보수성: 97.4</p>
+            
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>.github\scripts\advanced_ai_reviewer.py</h3>
+            <p>코드 라인: 280 | 복잡도: 43 | 유지보수성: 0</p>
+            
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>.github\scripts\ai_code_analyzer.py</h3>
+            <p>코드 라인: 134 | 복잡도: 25 | 유지보수성: 36.6</p>
+            
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>.github\scripts\ai_reviewer.py</h3>
+            <p>코드 라인: 0 | 복잡도: 1 | 유지보수성: 0.0</p>
+            
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>.github\scripts\auto_refactor.py</h3>
+            <p>코드 라인: 158 | 복잡도: 31 | 유지보수성: 22.2</p>
+            
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>.github\scripts\code_structure_analyzer.py</h3>
+            <p>코드 라인: 279 | 복잡도: 34 | 유지보수성: 4.1</p>
+            
+            
+        </div>
+        
+        <div class="file-metric">
+            <h3>.github\scripts\quality_check.py</h3>
+            <p>코드 라인: 0 | 복잡도: 1 | 유지보수성: 0.0</p>
+            
+            
+        </div>
+        
+    </div>
+    
+    <div class="section">
+        <h2>🤖 Gemini AI 분석</h2>
+        <div class="gemini-analysis">## Python 프로젝트 코드 품질 분석 결과 및 개선 제안
+
+제공된 코드 품질 분석 데이터를 바탕으로 프로젝트의 전반적인 상태를 평가하고, 구체적인 개선 방향을 제시합니다.
+
+**1. 전체적인 코드 품질 평가 (1-10점): 6.5점**
+
+* **긍정적인 측면:**
+    * 총 파일 수 대비 코드 라인 수가 비교적 적어, 전반적으로 과도하게 비대한 코드는 아닌 것으로 판단됩니다.
+    * 평균 유지보수성이 54.94점으로, 중간 수준 이상을 유지하고 있습니다.
+
+* **부정적인 측면:**
+    * 평균 복잡도가 17.23점으로, 상당 부분의 코드에서 복잡성이 높을 가능성이 있습니다.
+    * 총 코드 스멜이 36개, 보안 이슈가 4개 존재하며, 코드 품질 개선 및 보안 강화가 필요합니다.
+    * `trader.py`의 복잡도가 174로 매우 높아 집중적인 개선이 필요합니다.
+
+**2. 주요 문제점과 개선 방향:**
+
+* **높은 복잡도:** 함수 또는 클래스 내부에 너무 많은 기능이 구현되어 있을 가능성이 높습니다.
+    * **개선 방향:** 함수/클래스를 더 작고 명확한 역할로 분리 (Single Responsibility Principle), 중복 코드 제거, 알고리즘 개선 등을 통해 복잡도를 낮춰야 합니다.
+* **코드 스멜:** 중복 코드, 긴 함수, 긴 파라미터 목록, 매직 넘버, 과도한 결합 등 다양한 문제점을 내포할 수 있습니다.
+    * **개선 방향:** 코드 스멜 종류에 따라 적절한 리팩토링 기법 적용 (예: 중복 코드 제거, 함수 분리, 상수 사용 등). 코드 스멜 분석 도구 (예: pylint, flake8)를 활용하여 자동으로 코드 스멜을 탐지하고 수정하는 것이 좋습니다.
+* **보안 이슈:** SQL Injection, Cross-Site Scripting (XSS), 민감 정보 노출 등 다양한 보안 취약점을 의미할 수 있습니다.
+    * **개선 방향:** 보안 취약점 분석 도구 (예: bandit, snyk)를 활용하여 코드 내 보안 취약점 탐지 및 수정. 입력값 검증 강화, 안전한 API 사용, 암호화 등의 보안 기법 적용.
+* **문제 파일 집중:** 특정 파일 (특히 `trader.py`)에 문제점이 집중되어 있습니다.
+    * **개선 방향:** 해당 파일들의 코드를 면밀히 분석하여 문제 원인을 파악하고, 집중적인 리팩토링을 수행해야 합니다.
+
+**3. 우선순위별 리팩토링 권장사항:**
+
+1. **최우선:** `trader.py` 파일 리팩토링 (높은 복잡도).  함수 분리, 클래스 분리, 디자인 패턴 적용 등을 고려하여 복잡도를 낮추고 유지보수성을 높입니다.
+2. **우선:** `quality_analyzer.py` 파일의 보안 이슈 해결.  보안 취약점 분석 도구를 사용하여 구체적인 문제점을 파악하고, 안전한 코드로 수정합니다.
+3. **중요:** `test_improved.py`, `kis_api.py`, `data\fetcher.py` 파일의 복잡도 및 코드 스멜 개선.  코드를 읽기 쉽고 이해하기 쉽게 만들고, 잠재적인 버그를 예방합니다.
+4. **일반:** 전체 코드베이스의 코드 스멜 분석 및 수정.  자동화된 도구를 활용하여 코드 품질을 꾸준히 관리합니다.
+
+**4. 코드 아키텍처 개선 제안:**
+
+* **모듈화 및 패키지화:** 기능별로 모듈을 분리하고, 관련 모듈들을 패키지로 묶어 관리합니다. 이는 코드의 재사용성을 높이고, 의존성을 관리하기 용이하게 합니다.
+* **계층화 아키텍처:** 프레젠테이션 계층, 비즈니스 로직 계층, 데이터 접근 계층 등으로 구분하여 각 계층의 역할을 명확하게 합니다.  이를 통해 코드의 유지보수성을 높이고, 변경에 대한 영향을 최소화할 수 있습니다.
+* **디자인 패턴 적용:**  GoF 디자인 패턴을 프로젝트에 적절히 적용하여 코드의 설계 품질을 향상시킵니다 (예: Strategy 패턴, Factory 패턴, Observer 패턴).
+* **API 설계 개선:** RESTful API 디자인 원칙을 준수하여 API를 설계하고, API 문서화를 철저히 합니다.
+* **의존성 주입 (Dependency Injection):** 코드의 결합도를 낮추고 테스트 용이성을 높입니다.
+
+**5. 성능 최적화 방안:**
+
+* **병목 지점 파악:** 프로파일링 도구 (예: cProfile)를 사용하여 코드 실행 시간을 분석하고, 성능 병목 지점을 파악합니다.
+* **알고리즘 개선:** 비효율적인 알고리즘을 효율적인 알고리즘으로 개선합니다.
+* **캐싱:** 자주 사용되는 데이터를 캐싱하여 데이터 접근 시간을 줄입니다.  Redis, Memcached 등 캐싱 솔루션 활용을 고려합니다.
+* **비동기 처리:** I/O 작업, 네트워크 통신 등을 비동기적으로 처리하여 프로그램의 응답성을 높입니다.  asyncio 라이브러리를 활용합니다.
+* **데이터베이스 쿼리 최적화:** 데이터베이스 쿼리 성능을 개선합니다.  인덱스 사용, 쿼리 튜닝 등을 통해 데이터 접근 속도를 향상시킵니다.
+* **불필요한 객체 생성 최소화:** 객체 생성이 많은 부분을 파악하고, 객체 풀링 등의 기법을 사용하여 객체 생성 비용을 줄입니다.
+
+**6. 보안 강화 방안:**
+
+* **입력값 검증 강화:** 사용자로부터 입력받는 모든 데이터에 대해 유효성 검사를 수행하여 악의적인 입력 (예: SQL Injection, XSS)을 차단합니다.
+* **출력값 인코딩:** 사용자에게 출력하는 데이터에 대해 적절한 인코딩을 적용하여 XSS 공격을 방지합니다.
+* **인증 및 권한 부여 강화:** 강력한 인증 및 권한 부여 메커니즘을 구축하여 무단 접근을 차단합니다.  OAuth 2.0, JWT 등을 활용합니다.
+* **암호화:** 민감한 데이터 (예: 사용자 비밀번호, API 키)를 안전하게 암호화하여 저장합니다.  bcrypt, Argon2 등의 안전한 암호화 알고리즘을 사용합니다.
+* **보안 취약점 분석 도구 활용:**  bandit, snyk 등의 도구를 사용하여 코드 내 보안 취약점을 주기적으로 검사하고 수정합니다.
+* **보안 업데이트:** 사용하는 라이브러리 및 프레임워크를 최신 버전으로 유지하여 알려진 보안 취약점을 방지합니다.
+* **보안 정책 수립:**  프로젝트의 보안 정책을 수립하고, 개발팀 전체가 보안 정책을 준수하도록 교육합니다.
+* **OWASP Top 10:** OWASP Top 10과 같은 웹 애플리케이션 보안 취약점 목록을 참고하여 보안 취약점을 예방합니다.
+
+**결론:**
+
+전반적으로 개선의 여지가 많은 프로젝트입니다. 위에서 제시된 분석 내용을 바탕으로 우선순위에 따라 문제점을 해결하고, 코드 아키텍처 개선, 성능 최적화, 보안 강화 노력을 꾸준히 기울인다면 코드 품질을 크게 향상시킬 수 있을 것입니다. 코드 품질 분석 도구를 적극적으로 활용하고, 코드 리뷰를 통해 지속적으로 코드 품질을 관리하는 것이 중요합니다.
+</div>
+    </div>
+    
+    <div class="section">
+        <h2>💡 개선 권장사항</h2>
+        <div class="recommendation">높은 복잡도 파일 44개 리팩토링 필요</div><div class="recommendation">총 36개의 코드 스멜 해결 필요</div><div class="recommendation">총 4개의 보안 이슈 해결 필요</div><div class="recommendation">낮은 유지보수성 파일 38개 개선 필요</div>
+    </div>
+    
+    <div class="section">
+        <h2>📈 트렌드 분석</h2>
+        <p>품질 점수가 0.0에서 5.6로 개선되었습니다.</p>
+    </div>
+</body>
+</html>

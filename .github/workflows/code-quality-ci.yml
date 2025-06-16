@@ -1,0 +1,49 @@
+# .github/workflows/code-quality-ci.yml
+name: AI 코드 품질 관리 CI
+
+on:
+  # 1. main 브랜치에 코드가 push 될 때마다 실행
+  push:
+    branches: [ "main" ]
+  
+  # 2. 매일 오전 7시(KST)에 자동으로 실행 (UTC 기준 22:00)
+  schedule:
+    - cron: '0 22 * * *'
+
+jobs:
+  run-ai-quality-check:
+    runs-on: ubuntu-latest
+    
+    steps:
+      # 1. GitHub 리포지토리의 코드를 가져옵니다.
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Python 환경을 설정합니다.
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      # 3. requirements.txt 에 명시된 라이브러리들을 설치합니다.
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      # 4. (중요) GitHub Secrets에서 API 키를 가져와 .env 파일을 생성합니다.
+      #    - 이렇게 해야 코드에 키가 노출되지 않고 안전하게 자동화 스크립트를 실행할 수 있습니다.
+      - name: Create .env file from secrets
+        run: |
+          echo "GOOGLE_API_KEY=${{ secrets.GOOGLE_API_KEY }}" > .env
+          echo "KIS_APP_KEY=${{ secrets.KIS_APP_KEY }}" >> .env
+          echo "KIS_APP_SECRET=${{ secrets.KIS_APP_SECRET }}" >> .env
+          echo "KIS_ACCOUNT_NO=${{ secrets.KIS_ACCOUNT_NO }}" >> .env
+        shell: bash
+        # push 이벤트에서는 AI 분석을 실행하지 않으므로 키가 없어도 통과됩니다.
+        # schedule 이벤트에서는 키가 필수적입니다.
+        continue-on-error: true
+
+      # 5. AI 코드 품질 분석 스크립트를 실행합니다.
+      - name: Run AI Quality Analysis
+        run: python maintenance_tools/run_maintenance.py analyze
+        # 마찬가지로 push 이벤트에서는 키가 없으면 AI 분석 부분이 실패할 수 있으나, 전체 워크플로우는 성공으로 처리됩니다.
+        continue-on-error: true 

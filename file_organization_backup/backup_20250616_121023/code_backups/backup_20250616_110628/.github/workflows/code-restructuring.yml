@@ -1,0 +1,134 @@
+name: 🏗️ 코드 구조화 자동화
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    types: [opened, synchronize]
+  schedule:
+    - cron: '0 2 * * 1'  # 매주 월요일 오전 2시
+  workflow_dispatch:
+
+jobs:
+  analyze-code-structure:
+    name: 📊 코드 구조 분석
+    runs-on: ubuntu-latest
+    outputs:
+      restructure-needed: ${{ steps.analysis.outputs.restructure_needed }}
+      analysis-results: ${{ steps.analysis.outputs.results }}
+    
+    steps:
+    - name: 📥 코드 체크아웃
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: 🐍 Python 환경 설정
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: 📦 분석 도구 설치
+      run: |
+        pip install -r requirements.txt
+        pip install radon mccabe pyflakes vulture
+        pip install ast-grep semgrep lizard
+        pip install google-generativeai openai
+    
+    - name: 🔍 코드 구조 분석 실행
+      id: analysis
+      env:
+        GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      run: |
+        python .github/scripts/code_structure_analyzer.py
+        echo "restructure_needed=$(cat restructure_needed.txt)" >> $GITHUB_OUTPUT
+        echo "results=$(cat analysis_summary.json)" >> $GITHUB_OUTPUT
+    
+    - name: 📋 분석 결과 업로드
+      uses: actions/upload-artifact@v3
+      with:
+        name: structure-analysis
+        path: |
+          structure_analysis_report.md
+          restructure_plan.json
+          code_metrics.json
+
+  auto-restructure:
+    name: 🔧 자동 리팩토링
+    runs-on: ubuntu-latest
+    needs: analyze-code-structure
+    if: needs.analyze-code-structure.outputs.restructure-needed == 'true'
+    
+    steps:
+    - name: 📥 코드 체크아웃
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: 🐍 Python 환경 설정
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: 📦 리팩토링 도구 설치
+      run: |
+        pip install -r requirements.txt
+        pip install rope autoflake isort black
+        pip install google-generativeai
+    
+    - name: 📥 분석 결과 다운로드
+      uses: actions/download-artifact@v3
+      with:
+        name: structure-analysis
+    
+    - name: 🔧 자동 리팩토링 실행
+      env:
+        GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      run: |
+        python .github/scripts/auto_restructure.py
+    
+    - name: 📝 리팩토링 PR 생성
+      uses: peter-evans/create-pull-request@v5
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        commit-message: "🏗️ 자동 코드 구조화 리팩토링"
+        title: "🤖 AI 자동 코드 구조화"
+        body: |
+          ## 🏗️ 자동 코드 구조화 결과
+          
+          AI가 분석한 결과를 바탕으로 코드를 역할별로 재구성했습니다.
+          
+          ### 📊 주요 변경사항
+          - 매매 전략 모듈 분리
+          - 데이터 수집 로직 독립화
+          - 주문 실행 시스템 모듈화
+          - 로깅 및 모니터링 분리
+          
+          ### 🎯 개선 효과
+          - 코드 가독성 향상
+          - 유지보수성 개선
+          - 테스트 용이성 증대
+          - 모듈 재사용성 향상
+          
+          *이 PR은 AI가 자동으로 생성했습니다. 리뷰 후 병합해주세요.*
+        branch: auto-restructure
+        delete-branch: true
+
+  sonarqube-analysis:
+    name: 🔍 SonarQube 코드 품질 분석
+    runs-on: ubuntu-latest
+    steps:
+    - name: 📥 코드 체크아웃
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: 🔍 SonarQube 스캔
+      uses: sonarqube-quality-gate-action@master
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+    
+    - name: 📊 품질 게이트 체크
+      run: |
+        echo "SonarQube 품질 분석 완료" 
