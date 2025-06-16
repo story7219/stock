@@ -1,0 +1,49 @@
+name: "실시간 자동매매 시스템"
+
+on:
+  workflow_dispatch: # 수동 실행을 위한 버튼
+  schedule:
+    # KST 기준 월-금 09:00 - 15:30 동안 5분 간격으로 실행 (GitHub Actions 최소 간격)
+    # UTC 기준: 00:00 - 06:30
+    - cron: '*/5 0-6 * * 1-5'
+
+jobs:
+  trade:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: Run Trading Script
+        env:
+          IS_MOCK: "true"
+          KIS_APP_KEY: ${{ secrets.KIS_APP_KEY }}
+          KIS_APP_SECRET: ${{ secrets.KIS_APP_SECRET }}
+          KIS_ACCOUNT_NO: ${{ secrets.KIS_ACCOUNT_NO }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
+          GOOGLE_SPREADSHEET_ID: ${{ secrets.GOOGLE_SPREADSHEET_ID }}
+        run: python realtime_ai_trader.py run
+
+      - name: Send Telegram Notification on Failure
+        if: failure()
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_CHAT_ID }}
+          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          message: |
+            🚨 **실시간 자동매매 시스템 오류!** 🚨
+            - 워크플로우: ${{ github.workflow }}
+            - 실행 링크: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }} 

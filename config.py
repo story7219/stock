@@ -1,94 +1,131 @@
 """
-모든 설정을 관리하는 중앙 파일
-API 키, 거래 전략, 경로 등 모든 설정을 여기서 변경합니다.
+.env 파일에서 환경 변수를 로드하고,
+모의투자인지 실전투자인지에 따라 적절한 API 키와 계좌번호를 선택하여 제공합니다.
 """
 import os
+from dotenv import load_dotenv
 
-# --- 💡 API 설정 ---
-# 한국투자증권 API (실전/모의투자)
-KIS_APP_KEY = "YOUR_APP_KEY"  # 여기에 실제 App Key를 입력하세요.
-KIS_APP_SECRET = "YOUR_APP_SECRET" # 여기에 실제 App Secret을 입력하세요.
-KIS_ACCOUNT_NO = "YOUR_ACCOUNT_NUMBER" # 계좌번호 전체를 입력하세요. (예: 12345678-01)
+# .env 파일에서 환경 변수를 로드합니다.
+load_dotenv()
 
-# 구글 Gemini API
-# (환경 변수 'GOOGLE_API_KEY'에 설정하는 것을 권장)
-GOOGLE_API_KEY = os.environ.get('GOOGLE_API_KEY', 'YOUR_GOOGLE_API_KEY')
+# --- 환경 설정 ---
+# IS_MOCK이 'true' (대소문자 무관)이면 모의투자, 아니면 실전투자로 판단합니다.
+IS_MOCK = os.getenv('IS_MOCK', 'true').lower() == 'true'
 
-# --- 💰 거래 전략 설정 ---
-# 개인 투자자 현실형 전략
-TOTAL_CAPITAL = 10_000_000  # 총 투자 자본금 (예: 1천만원)
-MAX_STOCK_COUNT = 5        # 최대 보유 종목 수
-PER_STOCK_INVESTMENT = TOTAL_CAPITAL // MAX_STOCK_COUNT # 종목당 투자 금액
+# --- KIS API 자격증명 ---
+# 모의투자 여부에 따라 적절한 KIS API 정보를 선택합니다.
+if IS_MOCK:
+    KIS_APP_KEY = os.getenv('MOCK_KIS_APP_KEY')
+    KIS_APP_SECRET = os.getenv('MOCK_KIS_APP_SECRET')
+    KIS_ACCOUNT_NO = os.getenv('MOCK_KIS_ACCOUNT_NUMBER')
+    KIS_BASE_URL = "https://openapivts.koreainvestment.com:29443"  # 모의투자 서버
+else:
+    KIS_APP_KEY = os.getenv('LIVE_KIS_APP_KEY')
+    KIS_APP_SECRET = os.getenv('LIVE_KIS_APP_SECRET')
+    KIS_ACCOUNT_NO = os.getenv('LIVE_KIS_ACCOUNT_NUMBER')
+    KIS_BASE_URL = "https://openapi.koreainvestment.com:9443"  # 실전투자 서버
 
-# 리스크 관리
-STOP_LOSS_PCT = -0.10      # 손절매 퍼센트 (예: -10%)
-TAKE_PROFIT_PCT = 0.20     # 익절 퍼센트 (예: +20%)
+# --- 외부 서비스 API 키 ---
+TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
+TELEGRAM_CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
 
-# --- ⚙️ 시스템 설정 ---
-# 모의투자 여부 (True: 모의투자, False: 실전투자)
-IS_MOCK_TRADING = True
+GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
+GOOGLE_SERVICE_ACCOUNT_FILE = os.getenv('GOOGLE_SERVICE_ACCOUNT_FILE')
+GOOGLE_SPREADSHEET_ID = os.getenv('GOOGLE_SPREADSHEET_ID')
+GOOGLE_WORKSHEET_NAME = os.getenv('GOOGLE_WORKSHEET_NAME')
 
-# --- 기본 환경 설정 ---
-SYSTEM_CHECK_INTERVAL_MINUTES = 5  # 메인 루프의 사이클 간 대기 시간 (분)
+ZAPIER_NLA_API_KEY = os.getenv('ZAPIER_NLA_API_KEY')
 
-# --- 투자 전략: '실시간 오디션' & '듀얼 스탑' ---
-MAX_STOCKS_TO_HOLD = 2           # 최종 본대 편입 종목 수
-AUDITION_CANDIDATE_COUNT = 4     # 오디션 후보 종목 수 (4종목)
-AUDITION_SCOUT_BUY_AMOUNT = 1    # 척후병(정찰병) 매수 수량 (1주)
-AUDITION_WINNER_MIN_PROFIT_PCT = 3.0 # 오디션 통과 최소 수익률 (%)
-EXIT_STRATEGY_STOP_LOSS_PCT = -5.0   # 가격 기반 손절매 비율 (%)
-EXIT_STRATEGY_TIME_LIMIT_MINUTES = 60 # 시간 기반 손절매 시간 (분)
+# --- 시간 설정 ---
+# 환경 변수에서 값을 읽어오되, 없으면 기본값(정수)을 사용합니다.
+TOKEN_ISSUE_HOUR = int(os.getenv('TOKEN_ISSUE_HOUR', 6))
+TOKEN_ISSUE_MINUTE = int(os.getenv('TOKEN_ISSUE_MINUTE', 0))
 
-# --- AI 분석 설정 ---
-USE_GEMINI_ANALYSIS = True            # 장 초반 Gemini 분석 사용 여부
-GEMINI_ANALYSIS_START_TIME = "09:05"  # AI 분석 시작 시간
-GEMINI_ANALYSIS_END_TIME = "10:00"    # AI 분석 종료 시간
-GEMINI_MODEL_NAME = "gemini-1.5-flash" # AI 분석에 사용할 Gemini 모델
+# --- 설정값 확인용 출력 ---
+# 이 파일이 임포트될 때, 어떤 설정으로 실행되는지 명확히 보여줍니다.
+print("=" * 50)
+print("환경 변수 설정이 로드되었습니다.")
+if IS_MOCK:
+    print("✅ [모의투자] 모드로 실행됩니다.")
+else:
+    print("🔥 [실전투자] 모드로 실행됩니다.")
+print(f"  - KIS APP KEY: ...{KIS_APP_KEY[-4:] if KIS_APP_KEY else ''}")
+print(f"  - KIS ACCOUNT: {KIS_ACCOUNT_NO}")
+print(f"  - KIS BASE URL: {KIS_BASE_URL}")
+print("=" * 50)
 
-# --- 포트폴리오 설정 ---
-MIN_CASH_RATIO = 0.25            # 현금 25% 반드시 유지
+# === 거래 안전 설정 ===
+MINIMUM_CASH_RATIO = float(os.getenv('MINIMUM_CASH_RATIO', '0.1'))  # 최소 현금 비중 10%
 
-# --- 포트폴리오 기본 설정 ---
-MIN_STOCK_PRICE = 5000  # 최소 주가
-MAX_STOCK_PRICE = 100000  # 최대 주가
-MIN_VOLUME = 1000000  # 최소 거래량
+# === 설정 검증 함수 ===
+def validate_config():
+    """필수 설정값들이 모두 설정되었는지 확인"""
+    missing_configs = []
+    
+    # 한국투자증권 API 필수 설정
+    if not KIS_APP_KEY:
+        missing_configs.append(f"{'MOCK_KIS_APP_KEY' if IS_MOCK else 'LIVE_KIS_APP_KEY'}")
+    if not KIS_APP_SECRET:
+        missing_configs.append(f"{'MOCK_KIS_APP_SECRET' if IS_MOCK else 'LIVE_KIS_APP_SECRET'}")
+    if not KIS_ACCOUNT_NO:
+        missing_configs.append(f"{'MOCK_KIS_ACCOUNT_NUMBER' if IS_MOCK else 'LIVE_KIS_ACCOUNT_NUMBER'}")
+    
+    # 선택적 설정들 확인 (경고만 출력)
+    optional_configs = []
+    if not TELEGRAM_BOT_TOKEN:
+        optional_configs.append('TELEGRAM_BOT_TOKEN')
+    if not TELEGRAM_CHAT_ID:
+        optional_configs.append('TELEGRAM_CHAT_ID')
+    if not GEMINI_API_KEY:
+        optional_configs.append('GEMINI_API_KEY')
+    if not GOOGLE_SERVICE_ACCOUNT_FILE:
+        optional_configs.append('GOOGLE_SERVICE_ACCOUNT_FILE')
+    if not GOOGLE_SPREADSHEET_ID:
+        optional_configs.append('GOOGLE_SPREADSHEET_ID')
+    
+    return missing_configs, optional_configs
 
-# API 설정
-API_RATE_LIMIT = 10  # 초당 API 호출 제한
-REQUEST_TIMEOUT = 30  # API 요청 타임아웃 (초)
+# === 설정 출력 함수 ===
+def print_config_status():
+    """현재 설정 상태를 출력"""
+    print("=" * 50)
+    print(f"🔧 트레이딩 시스템 설정 상태")
+    print("=" * 50)
+    print(f"📊 거래 모드: {'모의투자' if IS_MOCK else '실전투자'}")
+    print(f"🏢 서버 URL: {KIS_BASE_URL}")
+    print()
+    
+    # 한국투자증권 API 설정 상태
+    print("📈 한국투자증권 API:")
+    print(f"   APP_KEY: {'✅ 설정됨' if KIS_APP_KEY else '❌ 누락'}")
+    print(f"   APP_SECRET: {'✅ 설정됨' if KIS_APP_SECRET else '❌ 누락'}")
+    print(f"   ACCOUNT_NUMBER: {'✅ 설정됨' if KIS_ACCOUNT_NO else '❌ 누락'}")
+    
+    # 기타 서비스 설정 상태
+    print("\n🤖 기타 서비스:")
+    print(f"   Telegram Bot: {'✅ 설정됨' if TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID else '⚠️ 미설정'}")
+    print(f"   Gemini AI: {'✅ 설정됨' if GEMINI_API_KEY else '⚠️ 미설정'}")
+    print(f"   Google Sheets: {'✅ 설정됨' if GOOGLE_SERVICE_ACCOUNT_FILE and GOOGLE_SPREADSHEET_ID else '⚠️ 미설정'}")
+    print(f"   Zapier: {'✅ 설정됨' if ZAPIER_NLA_API_KEY else '⚠️ 미설정'}")
+    
+    print("=" * 50)
 
-# 포트폴리오 관리
-MAX_POSITION_SIZE = 1000000  # 최대 포지션 크기 (100만원)
-MAX_POSITIONS = 3  # 최대 동시 보유 종목 수
-TARGET_PROFIT_RATE = 1.5  # 목표 수익률 (%)
-STOP_LOSS_RATE = 0.5  # 손절 기준 (%)
-
-# --- 거래 환경 설정 ---
-# IS_MOCK_TRADING = True  # 모의투자로 전환하려면 이 줄의 주석을 해제하고 위 줄을 주석 처리하세요.
-
-# --- 장기 투자 전략 설정 --- (장기 투자는 현재 논의에서 제외되었으므로 주석 처리 또는 확인)
-# LONG_TERM_BUY_SPLIT_DAYS = 30 # 분할 매수 기간 (영업일 기준)
-# LONG_TERM_SELL_PROFIT_TARGET = 0.20 # 수익실현 시작 목표 수익률 (예: 20%)
-# LONG_TERM_SELL_SHARES_PER_DAY = 5   # 수익실현 시 일일 매도 수량 (주)
-
-# --- 대상 종목 리스트 ---
-# 동적으로 로드되므로 설정 파일에서는 제거합니다.
-# SHORT_TERM_TARGET_STOCKS = fetch_kospi_tickers()
-
-# --- 기타 설정 ---
-# from data.fetcher import fetch_kospi_tickers # 순환 참조 오류를 유발하므로 제거합니다.
-
-# Google Sheet
-# (참고용으로 남겨둠)
-
-# 거래 제한
-MAX_DAILY_TRADES = 5  # 일일 최대 거래 횟수
-
-# API 설정
-# (참고용으로 남겨둠)
-
-# 거래 제한
-# (참고용으로 남겨둠)
-
-LONG_TERM_STOCK = "005930"  # 삼성전자
-LONG_TERM_BUY_AMOUNT = 0.25  # 25% 비중 
+# === 초기화 시 설정 검증 ===
+if __name__ == "__main__":
+    missing, optional = validate_config()
+    
+    if missing:
+        print("❌ 다음 필수 설정이 누락되었습니다:")
+        for config in missing:
+            print(f"   - {config}: *** 누락 ***")
+        print("\n.env 파일을 확인해주세요.")
+    else:
+        print("✅ 모든 필수 설정이 완료되었습니다!")
+        
+    if optional:
+        print("\n⚠️ 다음 선택적 설정이 누락되었습니다:")
+        for config in optional:
+            print(f"   - {config}: *** 누락 ***")
+        print("필요에 따라 .env 파일에 추가해주세요.")
+    
+    print_config_status()

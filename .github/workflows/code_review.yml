@@ -1,0 +1,35 @@
+name: "매일 아침 AI 코드 리뷰"
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 22 * * *' # KST 07:00
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+      - name: Run AI Code Review Script
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python code_reviewer.py
+      - name: Send Workflow Status Notification
+        if: always()
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_CHAT_ID }}
+          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          message: |
+            **매일 아침 AI 코드 리뷰 결과: ${{ job.status == 'success' && '✅ 성공' || '❌ 실패' }}**
+            - 실행 링크: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+            
+            ${{ job.status == 'success' && '코드 리뷰가 정상적으로 생성 및 발송되었습니다.' || '오류가 발생했습니다. 로그를 확인해주세요.' }} 
