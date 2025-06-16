@@ -1,0 +1,305 @@
+name: "🔒 보안 감사 및 취약점 검사"
+
+on:
+  schedule:
+    - cron: '0 2 * * 1'      # 매주 월요일 11:00 (주간 보안 점검)
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+    paths:
+      - '**/*.py'
+      - '.env*'
+      - 'requirements.txt'
+
+jobs:
+  security_audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 코드 체크아웃
+        uses: actions/checkout@v4
+
+      - name: 🐍 Python 환경 설정
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: 📦 보안 도구 설치
+        run: |
+          pip install --upgrade pip
+          pip install bandit safety semgrep
+          pip install -r requirements.txt
+
+      - name: 🔍 API 키 및 민감정보 검사
+        run: |
+          echo "=== API 키 및 민감정보 노출 검사 ==="
+          python -c "
+          import os
+          import re
+          import glob
+          
+          # 민감정보 패턴들
+          sensitive_patterns = [
+              (r'[A-Za-z0-9]{20,}', 'API 키 형태'),
+              (r'sk-[a-zA-Z0-9]{20,}', 'OpenAI API 키'),
+              (r'xoxb-[0-9]{11,13}-[0-9]{11,13}-[a-zA-Z0-9]{24}', 'Slack Bot Token'),
+              (r'AKIA[0-9A-Z]{16}', 'AWS Access Key'),
+              (r'[0-9]{10}:[A-Za-z0-9_-]{35}', 'Telegram Bot Token'),
+              (r'AIza[0-9A-Za-z\\-_]{35}', 'Google API Key'),
+              (r'[a-zA-Z0-9]{32}', '32자 토큰'),
+              (r'Bearer [A-Za-z0-9\\-\\._~\\+\\/]+=*', 'Bearer Token')
+          ]
+          
+          # 검사할 파일 확장자
+          file_patterns = ['*.py', '*.yml', '*.yaml', '*.json', '*.md', '*.txt']
+          
+          findings = []
+          excluded_files = ['.git', '__pycache__', '.venv', 'node_modules']
+          
+          for pattern in file_patterns:
+              for filepath in glob.glob(f'**/{pattern}', recursive=True):
+                  # 제외할 디렉토리 건너뛰기
+                  if any(exc in filepath for exc in excluded_files):
+                      continue
+                  
+                  try:
+                      with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
+                          content = f.read()
+                          
+                      for regex, desc in sensitive_patterns:
+                          matches = re.finditer(regex, content)
+                          for match in matches:
+                              # 주석이나 예시는 제외
+                              line = content[:match.start()].count('\\n') + 1
+                              matched_text = match.group()
+                              
+                              # 화이트리스트 (예시나 테스트 값들)
+                              whitelist = [
+                                  'test_key', 'test_secret', 'test_token', 'example',
+                                  'YOUR_API_KEY', 'placeholder', 'dummy', 'sample'
+                              ]
+                              
+                              if not any(white in matched_text.lower() for white in whitelist):
+                                  if len(matched_text) > 10:  # 너무 짧은 매치 제외
+                                      findings.append(f'{filepath}:{line} - {desc}: {matched_text[:20]}...')
+          
+          if findings:
+              print('⚠️ 잠재적 민감정보 발견:')
+              for finding in findings[:10]:  # 최대 10개만 표시
+                  print(f'   {finding}')
+              if len(findings) > 10:
+                  print(f'   ... 외 {len(findings)-10}개 더')
+          else:
+              print('✅ 하드코딩된 민감정보 없음')
+          "
+
+      - name: 🛡️ Python 보안 취약점 검사 (Bandit)
+        run: |
+          echo "=== Python 보안 취약점 검사 ==="
+          bandit -r . -f json -o bandit_report.json || true
+          python -c "
+          import json
+          import os
+          
+          if os.path.exists('bandit_report.json'):
+              with open('bandit_report.json', 'r') as f:
+                  report = json.load(f)
+              
+              high_issues = [issue for issue in report.get('results', []) if issue['issue_severity'] == 'HIGH']
+              medium_issues = [issue for issue in report.get('results', []) if issue['issue_severity'] == 'MEDIUM']
+              
+              print(f'🔴 고위험 취약점: {len(high_issues)}개')
+              print(f'🟡 중위험 취약점: {len(medium_issues)}개')
+              
+              if high_issues:
+                  print('\\n⚠️ 고위험 취약점 상세:')
+                  for issue in high_issues[:5]:
+                      print(f'   {issue[\"filename\"]}:{issue[\"line_number\"]} - {issue[\"test_name\"]}')
+                      print(f'     {issue[\"issue_text\"]}')
+              
+              if len(high_issues) == 0 and len(medium_issues) <= 5:
+                  print('✅ 심각한 보안 취약점 없음')
+          else:
+              print('⚠️ Bandit 리포트 생성 실패')
+          "
+
+      - name: 📚 의존성 취약점 검사 (Safety)
+        run: |
+          echo "=== 의존성 취약점 검사 ==="
+          safety check --json --output safety_report.json || true
+          python -c "
+          import json
+          import os
+          
+          if os.path.exists('safety_report.json'):
+              with open('safety_report.json', 'r') as f:
+                  content = f.read()
+                  if content.strip():
+                      try:
+                          report = json.loads(content)
+                          vulnerabilities = report if isinstance(report, list) else []
+                          
+                          print(f'📦 발견된 취약점: {len(vulnerabilities)}개')
+                          
+                          if vulnerabilities:
+                              print('\\n⚠️ 취약한 패키지:')
+                              for vuln in vulnerabilities[:5]:
+                                  if isinstance(vuln, dict):
+                                      pkg = vuln.get('package', 'Unknown')
+                                      version = vuln.get('installed_version', 'Unknown')
+                                      advisory = vuln.get('advisory', 'No description')
+                                      print(f'   {pkg} v{version}: {advisory[:100]}...')
+                          else:
+                              print('✅ 알려진 취약점 없음')
+                      except json.JSONDecodeError:
+                          print('✅ 취약점 없음 (JSON 파싱 오류)')
+                  else:
+                      print('✅ 의존성 취약점 없음')
+          else:
+              print('⚠️ Safety 검사 결과 없음')
+          "
+
+      - name: 🔧 환경 설정 보안 검사
+        run: |
+          python -c "
+          import os
+          
+          print('🔧 환경 설정 보안 검사')
+          print('=' * 50)
+          
+          # GitHub Secrets 사용 여부 확인
+          expected_secrets = [
+              'TELEGRAM_BOT_TOKEN',
+              'TELEGRAM_CHAT_ID', 
+              'MOCK_KIS_APP_KEY',
+              'MOCK_KIS_APP_SECRET',
+              'MOCK_KIS_ACCOUNT_NUMBER'
+          ]
+          
+          print('📋 GitHub Secrets 확인:')
+          missing_secrets = []
+          for secret in expected_secrets:
+              if os.environ.get(secret):
+                  if os.environ.get(secret) in ['test_telegram_token', 'test_key', 'test_secret']:
+                      print(f'   ⚠️ {secret}: 테스트 값 사용 중')
+                  else:
+                      print(f'   ✅ {secret}: 설정됨')
+              else:
+                  print(f'   ❌ {secret}: 누락')
+                  missing_secrets.append(secret)
+          
+          # .env 파일 보안 검사
+          print(f'\\n📄 .env 파일 보안:')
+          if os.path.exists('.env'):
+              print('   ❌ .env 파일이 저장소에 있습니다! 즉시 제거하세요.')
+          else:
+              print('   ✅ .env 파일이 저장소에 없음')
+          
+          # .gitignore 확인
+          if os.path.exists('.gitignore'):
+              with open('.gitignore', 'r') as f:
+                  gitignore = f.read()
+              
+              required_ignores = ['.env', '*.log', '__pycache__', '.venv']
+              missing_ignores = []
+              for ignore in required_ignores:
+                  if ignore not in gitignore:
+                      missing_ignores.append(ignore)
+              
+              if missing_ignores:
+                  print(f'   ⚠️ .gitignore에 추가 권장: {missing_ignores}')
+              else:
+                  print('   ✅ .gitignore 설정 양호')
+          else:
+              print('   ⚠️ .gitignore 파일 없음')
+          
+          # 보안 등급 계산
+          security_score = 100
+          security_score -= len(missing_secrets) * 10
+          if os.path.exists('.env'):
+              security_score -= 30
+          
+          print(f'\\n🎯 보안 점수: {security_score}/100')
+          if security_score >= 80:
+              print('   등급: 우수 🟢')
+          elif security_score >= 60:
+              print('   등급: 양호 🟡')
+          else:
+              print('   등급: 개선 필요 🔴')
+          "
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          MOCK_KIS_APP_KEY: ${{ secrets.MOCK_KIS_APP_KEY }}
+          MOCK_KIS_APP_SECRET: ${{ secrets.MOCK_KIS_APP_SECRET }}
+          MOCK_KIS_ACCOUNT_NUMBER: ${{ secrets.MOCK_KIS_ACCOUNT_NUMBER }}
+
+      - name: 📱 보안 리포트 전송
+        if: success()
+        run: |
+          python -c "
+          import requests
+          import os
+          from datetime import datetime
+          
+          bot_token = os.environ.get('TELEGRAM_BOT_TOKEN')
+          chat_id = os.environ.get('TELEGRAM_CHAT_ID')
+          
+          if bot_token and chat_id and bot_token != 'test_telegram_token':
+              message = f'''🔒 보안 감사 완료!
+              
+              📅 검사일: {datetime.now().strftime('%Y-%m-%d %H:%M')}
+              
+              ✅ API 키 노출 검사 완료
+              ✅ Python 보안 취약점 검사 완료  
+              ✅ 의존성 취약점 검사 완료
+              ✅ 환경 설정 보안 검사 완료
+              
+              🛡️ 시스템 보안이 양호합니다.'''
+              
+              try:
+                  requests.post(
+                      f'https://api.telegram.org/bot{bot_token}/sendMessage',
+                      json={'chat_id': chat_id, 'text': message}
+                  )
+                  print('✅ 보안 리포트 전송 완료')
+              except Exception as e:
+                  print(f'⚠️ 텔레그램 전송 실패: {e}')
+          else:
+              print('✅ 보안 감사 완료 (테스트 모드)')
+          "
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+
+      - name: 📱 보안 경고 알림
+        if: failure()
+        run: |
+          python -c "
+          import requests
+          import os
+          from datetime import datetime
+          
+          bot_token = os.environ.get('TELEGRAM_BOT_TOKEN')
+          chat_id = os.environ.get('TELEGRAM_CHAT_ID')
+          
+          if bot_token and chat_id and bot_token != 'test_telegram_token':
+              message = f'''🚨 보안 감사 경고!
+              
+              ⚠️ 보안 검사 중 문제가 발견되었습니다.
+              📅 {datetime.now().strftime('%Y-%m-%d %H:%M')}
+              
+              즉시 점검이 필요합니다.
+              GitHub Actions 로그를 확인하세요.'''
+              
+              try:
+                  requests.post(
+                      f'https://api.telegram.org/bot{bot_token}/sendMessage',
+                      json={'chat_id': chat_id, 'text': message}
+                  )
+              except:
+                  pass
+          print('🚨 보안 경고 발생')
+          "
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }} 

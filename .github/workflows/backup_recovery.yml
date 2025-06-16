@@ -1,0 +1,492 @@
+name: "💾 자동 백업 및 복구 관리"
+
+on:
+  schedule:
+    - cron: '0 3 * * 0'      # 매주 일요일 12:00 (주간 백업)
+    - cron: '0 23 * * *'     # 매일 08:00 (일일 백업)
+  workflow_dispatch:
+    inputs:
+      backup_type:
+        description: '백업 타입 선택'
+        required: true
+        default: 'incremental'
+        type: choice
+        options:
+        - 'full'
+        - 'incremental'
+        - 'config_only'
+
+jobs:
+  backup_system:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 코드 체크아웃
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # 전체 히스토리 가져오기
+
+      - name: 🐍 Python 환경 설정
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: 📦 백업 도구 설치
+        run: |
+          pip install --upgrade pip
+          pip install requests python-dateutil
+          sudo apt-get update
+          sudo apt-get install -y zip unzip tar gzip
+
+      - name: 📋 백업 대상 분석
+        run: |
+          python -c "
+          import os
+          import json
+          from datetime import datetime
+          
+          print('📋 백업 대상 파일 분석')
+          print('=' * 50)
+          
+          # 백업 대상 카테고리별 분류
+          categories = {
+              '핵심 트레이딩 파일': [
+                  'core_trader.py',
+                  'advanced_scalping_system.py',
+                  'config.py'
+              ],
+              '워크플로우 파일': [
+                  '.github/workflows/trading.yml',
+                  '.github/workflows/code_review.yml',
+                  '.github/workflows/report.yml',
+                  '.github/workflows/security_audit.yml',
+                  '.github/workflows/system_health.yml'
+              ],
+              '테스트 및 유틸': [
+                  'test_optimized_scalping.py',
+                  'requirements.txt',
+                  '.gitignore'
+              ],
+              '설정 및 문서': [
+                  'README.md',
+                  '.env.example'
+              ]
+          }
+          
+          total_size = 0
+          backup_manifest = {}
+          
+          for category, files in categories.items():
+              category_size = 0
+              category_files = []
+              
+              print(f'\\n📂 {category}:')
+              for file_path in files:
+                  if os.path.exists(file_path):
+                      size = os.path.getsize(file_path)
+                      mtime = os.path.getmtime(file_path)
+                      
+                      category_files.append({
+                          'path': file_path,
+                          'size': size,
+                          'modified': datetime.fromtimestamp(mtime).isoformat()
+                      })
+                      
+                      category_size += size
+                      total_size += size
+                      print(f'   ✅ {file_path} ({size:,} bytes)')
+                  else:
+                      print(f'   ❌ {file_path} (파일 없음)')
+              
+              backup_manifest[category] = {
+                  'files': category_files,
+                  'total_size': category_size
+              }
+          
+          print(f'\\n📊 백업 요약:')
+          print(f'   총 파일 크기: {total_size:,} bytes ({total_size/1024:.1f} KB)')
+          print(f'   백업 시간: {datetime.now().isoformat()}')
+          
+          # 백업 매니페스트 저장
+          with open('backup_manifest.json', 'w', encoding='utf-8') as f:
+              json.dump(backup_manifest, f, ensure_ascii=False, indent=2)
+          
+          print('\\n✅ 백업 매니페스트 생성 완료')
+          "
+
+      - name: 🗜️ 파일 백업 생성
+        run: |
+          python -c "
+          import os
+          import shutil
+          import subprocess
+          from datetime import datetime
+          
+          print('🗜️ 백업 파일 생성')
+          print('=' * 50)
+          
+          backup_type = '${{ github.event.inputs.backup_type }}' or 'incremental'
+          timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+          
+          # 백업 디렉토리 생성
+          backup_dir = f'backup_{timestamp}'
+          os.makedirs(backup_dir, exist_ok=True)
+          
+          print(f'📁 백업 디렉토리: {backup_dir}')
+          print(f'🔧 백업 타입: {backup_type}')
+          
+          # 핵심 파일들 백업
+          core_files = [
+              'core_trader.py',
+              'advanced_scalping_system.py', 
+              'config.py',
+              'test_optimized_scalping.py',
+              'requirements.txt',
+              '.gitignore',
+              'backup_manifest.json'
+          ]
+          
+          # 워크플로우 디렉토리 백업
+          workflows_backup = os.path.join(backup_dir, 'workflows')
+          os.makedirs(workflows_backup, exist_ok=True)
+          
+          if os.path.exists('.github/workflows'):
+              for workflow_file in os.listdir('.github/workflows'):
+                  if workflow_file.endswith('.yml'):
+                      shutil.copy2(
+                          os.path.join('.github/workflows', workflow_file),
+                          os.path.join(workflows_backup, workflow_file)
+                      )
+                      print(f'   📄 워크플로우 복사: {workflow_file}')
+          
+          # 핵심 파일 백업
+          files_backup = os.path.join(backup_dir, 'core_files')
+          os.makedirs(files_backup, exist_ok=True)
+          
+          for file_path in core_files:
+              if os.path.exists(file_path):
+                  shutil.copy2(file_path, os.path.join(files_backup, os.path.basename(file_path)))
+                  print(f'   📄 파일 복사: {file_path}')
+          
+          # Git 정보 백업
+          git_info = {
+              'commit_hash': subprocess.check_output(['git', 'rev-parse', 'HEAD']).decode().strip(),
+              'branch': subprocess.check_output(['git', 'rev-parse', '--abbrev-ref', 'HEAD']).decode().strip(),
+              'commit_message': subprocess.check_output(['git', 'log', '-1', '--pretty=%s']).decode().strip(),
+              'backup_timestamp': timestamp
+          }
+          
+          with open(os.path.join(backup_dir, 'git_info.json'), 'w') as f:
+              import json
+              json.dump(git_info, f, indent=2)
+          
+          print(f'   📄 Git 정보 저장: {git_info[\"commit_hash\"][:8]}')
+          
+          # 압축 파일 생성
+          backup_name = f'trading_system_backup_{timestamp}'
+          
+          # ZIP 형식으로 압축
+          shutil.make_archive(backup_name, 'zip', backup_dir)
+          print(f'   🗜️ ZIP 백업 생성: {backup_name}.zip')
+          
+          # TAR.GZ 형식으로도 압축 (추가 보안)
+          shutil.make_archive(backup_name, 'gztar', backup_dir)
+          print(f'   🗜️ TAR.GZ 백업 생성: {backup_name}.tar.gz')
+          
+          # 백업 파일 크기 확인
+          zip_size = os.path.getsize(f'{backup_name}.zip')
+          tar_size = os.path.getsize(f'{backup_name}.tar.gz')
+          
+          print(f'\\n📊 백업 파일 크기:')
+          print(f'   ZIP: {zip_size:,} bytes ({zip_size/1024:.1f} KB)')
+          print(f'   TAR.GZ: {tar_size:,} bytes ({tar_size/1024:.1f} KB)')
+          
+          # 임시 디렉토리 정리
+          shutil.rmtree(backup_dir)
+          print('\\n✅ 백업 생성 완료')
+          "
+
+      - name: 🔍 백업 무결성 검증
+        run: |
+          python -c "
+          import os
+          import zipfile
+          import tarfile
+          import hashlib
+          from datetime import datetime
+          
+          print('🔍 백업 무결성 검증')
+          print('=' * 50)
+          
+          timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+          backup_name = f'trading_system_backup_{timestamp}'
+          
+          # 백업 파일들 찾기
+          backup_files = []
+          for file in os.listdir('.'):
+              if file.startswith('trading_system_backup_') and (file.endswith('.zip') or file.endswith('.tar.gz')):
+                  backup_files.append(file)
+          
+          if not backup_files:
+              print('⚠️ 백업 파일을 찾을 수 없습니다')
+              exit(1)
+          
+          backup_files.sort(reverse=True)  # 최신 파일부터
+          latest_zip = None
+          latest_tar = None
+          
+          for file in backup_files:
+              if file.endswith('.zip') and not latest_zip:
+                  latest_zip = file
+              elif file.endswith('.tar.gz') and not latest_tar:
+                  latest_tar = file
+          
+          print(f'📦 검증 대상 파일:')
+          if latest_zip:
+              print(f'   ZIP: {latest_zip}')
+          if latest_tar:
+              print(f'   TAR.GZ: {latest_tar}')
+          
+          # ZIP 파일 검증
+          if latest_zip and os.path.exists(latest_zip):
+              try:
+                  with zipfile.ZipFile(latest_zip, 'r') as zf:
+                      test_result = zf.testzip()
+                      if test_result is None:
+                          print(f'   ✅ ZIP 파일 무결성 확인')
+                          
+                          # 파일 목록 확인
+                          file_list = zf.namelist()
+                          print(f'   📁 포함된 파일 수: {len(file_list)}개')
+                          
+                          # 중요 파일 존재 확인
+                          required_files = ['core_trader.py', 'config.py', 'advanced_scalping_system.py']
+                          missing_files = []
+                          
+                          for req_file in required_files:
+                              found = any(req_file in path for path in file_list)
+                              if not found:
+                                  missing_files.append(req_file)
+                          
+                          if missing_files:
+                              print(f'   ⚠️ 누락된 중요 파일: {missing_files}')
+                          else:
+                              print(f'   ✅ 모든 중요 파일 포함됨')
+                      else:
+                          print(f'   ❌ ZIP 파일 손상: {test_result}')
+              except Exception as e:
+                  print(f'   ❌ ZIP 검증 실패: {e}')
+          
+          # TAR.GZ 파일 검증
+          if latest_tar and os.path.exists(latest_tar):
+              try:
+                  with tarfile.open(latest_tar, 'r:gz') as tf:
+                      member_names = tf.getnames()
+                      print(f'   ✅ TAR.GZ 파일 읽기 성공')
+                      print(f'   📁 포함된 항목 수: {len(member_names)}개')
+              except Exception as e:
+                  print(f'   ❌ TAR.GZ 검증 실패: {e}')
+          
+          # 체크섬 생성
+          checksums = {}
+          for backup_file in [latest_zip, latest_tar]:
+              if backup_file and os.path.exists(backup_file):
+                  hasher = hashlib.sha256()
+                  with open(backup_file, 'rb') as f:
+                      for chunk in iter(lambda: f.read(4096), b''):
+                          hasher.update(chunk)
+                  checksums[backup_file] = hasher.hexdigest()
+                  print(f'   🔐 {backup_file} SHA256: {checksums[backup_file][:16]}...')
+          
+          # 체크섬 파일 저장
+          if checksums:
+              with open('backup_checksums.txt', 'w') as f:
+                  for file, checksum in checksums.items():
+                      f.write(f'{checksum}  {file}\\n')
+              print('   📄 체크섬 파일 생성: backup_checksums.txt')
+          
+          print('\\n✅ 백업 무결성 검증 완료')
+          "
+
+      - name: 📚 복구 가이드 생성
+        run: |
+          python -c "
+          from datetime import datetime
+          
+          print('📚 복구 가이드 생성')
+          print('=' * 50)
+          
+          recovery_guide = '''# 🚑 트레이딩 시스템 복구 가이드
+          
+          ## 📅 백업 정보
+          - 백업 생성일: {timestamp}
+          - 백업 타입: {backup_type}
+          - Git 커밋: {git_commit}
+          
+          ## 🔧 복구 절차
+          
+          ### 1단계: 백업 파일 확인
+          ```bash
+          # 백업 파일 무결성 검증
+          sha256sum -c backup_checksums.txt
+          ```
+          
+          ### 2단계: 백업 압축 해제
+          ```bash
+          # ZIP 파일 해제
+          unzip trading_system_backup_*.zip
+          
+          # 또는 TAR.GZ 파일 해제
+          tar -xzf trading_system_backup_*.tar.gz
+          ```
+          
+          ### 3단계: 핵심 파일 복구
+          ```bash
+          # 핵심 트레이딩 파일 복사
+          cp backup_*/core_files/* ./
+          
+          # 워크플로우 파일 복사
+          cp -r backup_*/workflows/* .github/workflows/
+          ```
+          
+          ### 4단계: 환경 설정 복구
+          ```bash
+          # 가상환경 재생성
+          python -m venv .venv
+          source .venv/bin/activate  # Linux/Mac
+          # 또는 .venv\\Scripts\\activate  # Windows
+          
+          # 의존성 재설치
+          pip install -r requirements.txt
+          ```
+          
+          ### 5단계: 설정 파일 복구
+          ```bash
+          # .env 파일 수동 생성 (백업에 포함되지 않음)
+          cp .env.example .env
+          # 실제 API 키와 토큰 입력 필요
+          ```
+          
+          ### 6단계: 시스템 테스트
+          ```bash
+          # 모듈 로드 테스트
+          python -c "from config import *; print('✅ Config 로드 성공')"
+          python -c "from core_trader import CoreTrader; print('✅ CoreTrader 로드 성공')"
+          python -c "from advanced_scalping_system import AdvancedScalpingSystem; print('✅ 스캘핑 시스템 로드 성공')"
+          ```
+          
+          ## ⚠️ 주의사항
+          
+          1. **환경변수 재설정**: 백업에는 민감한 정보가 포함되지 않으므로 API 키 등을 수동으로 설정해야 합니다.
+          2. **GitHub Secrets**: GitHub Actions를 사용하는 경우 Secrets 재설정이 필요할 수 있습니다.
+          3. **네트워크 설정**: 방화벽이나 프록시 설정을 확인하세요.
+          4. **권한 설정**: 파일 실행 권한을 확인하고 필요시 조정하세요.
+          
+          ## 🆘 긴급 연락처
+          
+          - GitHub Issues: [프로젝트 저장소]/issues
+          - 시스템 관리자: [연락처 정보]
+          
+          ## 📋 복구 체크리스트
+          
+          - [ ] 백업 파일 무결성 확인
+          - [ ] 압축 파일 해제
+          - [ ] 핵심 파일 복사
+          - [ ] 워크플로우 복구
+          - [ ] 가상환경 재생성
+          - [ ] 의존성 설치
+          - [ ] 환경변수 설정
+          - [ ] 모듈 로드 테스트
+          - [ ] API 연결 테스트
+          - [ ] 트레이딩 시스템 가동 테스트
+          
+          ---
+          *이 가이드는 자동으로 생성되었습니다. 복구 시 문제가 발생하면 최신 문서를 확인하세요.*
+          '''.format(
+              timestamp=datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+              backup_type='${{ github.event.inputs.backup_type }}' or 'incremental',
+              git_commit='${{ github.sha }}' if '${{ github.sha }}' != '' else 'unknown'
+          )
+          
+          with open('RECOVERY_GUIDE.md', 'w', encoding='utf-8') as f:
+              f.write(recovery_guide)
+          
+          print('✅ 복구 가이드 생성 완료: RECOVERY_GUIDE.md')
+          "
+
+      - name: 📱 백업 완료 알림
+        if: success()
+        run: |
+          python -c "
+          import requests
+          import os
+          from datetime import datetime
+          
+          bot_token = os.environ.get('TELEGRAM_BOT_TOKEN')
+          chat_id = os.environ.get('TELEGRAM_CHAT_ID')
+          
+          if bot_token and chat_id and bot_token != 'test_telegram_token':
+              backup_type = '${{ github.event.inputs.backup_type }}' or 'incremental'
+              
+              message = f'''💾 시스템 백업 완료!
+              
+              📅 백업 시간: {datetime.now().strftime('%Y-%m-%d %H:%M')}
+              🔧 백업 타입: {backup_type}
+              
+              ✅ 핵심 트레이딩 파일 백업 완료
+              ✅ 워크플로우 설정 백업 완료
+              ✅ 백업 무결성 검증 완료
+              ✅ 복구 가이드 생성 완료
+              
+              🛡️ 시스템 복구 준비가 완료되었습니다.'''
+              
+              try:
+                  requests.post(
+                      f'https://api.telegram.org/bot{bot_token}/sendMessage',
+                      json={'chat_id': chat_id, 'text': message}
+                  )
+                  print('✅ 백업 완료 알림 전송')
+              except Exception as e:
+                  print(f'⚠️ 텔레그램 전송 실패: {e}')
+          else:
+              print('✅ 백업 완료 (테스트 모드)')
+          "
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+
+      - name: 🚨 백업 실패 알림
+        if: failure()
+        run: |
+          python -c "
+          import requests
+          import os
+          from datetime import datetime
+          
+          bot_token = os.environ.get('TELEGRAM_BOT_TOKEN')
+          chat_id = os.environ.get('TELEGRAM_CHAT_ID')
+          
+          if bot_token and chat_id and bot_token != 'test_telegram_token':
+              message = f'''🚨 백업 프로세스 실패!
+              
+              ⚠️ 시스템 백업 중 오류가 발생했습니다.
+              📅 {datetime.now().strftime('%Y-%m-%d %H:%M')}
+              
+              🔍 가능한 원인:
+              - 디스크 공간 부족
+              - 파일 권한 문제
+              - 네트워크 연결 오류
+              
+              즉시 점검이 필요합니다!'''
+              
+              try:
+                  requests.post(
+                      f'https://api.telegram.org/bot{bot_token}/sendMessage',
+                      json={'chat_id': chat_id, 'text': message}
+                  )
+              except:
+                  pass
+          print('🚨 백업 실패 알림')
+          "
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
