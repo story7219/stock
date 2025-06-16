@@ -5,6 +5,8 @@ on:
     - cron: '0 0 * * 1-5'    # 월-금 09:00 (장시작)
     - cron: '*/10 0-6 * * 1-5' # 월-금 09:00-15:59, 10분마다  
   workflow_dispatch:
+  push:
+    branches: [ main, develop ]
 
 jobs:
   scalping_trading:

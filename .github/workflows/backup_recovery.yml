@@ -8,13 +8,16 @@ on:
     inputs:
       backup_type:
         description: '백업 타입 선택'
-        required: true
-        default: 'incremental'
+        required: false
+        default: 'daily'
         type: choice
         options:
-        - 'full'
-        - 'incremental'
-        - 'config_only'
+          - 'daily'
+          - 'weekly'
+          - 'full_system'
+          - 'config_only'
+  push:
+    branches: [ main, develop ]
 
 jobs:
   backup_system:

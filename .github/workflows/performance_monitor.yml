@@ -6,6 +6,8 @@ on:
     - cron: '30 6 * * 1-5'   # 월-금 15:30 (장 마감 30분 후) - 트레이딩 성능
     - cron: '0 23 * * 0'     # 일요일 08:00 (주간 종합 분석)
   workflow_dispatch:
+  push:
+    branches: [ main, develop ]
 
 jobs:
   integrated_monitoring:
