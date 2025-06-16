@@ -10,6 +10,7 @@ import logging
 from datetime import datetime, timedelta
 import config
 from core_trader import CoreTrader
+import time
 
 logger = logging.getLogger(__name__)
 
@@ -33,37 +34,97 @@ class StrategyEngine:
         ]
         
     def get_daily_data(self, stock_code: str, days: int = 300):
-        """일봉 데이터 조회 (300일)"""
-        try:
-            path = "/uapi/domestic-stock/v1/quotations/inquire-daily-price"
-            headers = self.trader._get_common_headers()
-            headers["tr_id"] = "FHKST01010400"
-            
-            params = {
-                "fid_cond_mrkt_div_code": "J",
-                "fid_input_iscd": stock_code,
-                "fid_org_adj_prc": "1",
-                "fid_period_div_code": "D"
-            }
-            
-            response = requests.get(f"{self.trader.base_url}{path}", headers=headers, params=params)
-            data = response.json()
-            
-            if data.get('rt_cd') == '0' and 'output' in data:
-                df = pd.DataFrame(data['output'])
-                df['stck_bsop_date'] = pd.to_datetime(df['stck_bsop_date'])
+        """일봉 데이터 조회 (300일) - 개선된 에러 핸들링 포함"""
+        max_retries = 3
+        retry_delay = 1
+        
+        for attempt in range(max_retries):
+            try:
+                logger.info(f"📊 {stock_code} 일봉 데이터 조회 시도 ({attempt + 1}/{max_retries})")
+                
+                # CoreTrader의 _send_request 메서드를 사용하여 API 호출
+                with self.trader.market_data_limiter:
+                    response = self.trader._send_request(
+                        method="GET",
+                        path="/uapi/domestic-stock/v1/quotations/inquire-daily-price",
+                        headers={"tr_id": "FHKST01010400"},
+                        params={
+                            "fid_cond_mrkt_div_code": "J",
+                            "fid_input_iscd": stock_code,
+                            "fid_org_adj_prc": "1",
+                            "fid_period_div_code": "D"
+                        }
+                    )
+                
+                if not response:
+                    logger.warning(f"⚠️ {stock_code} API 응답이 없습니다. (시도 {attempt + 1})")
+                    if attempt < max_retries - 1:
+                        time.sleep(retry_delay * (attempt + 1))
+                        continue
+                    return None
+                
+                if response.get('rt_cd') != '0':
+                    logger.error(f"❌ {stock_code} API 오류: {response.get('msg1', '알 수 없는 오류')}")
+                    if attempt < max_retries - 1:
+                        time.sleep(retry_delay * (attempt + 1))
+                        continue
+                    return None
+                
+                if 'output' not in response or not response['output']:
+                    logger.warning(f"⚠️ {stock_code} 데이터가 비어있습니다.")
+                    return None
+                
+                # 데이터 프레임 생성 및 처리
+                df = pd.DataFrame(response['output'])
+                
+                if df.empty:
+                    logger.warning(f"⚠️ {stock_code} 빈 데이터프레임")
+                    return None
+                
+                # 날짜 컬럼 처리
+                df['stck_bsop_date'] = pd.to_datetime(df['stck_bsop_date'], errors='coerce')
+                df = df.dropna(subset=['stck_bsop_date'])
+                
+                if df.empty:
+                    logger.warning(f"⚠️ {stock_code} 유효한 날짜 데이터가 없습니다.")
+                    return None
+                
                 df = df.sort_values('stck_bsop_date').tail(days)
                 
+                # 숫자형 컬럼 변환
                 numeric_cols = ['stck_oprc', 'stck_hgpr', 'stck_lwpr', 'stck_prpr', 'acml_vol']
                 for col in numeric_cols:
-                    df[col] = pd.to_numeric(df[col], errors='coerce')
-                    
+                    if col in df.columns:
+                        df[col] = pd.to_numeric(df[col], errors='coerce')
+                    else:
+                        logger.warning(f"⚠️ {stock_code} 컬럼 '{col}'이 없습니다.")
+                
+                # 결측값 제거
+                df = df.dropna(subset=numeric_cols)
+                
+                if len(df) < 50:  # 최소 50일 데이터 필요
+                    logger.warning(f"⚠️ {stock_code} 데이터가 부족합니다. ({len(df)}일)")
+                    return None
+                
+                logger.info(f"✅ {stock_code} 일봉 데이터 조회 성공 ({len(df)}일)")
                 return df
-            return None
-            
-        except Exception as e:
-            logger.error(f"{stock_code} 일봉 데이터 조회 실패: {e}")
-            return None
+                
+            except requests.exceptions.RequestException as e:
+                logger.error(f"❌ {stock_code} 네트워크 오류 (시도 {attempt + 1}): {e}")
+                if attempt < max_retries - 1:
+                    time.sleep(retry_delay * (attempt + 1))
+                    continue
+            except pd.errors.EmptyDataError as e:
+                logger.error(f"❌ {stock_code} 데이터 파싱 오류: {e}")
+                return None
+            except Exception as e:
+                logger.error(f"❌ {stock_code} 예상치 못한 오류 (시도 {attempt + 1}): {e}")
+                if attempt < max_retries - 1:
+                    time.sleep(retry_delay * (attempt + 1))
+                    continue
+        
+        logger.error(f"❌ {stock_code} 모든 재시도 실패")
+        return None
     
     def check_300day_low_and_consolidation(self, df: pd.DataFrame):
         """300일 최저가 + 40~100일 횡보 확인"""

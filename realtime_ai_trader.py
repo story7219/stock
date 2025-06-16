@@ -1,7 +1,7 @@
 """
 실시간 AI 트레이딩 시스템 (v4.0 - GitHub Actions 최적화)
-- 환경 변수에서 설정을 로드하고, --action 플래그로 실행 모드 제어.
-- 거래, 분석, 리포팅 로직을 모두 포함하는 통합 컨트롤 타워.
+- config 모듈을 통한 중앙 집중식 설정 관리
+- 거래, 분석, 리포팅 로직을 모두 포함하는 통합 컨트롤 타워
 """
 import logging
 import json
@@ -12,47 +12,19 @@ import google.generativeai as genai
 from datetime import datetime
 from core_trader import CoreTrader
 import pytz
+import config
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-# 환경변수 체크 (더 자세한 디버깅 정보 포함)
-def check_environment():
-    """필수 환경변수들이 설정되었는지 확인"""
-    required_vars = {
-        'KIS_APP_KEY': '한국투자증권 앱 키',
-        'KIS_APP_SECRET': '한국투자증권 앱 시크릿',
-        'KIS_ACCOUNT_NO': '계좌번호',
-        'GEMINI_API_KEY': 'Gemini API 키',
-        'TELEGRAM_BOT_TOKEN': '텔레그램 봇 토큰',
-        'TELEGRAM_CHAT_ID': '텔레그램 채팅 ID',
-        'GCP_SA_KEY': 'Google Cloud Platform 서비스 계정 키',
-        'GOOGLE_SPREADSHEET_ID': 'Google 스프레드시트 ID'
-    }
-    
-    print("=== 환경변수 체크 ===")
-    missing_vars = []
-    
-    for var, desc in required_vars.items():
-        value = os.environ.get(var)
-        if value:
-            print(f"✅ {var}: 설정됨 (길이: {len(value)})")
-        else:
-            print(f"❌ {var}: 누락!")
-            missing_vars.append(f"{var} ({desc})")
-    
-    if missing_vars:
-        print(f"\n⚠️ 누락된 환경변수: {len(missing_vars)}개")
-        for var in missing_vars:
-            print(f"  - {var}")
-        print("\n💡 GitHub Secrets에서 해당 변수들을 설정해주세요.")
-        return False
-    
-    print("✅ 모든 필수 환경변수가 설정되었습니다.")
-    return True
-
 class RealtimeAITrader:
     def __init__(self):
+        # config 모듈을 통한 설정 검증
+        missing_configs, optional_configs = config.validate_config()
+        if missing_configs:
+            logger.error(f"❌ 필수 환경변수가 설정되지 않았습니다: {missing_configs}")
+            sys.exit(1)
+        
         self.trader = CoreTrader()
         self.state_file = 'trading_state.json'
         self.active_trades = self._load_state()
@@ -65,11 +37,10 @@ class RealtimeAITrader:
         
     def _initialize_ai_model(self):
         try:
-            api_key = os.environ.get('GEMINI_API_KEY')
-            if not api_key:
+            if not config.GEMINI_API_KEY:
                 logger.warning("⚠️ GEMINI_API_KEY 환경변수가 없어 AI 기능이 비활성화됩니다.")
                 return None
-            genai.configure(api_key=api_key)
+            genai.configure(api_key=config.GEMINI_API_KEY)
             logger.info("✅ Gemini AI 모델이 성공적으로 설정되었습니다.")
             return genai.GenerativeModel('gemini-1.5-flash-latest')
         except Exception as e:
@@ -212,38 +183,21 @@ def main():
     parser.add_argument('action', choices=['run', 'report'], help='실행 모드')
     args = parser.parse_args()
     
-    # 환경변수 체크
-    if not check_environment():
-        print("❌ 환경변수 설정이 완료되지 않아 프로그램을 종료합니다.")
-        sys.exit(1)
-    
     try:
+        trader_instance = RealtimeAITrader()
+        
         if args.action == 'run':
-            print("🚀 실시간 매매 시스템 시작...")
-            # 여기에 실제 매매 로직 구현
-            run_trading()
+            logger.info("🚀 실시간 매매 시스템 시작...")
+            trader_instance.run()
         elif args.action == 'report':
-            print("📊 일일 리포트 생성 시작...")
-            # 여기에 리포트 생성 로직 구현
-            generate_daily_report()
+            logger.info("📊 일일 리포트 생성 시작...")
+            trader_instance.generate_daily_report()
             
     except Exception as e:
-        print(f"❌ 오류 발생: {str(e)}")
+        logger.error(f"❌ 오류 발생: {str(e)}")
         import traceback
         traceback.print_exc()
         sys.exit(1)
-
-def run_trading():
-    """실시간 매매 실행"""
-    print("매매 로직 실행 중...")
-    # 실제 매매 로직을 여기에 구현
-    pass
-
-def generate_daily_report():
-    """일일 리포트 생성"""
-    print("리포트 생성 중...")
-    # 실제 리포트 생성 로직을 여기에 구현
-    pass
 
 if __name__ == "__main__":
     main() 

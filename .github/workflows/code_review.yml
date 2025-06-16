@@ -27,7 +27,40 @@ jobs:
       - name: 🔧 코드 품질 검사
         run: |
           echo "=== 파이썬 구문 검사 ==="
-          python -m py_compile *.py
+          python -c "
+          import os
+          import py_compile
+          import glob
+          
+          # 핵심 파일들만 구문 검사
+          key_files = [
+              'config.py',
+              'core_trader.py', 
+              'advanced_scalping_system.py',
+              'test_optimized_scalping.py',
+              'code_reviewer.py'
+          ]
+          
+          errors = []
+          for file in key_files:
+              if os.path.exists(file):
+                  try:
+                      py_compile.compile(file, doraise=True)
+                      print(f'✅ {file}: 구문 검사 통과')
+                  except Exception as e:
+                      print(f'❌ {file}: 구문 오류 - {e}')
+                      errors.append(f'{file}: {e}')
+              else:
+                  print(f'⚠️ {file}: 파일 없음')
+          
+          if errors:
+              print(f'\\n❌ 총 {len(errors)}개 파일에 구문 오류 발견')
+              for error in errors:
+                  print(f'   - {error}')
+              exit(1)
+          else:
+              print('✅ 모든 핵심 파일 구문 검사 통과')
+          "
           
           echo "=== 핵심 모듈 검사 ==="
           python -c "

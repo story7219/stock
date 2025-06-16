@@ -90,8 +90,8 @@ def run_default():
         
         if not trader.token_manager.get_valid_token():
             print("❌ API 토큰을 가져올 수 없습니다. .env 파일을 확인해주세요.")
-            return
-            
+        return
+
         balance = trader.get_balance()
         if balance and balance.get('rt_cd') == '0':
             print("✅ 잔고 조회 성공!")
