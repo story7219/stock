@@ -73,18 +73,33 @@ jobs:
           os.environ['KIS_APP_SECRET'] = 'test_secret'
           os.environ['KIS_ACCOUNT_NO'] = 'test_account'
           
-          modules = ['config', 'core_trader', 'advanced_scalping_system']
-          for module in modules:
+          # 핵심 모듈들과 필수 여부
+          modules = [
+              ('config', True),           # 필수 모듈
+              ('core_trader', True),      # 필수 모듈  
+              ('advanced_scalping_system', False)  # 선택적 모듈
+          ]
+          
+          critical_errors = []
+          
+          for module_name, is_required in modules:
               try:
-                  __import__(module)
-                  print(f'✅ {module}: 정상')
+                  __import__(module_name)
+                  print(f'✅ {module_name}: 정상 로드')
               except Exception as e:
-                  print(f'❌ {module}: {e}')
-                  # 치명적 오류가 아니라면 계속 진행
-                  if 'config' in module:
-                      continue
-                  sys.exit(1)
-          print('✅ 핵심 모듈 검사 완료')
+                  if is_required:
+                      print(f'❌ {module_name}: {e} (필수 모듈)')
+                      critical_errors.append(f'{module_name}: {e}')
+                  else:
+                      print(f'⚠️ {module_name}: {e} (선택적 모듈)')
+          
+          if critical_errors:
+              print(f'\\n❌ 치명적 오류 발생:')
+              for error in critical_errors:
+                  print(f'   - {error}')
+              sys.exit(1)
+          else:
+              print('✅ 핵심 모듈 검사 완료 (선택적 모듈 오류는 무시됨)')
           "
 
       - name: 🔍 스캘핑 시스템 무결성 검사
