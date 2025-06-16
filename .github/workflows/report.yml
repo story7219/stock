@@ -28,7 +28,7 @@ jobs:
 
       - name: 📊 AI 코치 일일 리포트 생성
         id: report_step
-        run: python realtime_ai_trader.py --report
+        run: python realtime_ai_trader.py report
         env:
           KIS_APP_KEY: ${{ secrets.KIS_APP_KEY }}
           KIS_APP_SECRET: ${{ secrets.KIS_APP_SECRET }}
