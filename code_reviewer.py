@@ -1,9 +1,34 @@
+#!/usr/bin/env python3
+"""
+🔍 AI 코드 품질 검사 도구
+GitHub Actions와 로컬 환경 모두 지원
+"""
+
 import os
 import sys
 import glob
 import google.generativeai as genai
-import config
 from utils.telegram_bot import TelegramNotifier
+import ast
+import subprocess
+import logging
+from pathlib import Path
+
+# GitHub Actions 환경에서 안전한 config 로드
+try:
+    import config
+    CONFIG_LOADED = True
+    print("✅ config 모듈 로드 성공")
+except Exception as e:
+    CONFIG_LOADED = False
+    print(f"⚠️ config 모듈 로드 실패: {e}")
+    print("📋 기본 로깅 설정으로 진행")
+    
+    # 기본 로깅 설정
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(levelname)s - %(message)s'
+    )
 
 def gather_codebase():
     """프로젝트 내 모든 .py 파일의 내용을 취합합니다."""
@@ -67,26 +92,52 @@ def get_ai_code_review(codebase: str):
         return f"AI 코드 리뷰 생성 중 오류가 발생했습니다: {e}"
 
 def main():
-    """메인 실행 함수"""
-    print("코드 리뷰 스크립트를 시작합니다...")
+    """메인 함수 - config 모듈 사용"""
+    print("=== AI 코드 리뷰 시스템 시작 ===")
     
+    # config 모듈을 통한 설정 검증
+    missing_configs, optional_configs = config.validate_config()
+    
+    # 코드 리뷰에 필요한 필수 설정 확인
+    required_for_review = []
+    if not config.GEMINI_API_KEY:
+        required_for_review.append('GEMINI_API_KEY')
+    if not config.TELEGRAM_BOT_TOKEN:
+        required_for_review.append('TELEGRAM_BOT_TOKEN')
+    if not config.TELEGRAM_CHAT_ID:
+        required_for_review.append('TELEGRAM_CHAT_ID')
+    
+    if required_for_review:
+        print("❌ 코드 리뷰에 필요한 환경변수가 설정되지 않았습니다:")
+        for var in required_for_review:
+            print(f"  - {var}")
+        sys.exit(1)
+    
+    print("✅ 모든 필수 환경변수가 설정되었습니다.")
+    print("\n🚀 AI 코드 리뷰를 시작합니다...")
+    
+    # 코드베이스 수집
     codebase = gather_codebase()
     if not codebase:
-        print("리뷰할 코드를 찾지 못했습니다.")
+        print("❌ 리뷰할 코드를 찾지 못했습니다.")
         return
 
-    print("Gemini에게 코드 리뷰를 요청합니다...")
+    print("🤖 Gemini에게 코드 리뷰를 요청합니다...")
     review_report = get_ai_code_review(codebase)
 
-    print("리뷰 리포트:\n", review_report)
+    print("📋 리뷰 리포트 생성 완료!")
+    print("=" * 50)
+    print(review_report)
+    print("=" * 50)
 
     # 텔레그램으로 결과 전송
     try:
         telegram_bot = TelegramNotifier(config.TELEGRAM_BOT_TOKEN, config.TELEGRAM_CHAT_ID)
         telegram_bot.send_message(review_report)
-        print("텔레그램으로 리뷰 리포트를 성공적으로 전송했습니다.")
+        print("✅ 텔레그램으로 리뷰 리포트를 성공적으로 전송했습니다.")
     except Exception as e:
-        print(f"텔레그램 전송 실패: {e}")
+        print(f"❌ 텔레그램 전송 실패: {e}")
+        sys.exit(1)
 
 if __name__ == "__main__":
     main() 
