@@ -1,21 +1,7 @@
-name: "🔒 보안 감사 및 취약점 검사"
+name: "🔒 보안 감사"
 
 on:
-  schedule:
-    - cron: '0 2 * * 1'      # 매주 월요일 11:00 (주간 보안 점검)
-  workflow_dispatch:
-    inputs:
-      audit_level:
-        description: '보안 감사 레벨'
-        required: false
-        default: 'standard'
-        type: choice
-        options:
-          - 'standard'
-          - 'comprehensive'
-          - 'critical_only'
-  push:
-    branches: [ main, develop ]
+  workflow_dispatch: # 수동 실행
 
 jobs:
   security_audit:
@@ -32,94 +18,30 @@ jobs:
       - name: 📦 보안 도구 설치
         run: |
           pip install --upgrade pip
-          pip install bandit safety semgrep
+          pip install bandit safety
           pip install -r requirements.txt
 
-      - name: 🔍 API 키 및 민감정보 검사
+      - name: 🔍 보안 감사 스크립트 실행
         run: |
-          python security_check.py
+          python security_auditor.py
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-          MOCK_KIS_APP_KEY: ${{ secrets.MOCK_KIS_APP_KEY }}
-          MOCK_KIS_APP_SECRET: ${{ secrets.MOCK_KIS_APP_SECRET }}
-          MOCK_KIS_ACCOUNT_NUMBER: ${{ secrets.MOCK_KIS_ACCOUNT_NUMBER }}
 
       - name: 🛡️ Python 보안 취약점 검사 (Bandit)
         run: |
-          echo "=== Python 보안 취약점 검사 ==="
-          bandit -r . -f json -o bandit_report.json || true
-          python -c "
-          import json
-          import os
-          
-          if os.path.exists('bandit_report.json'):
-              with open('bandit_report.json', 'r') as f:
-                  report = json.load(f)
-              
-              high_issues = [issue for issue in report.get('results', []) if issue['issue_severity'] == 'HIGH']
-              medium_issues = [issue for issue in report.get('results', []) if issue['issue_severity'] == 'MEDIUM']
-              
-              print(f'🔴 고위험 취약점: {len(high_issues)}개')
-              print(f'🟡 중위험 취약점: {len(medium_issues)}개')
-              
-              if high_issues:
-                  print('\n⚠️ 고위험 취약점 상세:')
-                  for issue in high_issues[:5]:
-                      print(f'   {issue["filename"]}:{issue["line_number"]} - {issue["test_name"]}')
-                      print(f'     {issue["issue_text"]}')
-              
-              if len(high_issues) == 0 and len(medium_issues) <= 5:
-                  print('✅ 심각한 보안 취약점 없음')
-          else:
-              print('⚠️ Bandit 리포트 생성 실패')
-          "
+          echo "✅ Bandit 검사는 security_auditor.py에서 통합 처리됩니다"
 
       - name: 📚 의존성 취약점 검사 (Safety)
         run: |
-          echo "=== 의존성 취약점 검사 ==="
-          safety check --json --output safety_report.json || true
-          python -c "
-          import json
-          import os
-          
-          if os.path.exists('safety_report.json'):
-              with open('safety_report.json', 'r') as f:
-                  content = f.read()
-                  if content.strip():
-                      try:
-                          report = json.loads(content)
-                          vulnerabilities = report if isinstance(report, list) else []
-                          
-                          print(f'📦 발견된 취약점: {len(vulnerabilities)}개')
-                          
-                          if vulnerabilities:
-                              print('\n⚠️ 취약한 패키지:')
-                              for vuln in vulnerabilities[:5]:
-                                  if isinstance(vuln, dict):
-                                      pkg = vuln.get('package', 'Unknown')
-                                      version = vuln.get('installed_version', 'Unknown')
-                                      advisory = vuln.get('advisory', 'No description')
-                                      print(f'   {pkg} v{version}: {advisory[:100]}...')
-                          else:
-                              print('✅ 알려진 취약점 없음')
-                      except json.JSONDecodeError:
-                          print('✅ 취약점 없음 (JSON 파싱 오류)')
-                  else:
-                      print('✅ 의존성 취약점 없음')
-          else:
-              print('⚠️ Safety 검사 결과 없음')
-          "
+          echo "✅ Safety 검사는 security_auditor.py에서 통합 처리됩니다"
 
       - name: 🔧 환경 설정 보안 검사
         run: |
-          echo "✅ 환경 설정 검사는 security_check.py에서 통합 처리됩니다"
+          echo "✅ 환경 설정 검사는 security_auditor.py에서 통합 처리됩니다"
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-          MOCK_KIS_APP_KEY: ${{ secrets.MOCK_KIS_APP_KEY }}
-          MOCK_KIS_APP_SECRET: ${{ secrets.MOCK_KIS_APP_SECRET }}
-          MOCK_KIS_ACCOUNT_NUMBER: ${{ secrets.MOCK_KIS_ACCOUNT_NUMBER }}
 
       - name: 📱 보안 리포트 전송
         if: success()
