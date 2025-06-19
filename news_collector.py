@@ -128,17 +128,17 @@ class NewsCollector:
             news_list = []
             
             # 병렬로 여러 소스에서 뉴스 수집
-            with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
+            with concurrent.futures.ThreadPoolExecutor(max_workers=self.max_workers) as executor:
                 futures = []
                 
-                # 1. 네이버 금융 뉴스
-                futures.append(executor.submit(self._get_naver_finance_news, limit))
+                # 1. 네이버 금융 뉴스 (70%)
+                futures.append(executor.submit(self._get_naver_finance_news, int(limit * 0.7)))
                 
-                # 2. 네이버 증권 뉴스 (대체 소스)
-                futures.append(executor.submit(self._get_naver_stock_news, limit))
+                # 2. 한국경제 뉴스 (20%)
+                futures.append(executor.submit(self._get_hankyung_news, int(limit * 0.2)))
                 
-                # 3. 모의 뉴스 생성 (테스트용)
-                futures.append(executor.submit(self._get_sample_news, 5))
+                # 3. 이데일리 뉴스 (10%)
+                futures.append(executor.submit(self._get_edaily_news, int(limit * 0.1)))
                 
                 # 결과 수집
                 for future in concurrent.futures.as_completed(futures, timeout=10):
@@ -191,80 +191,117 @@ class NewsCollector:
             logger.error(f"❌ 뉴스 수집 실패: {e}")
             return []
     
-    def _get_naver_finance_news(self, limit: int) -> List[NewsItem]:
-        """네이버 금융 뉴스 크롤링 (개선된 셀렉터)"""
+    def _get_hankyung_news(self, limit: int) -> List[NewsItem]:
+        """한국경제(hankyung.com) 증권 뉴스 크롤링"""
         news_list = []
-        
+        url = "https://www.hankyung.com/finance"
         try:
-            # 여러 네이버 금융 뉴스 URL 시도
-            urls = [
-                "https://finance.naver.com/news/news_list.naver?mode=LSS2D&section_id=101&section_id2=258",
-                "https://finance.naver.com/news/mainnews.naver",
-                "https://finance.naver.com/news/news_list.naver?mode=RANK"
-            ]
+            response = self.session.get(url, timeout=8)
+            response.raise_for_status()
+            soup = BeautifulSoup(response.text, 'html.parser')
             
-            for url in urls:
+            items = soup.select('.news-list .news-item a')
+            for item in items[:limit]:
                 try:
-                    response = self.session.get(url, timeout=8)
-                    response.raise_for_status()
-                    soup = BeautifulSoup(response.text, 'html.parser')
+                    title = item.select_one('h3.news-tit').get_text(strip=True)
+                    link = item.get('href', '')
+                    if not link.startswith('http'):
+                        link = "https://www.hankyung.com" + link
                     
-                    # 다양한 셀렉터 시도
-                    selectors = [
-                        '.articleSubject a',  # 새로운 구조
-                        '.newsList li a',     # 기존 구조
-                        '.simpleNewsList li a',
-                        '.news_area .subject a',
-                        '.newsflash_body .subject a'
-                    ]
-                    
-                    for selector in selectors:
-                        items = soup.select(selector)
-                        if items:
-                            for item in items[:limit]:
-                                try:
-                                    title = item.get_text(strip=True)
-                                    if not title or len(title) < 10:
-                                        continue
-                                    
-                                    link = item.get('href', '')
-                                    if link and not link.startswith('http'):
-                                        link = 'https://finance.naver.com' + link
-                                    
-                                    # 뉴스 아이템 생성
-                                    news_item = NewsItem(
-                                        title=title,
-                                        content='',
-                                        url=link,
-                                        timestamp=datetime.now(),
-                                        source='네이버금융',
-                                        sentiment='neutral',
-                                        sentiment_score=0.0
-                                    )
-                                    
-                                    news_list.append(news_item)
-                                    
-                                except Exception as e:
-                                    continue
-                            
-                            if news_list:
-                                break
-                    
-                    if news_list:
-                        break
-                        
-                except Exception as e:
+                    news_list.append(NewsItem(
+                        title=title, content='', url=link, timestamp=datetime.now(),
+                        source='한국경제', sentiment='neutral', sentiment_score=0.0
+                    ))
+                    time.sleep(0.1) # 크롤링 예의 준수
+                except Exception:
                     continue
+        except Exception as e:
+            logger.warning(f"⚠️ 한국경제 뉴스 수집 실패: {e}")
+        return news_list
+
+    def _get_edaily_news(self, limit: int) -> List[NewsItem]:
+        """이데일리(edaily.co.kr) 증권 뉴스 크롤링"""
+        news_list = []
+        url = "https://www.edaily.co.kr/news/stock"
+        try:
+            response = self.session.get(url, timeout=8)
+            response.raise_for_status()
+            soup = BeautifulSoup(response.text, 'html.parser')
+
+            items = soup.select('.news-list a.news-title')
+            for item in items[:limit]:
+                try:
+                    title = item.get_text(strip=True)
+                    link = item.get('href', '')
+                    if not link.startswith('http'):
+                        link = "https://www.edaily.co.kr" + link
+
+                    news_list.append(NewsItem(
+                        title=title, content='', url=link, timestamp=datetime.now(),
+                        source='이데일리', sentiment='neutral', sentiment_score=0.0
+                    ))
+                    time.sleep(0.1) # 크롤링 예의 준수
+                except Exception:
+                    continue
+        except Exception as e:
+            logger.warning(f"⚠️ 이데일리 뉴스 수집 실패: {e}")
+        return news_list
+    
+    def _get_naver_finance_news(self, limit: int) -> List[NewsItem]:
+        """네이버 금융 뉴스 크롤링 (DART 공시 연계 및 30일 필터링 강화)"""
+        news_list = []
+        url = "https://finance.naver.com/news/mainnews.naver"
+        try:
+            response = self.session.get(url, timeout=8)
+            response.raise_for_status()
+            soup = BeautifulSoup(response.text, 'html.parser')
+
+            # 뉴스 목록 아이템 선택자 수정 (더 구체적으로)
+            news_items = soup.select('.mainNewsList li')
             
-            logger.info(f"📰 네이버 금융 뉴스 {len(news_list)}개 수집")
-            
+            thirty_days_ago = datetime.now() - timedelta(days=30)
+
+            for item in news_items:
+                if len(news_list) >= limit:
+                    break
+                
+                try:
+                    dt_span = item.select_one('span.date')
+                    if not dt_span: continue
+                    
+                    # 날짜 파싱 및 필터링
+                    news_date_str = dt_span.get_text(strip=True)
+                    news_dt = self._parse_naver_time(news_date_str)
+                    
+                    if news_dt < thirty_days_ago:
+                        continue # 30일 이전 뉴스는 건너뛰기
+
+                    title_tag = item.select_one('dd a')
+                    if not title_tag: continue
+                    
+                    title = title_tag.get_text(strip=True)
+                    link = "https://finance.naver.com" + title_tag['href']
+
+                    # DART 공시 관련 뉴스 가중치 부여
+                    sentiment_score = 0.0
+                    if '공시' in title or '[유가증권]' in title or '[코스닥]' in title:
+                        sentiment_score = 0.1 # 기본 가중치
+
+                    news_list.append(NewsItem(
+                        title=title, content='', url=link, timestamp=news_dt,
+                        source='네이버금융', sentiment='neutral', sentiment_score=sentiment_score
+                    ))
+                    time.sleep(0.1) # 크롤링 예의 준수
+                except Exception:
+                    continue
+                    
         except Exception as e:
             logger.warning(f"⚠️ 네이버 금융 뉴스 수집 실패: {e}")
-        
+            
         return news_list
     
     def _get_naver_stock_news(self, limit: int) -> List[NewsItem]:
-        """네이버 증권 뉴스 크롤링 (대체 소스)"""
+        """네이버 증권 뉴스 크롤링 (보조 소스)"""
         news_list = []
         
         try:
@@ -587,24 +624,27 @@ class NewsCollector:
         return filtered
     
     def _parse_naver_time(self, time_str: str) -> datetime:
-        """네이버 시간 문자열 파싱"""
-        try:
-            # 간단한 파싱 (예: "10:30", "어제", "2일전" 등)
-            now = datetime.now()
-            
-            if ':' in time_str:  # 오늘 시간
-                hour, minute = map(int, time_str.split(':'))
-                return now.replace(hour=hour, minute=minute, second=0, microsecond=0)
-            elif '어제' in time_str:
-                return now - timedelta(days=1)
-            elif '일전' in time_str:
-                days = int(re.search(r'(\d+)일전', time_str).group(1))
-                return now - timedelta(days=days)
-            else:
-                return now
-                
-        except:
-            return datetime.now()
+        """네이버 금융 뉴스 시간 문자열을 datetime 객체로 변환합니다."""
+        now = datetime.now()
+        time_str = time_str.strip()
+        
+        if '분 전' in time_str:
+            minutes = int(re.search(r'(\d+)분 전', time_str).group(1))
+            return now - timedelta(minutes=minutes)
+        elif '시간 전' in time_str:
+            hours = int(re.search(r'(\d+)시간 전', time_str).group(1))
+            return now - timedelta(hours=hours)
+        else:
+            # 'YYYY.MM.DD HH:mm' 또는 'YYYY.MM.DD' 형식 처리
+            try:
+                # 날짜와 시간이 모두 있는 경우
+                if len(time_str.split()) > 1:
+                    return datetime.strptime(time_str, '%Y.%m.%d %H:%M')
+                # 날짜만 있는 경우 (시간은 00:00으로 설정)
+                else:
+                    return datetime.strptime(time_str, '%Y.%m.%d')
+            except ValueError:
+                return now # 파싱 실패 시 현재 시간 반환
     
     def _parse_kind_time(self, date_str: str) -> datetime:
         """KIND 시간 문자열 파싱"""

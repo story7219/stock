@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 환경 변수 중앙 관리 모듈 (GitHub Actions 호환)
 """
@@ -219,7 +218,7 @@ def validate_config():
         missing_configs.append(f"{'MOCK_KIS_APP_SECRET' if IS_MOCK else 'LIVE_KIS_APP_SECRET'}")
     if not KIS_ACCOUNT_NO:
         missing_configs.append(f"{'MOCK_KIS_ACCOUNT_NUMBER' if IS_MOCK else 'LIVE_KIS_ACCOUNT_NUMBER'}")
-
+    
     # 선택적 설정들 확인 (경고만 출력)
     optional_configs = []
     if not TELEGRAM_BOT_TOKEN:

@@ -22,10 +22,13 @@ import gspread
 import websocket
 from google.oauth2.service_account import Credentials
 import httpx
+import pandas_ta as ta # pandas-ta 임포트
 
 from telegram_wrapper import TelegramNotifierWrapper
 import config
 from google_sheet_logger import GoogleSheetLogger
+from abc import ABC, abstractmethod
+import pandas as pd
 
 logger = logging.getLogger(__name__)
 
@@ -661,3 +664,123 @@ class CoreTrader:
             logger.warning(f"⚠️ 종목({symbol}) 현재가 조회 실패")
             return None
         out = res['output']; return {'price':int(out.get('stck_prpr',0)), 'symbol':symbol, 'change_rate':float(out.get('prdy_ctrt',0.0)), 'volume':int(out.get('acml_vol',0))}
+
+    async def get_technical_indicators(self, symbol: str, days: int = 200) -> Optional[pd.DataFrame]:
+        """
+        일봉 데이터를 기반으로 주요 기술적 지표를 계산합니다.
+        (현재 numpy 호환성 문제로 임시 비활성화)
+        """
+        logger.warning(f"[{symbol}] 기술적 지표 계산 기능이 임시 비활성화되었습니다.")
+        return None
+        
+        # 원본 코드 (임시 주석 처리)
+        # try:
+        #     logger.info(f"[{symbol}] KIS API로 일봉 데이터 조회 (기간: {days}일)...")
+        #     daily_chart = await self.fetch_daily_price_history(symbol, days_to_fetch=days)
+        #     if daily_chart is None or daily_chart.empty:
+        #         logger.warning(f"[{symbol}] 기술적 지표 계산을 위한 일봉 데이터가 없습니다.")
+        #         return None
+        #
+        #     # pandas-ta를 사용하여 기술적 지표 추가
+        #     daily_chart.ta.ema(length=5, append=True)
+        #     daily_chart.ta.ema(length=20, append=True)
+        #     daily_chart.ta.ema(length=60, append=True)
+        #     daily_chart.ta.ichimoku(append=True)
+        #
+        #     # 불필요한 컬럼 정리
+        #     daily_chart.drop(['STCK_CLPR', 'STCK_OPN', 'STCK_HGPR', 'STCK_LWPR', 'ACML_VOL', 'ACML_TR_PBMN'], axis=1, inplace=True, errors='ignore')
+        #     logger.info(f"✅ [{symbol}] 기술적 지표 계산 완료.")
+        #     return daily_chart
+        #
+        # except Exception as e:
+        #     logger.error(f"❌ [{symbol}] pandas-ta 지표 계산 중 오류: {e}", exc_info=True)
+        #     return None
+
+# --- 전략 추상 클래스 ---
+class Strategy(ABC):
+    """
+    매매 전략에 대한 추상 베이스 클래스(ABC)입니다.
+    모든 매매 전략은 이 클래스를 상속받아 `generate_signals` 메서드를 구현해야 합니다.
+    """
+    @abstractmethod
+    def generate_signals(self, data: pd.DataFrame) -> pd.DataFrame:
+        """
+        주어진 데이터를 바탕으로 매매 신호(매수/매도/보유)를 생성합니다.
+
+        :param data: 분석할 시계열 데이터 (Pandas DataFrame)
+        :return: 매매 신호가 포함된 DataFrame. 'signal' 컬럼에 1(매수), -1(매도), 0(보유)을 표시합니다.
+        """
+        pass
+
+# --- 예시 전략: 간단한 이동 평균 교차 전략 ---
+class MovingAverageCrossStrategy(Strategy):
+    """
+    간단한 이동 평균 교차 전략을 구현한 클래스입니다.
+    단기 이동 평균선이 장기 이동 평균선을 상향 돌파하면 매수, 하향 돌파하면 매도합니다.
+    """
+    def __init__(self, short_window: int = 5, long_window: int = 20):
+        self.short_window = short_window
+        self.long_window = long_window
+
+    def generate_signals(self, data: pd.DataFrame) -> pd.DataFrame:
+        """
+        이동 평균 교차 전략에 따라 매매 신호를 생성합니다.
+
+        :param data: 'close' 컬럼(종가)을 포함하는 시계열 데이터
+        :return: 'signal' 컬럼이 추가된 DataFrame
+        """
+        signals = pd.DataFrame(index=data.index)
+        signals['signal'] = 0.0
+
+        # 이동 평균 계산
+        signals['short_mavg'] = data['close'].rolling(window=self.short_window, min_periods=1, center=False).mean()
+        signals['long_mavg'] = data['close'].rolling(window=self.long_window, min_periods=1, center=False).mean()
+
+        # 매수 신호 (단기 > 장기)
+        signals['signal'][self.long_window:] = \
+            (signals['short_mavg'][self.long_window:] > signals['long_mavg'][self.long_window:]).astype(float)
+
+        # 포지션 변경 (신호가 변경되는 시점)
+        signals['positions'] = signals['signal'].diff()
+        
+        # 'positions' 컬럼을 사용하여 최종 신호를 결정: 1.0 (매수), -1.0 (매도)
+        # 실제로는 positions가 1.0일때 매수, -1.0일때 매도
+        print("이동 평균 교차 전략 신호 생성 완료")
+        return signals
+
+# if __name__ == '__main__': 블록을 비동기 함수로 변경
+async def main_test():
+    """
+    CoreTrader 모듈의 주요 기능들을 테스트하기 위한 비동기 함수.
+    """
+    # 로깅 설정
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    
+    trader = CoreTrader(sheet_logger=None)
+    initialized = await trader.async_initialize()
+    if not initialized:
+        print("❌ CoreTrader 초기화 실패")
+        return
+
+    symbol = "005930" # 삼성전자
+    
+    print(f"--- [{symbol}] 데이터 조회 테스트 ---")
+    price = await trader.get_current_price(symbol)
+    print(f"현재가 정보: {price}")
+    
+    balance = await trader.get_balance()
+    # print(f"계좌 잔고: {balance}") # 응답이 길어 주석 처리
+    
+    # 기술적 지표 테스트
+    indicators = await trader.get_technical_indicators(symbol)
+    if indicators is not None and not indicators.empty:
+        print(f"\n--- [{symbol}] 기술적 지표 (최근 5일) ---")
+        print(indicators.tail())
+    else:
+        print(f"[{symbol}] 기술적 지표를 가져오지 못했습니다.")
+
+    await trader.close()
+
+if __name__ == "__main__":
+    # 비동기 테스트 함수 실행
+    asyncio.run(main_test())
