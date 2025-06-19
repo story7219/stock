@@ -1,11 +1,7 @@
 name: "🔍 AI 코드 품질 검사"
 
 on:
-  schedule:
-    - cron: '0 22 * * *'  # 매일 오전 7:00 (UTC 22:00 = 한국시간 07:00) - 장 시작 전 점검
   workflow_dispatch:
-  push:
-    branches: [ main, develop ]
 
 jobs:
   code_quality_check:

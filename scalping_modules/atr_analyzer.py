@@ -3,27 +3,46 @@
 - 변동성 기반 매매 신호 생성
 - 스캘핑에 적합한 종목 선별
 - 진입/청산 타이밍 최적화
+- v1.1.0 (2024-07-26): 리팩토링 및 구조 개선
 """
 
 import logging
-from typing import List, Dict, Optional, Tuple
-from dataclasses import dataclass
+import math
+from typing import List, Dict, Optional, NamedTuple
+from dataclasses import dataclass, field
 from datetime import datetime
+from statistics import mean
 
 logger = logging.getLogger(__name__)
 
+# --- 데이터 클래스 정의 ---
+
 @dataclass
 class ATRData:
-    """ATR 분석 데이터 클래스"""
+    """ATR 분석 결과를 담는 데이터 클래스"""
     symbol: str
     atr_value: float
     atr_percentage: float
     volatility_level: str  # LOW, MEDIUM, HIGH, EXTREME
     scalping_suitability: float  # 0-100 점수
-    timestamp: datetime
+    timestamp: datetime = field(default_factory=datetime.now)
+
+class TradingSignalLevels(NamedTuple):
+    """ATR 기반 매매 신호 레벨을 담는 튜플"""
+    resistance_2: float
+    resistance_1: float
+    pivot: float
+    support_1: float
+    support_2: float
+    position_size_multiplier: float
+
+# --- 메인 분석기 클래스 ---
 
 class ATRAnalyzer:
-    """ATR 기반 변동성 분석기"""
+    """
+    ATR(Average True Range)을 기반으로 자산의 변동성을 분석하고,
+    스캘핑 적합도를 평가하여 매매 신호 생성을 돕습니다.
+    """
     
     def __init__(self, 
                  optimal_atr_min: float = 0.5,
@@ -37,211 +56,199 @@ class ATRAnalyzer:
             optimal_atr_max: 스캘핑에 최적인 ATR 최대값 (%)
             period: ATR 계산 기간
         """
+        if not 0 < optimal_atr_min < optimal_atr_max:
+            raise ValueError("ATR 최적 범위 설정이 유효하지 않습니다.")
         self.optimal_atr_min = optimal_atr_min
         self.optimal_atr_max = optimal_atr_max
         self.period = period
         
-        logger.info(f"📊 ATR 분석기 초기화: 최적 범위 {optimal_atr_min}%-{optimal_atr_max}%")
-    
-    def calculate_atr(self, high_prices: List[float], 
-                     low_prices: List[float], 
-                     close_prices: List[float]) -> float:
-        """
-        ATR 계산
-        
-        Args:
-            high_prices: 고가 리스트
-            low_prices: 저가 리스트  
-            close_prices: 종가 리스트
-            
-        Returns:
-            ATR 값
-        """
-        if len(high_prices) < self.period + 1:
-            logger.warning("⚠️ ATR 계산을 위한 데이터 부족")
-            return 0.0
-        
-        try:
-            true_ranges = []
-            
-            for i in range(1, len(close_prices)):
-                # True Range 계산
-                tr1 = high_prices[i] - low_prices[i]  # 당일 고가 - 저가
-                tr2 = abs(high_prices[i] - close_prices[i-1])  # 당일 고가 - 전일 종가
-                tr3 = abs(low_prices[i] - close_prices[i-1])   # 당일 저가 - 전일 종가
-                
-                true_range = max(tr1, tr2, tr3)
-                true_ranges.append(true_range)
-            
-            # ATR = True Range의 이동평균
-            if len(true_ranges) >= self.period:
-                atr = sum(true_ranges[-self.period:]) / self.period
-                return atr
-            else:
-                return sum(true_ranges) / len(true_ranges)
-                
-        except Exception as e:
-            logger.error(f"❌ ATR 계산 실패: {e}")
-            return 0.0
+        logger.info(f"📊 ATR 분석기 초기화: 최적 범위 {optimal_atr_min}%-{optimal_atr_max}%, 기간 {period}일")
+
+    # --- Public API ---
     
     def analyze_volatility(self, symbol: str, 
-                          high_prices: List[float],
-                          low_prices: List[float], 
-                          close_prices: List[float]) -> Optional[ATRData]:
+                           high_prices: List[float],
+                           low_prices: List[float], 
+                           close_prices: List[float]) -> Optional[ATRData]:
         """
-        변동성 분석 수행
+        주어진 가격 데이터로 변동성 분석을 수행합니다.
         
         Args:
             symbol: 종목 코드
-            high_prices: 고가 데이터
-            low_prices: 저가 데이터
-            close_prices: 종가 데이터
+            high_prices: 고가 리스트
+            low_prices: 저가 리스트
+            close_prices: 종가 리스트
             
         Returns:
-            ATR 분석 결과
+            분석된 ATR 데이터 객체 또는 데이터 부족 시 None
         """
-        if not close_prices:
-            logger.warning(f"⚠️ {symbol} 가격 데이터 없음")
+        if len(close_prices) <= self.period:
+            logger.debug(f"⚠️ {symbol}: ATR 계산을 위한 데이터 부족 ({len(close_prices)}/{self.period + 1})")
             return None
         
         try:
-            # ATR 계산
             atr_value = self.calculate_atr(high_prices, low_prices, close_prices)
-            if atr_value == 0:
+            if atr_value is None or atr_value == 0:
                 return None
             
-            # ATR 퍼센티지 계산 (현재가 대비)
             current_price = close_prices[-1]
             atr_percentage = (atr_value / current_price) * 100
             
-            # 변동성 수준 분류
             volatility_level = self._classify_volatility(atr_percentage)
-            
-            # 스캘핑 적합성 점수 계산
             scalping_score = self._calculate_scalping_suitability(atr_percentage)
             
             return ATRData(
                 symbol=symbol,
-                atr_value=atr_value,
-                atr_percentage=atr_percentage,
+                atr_value=round(atr_value, 4),
+                atr_percentage=round(atr_percentage, 2),
                 volatility_level=volatility_level,
-                scalping_suitability=scalping_score,
-                timestamp=datetime.now()
+                scalping_suitability=round(scalping_score, 1)
             )
             
         except Exception as e:
-            logger.error(f"❌ {symbol} ATR 분석 실패: {e}")
+            logger.error(f"❌ {symbol} ATR 분석 중 오류 발생: {e}", exc_info=True)
             return None
-    
-    def _classify_volatility(self, atr_percentage: float) -> str:
-        """변동성 수준 분류"""
-        if atr_percentage < 1.0:
-            return "LOW"
-        elif atr_percentage < 2.0:
-            return "MEDIUM"
-        elif atr_percentage < 4.0:
-            return "HIGH"
-        else:
-            return "EXTREME"
-    
-    def _calculate_scalping_suitability(self, atr_percentage: float) -> float:
+
+    def calculate_atr(self, high_prices: List[float], 
+                      low_prices: List[float], 
+                      close_prices: List[float]) -> Optional[float]:
         """
-        스캘핑 적합성 점수 계산 (0-100)
+        ATR(Average True Range) 값을 계산합니다.
         
-        Args:
-            atr_percentage: ATR 퍼센티지
-            
         Returns:
-            적합성 점수 (높을수록 스캘핑에 적합)
+            계산된 ATR 값 또는 실패 시 None
         """
         try:
-            # 최적 범위 내에 있는 경우 높은 점수
-            if self.optimal_atr_min <= atr_percentage <= self.optimal_atr_max:
-                # 최적 범위 중앙값에 가까울수록 높은 점수
-                center = (self.optimal_atr_min + self.optimal_atr_max) / 2
-                distance_from_center = abs(atr_percentage - center)
-                max_distance = (self.optimal_atr_max - self.optimal_atr_min) / 2
-                
-                normalized_distance = distance_from_center / max_distance
-                score = 100 * (1 - normalized_distance)
-                return max(80, score)  # 최적 범위 내는 최소 80점
+            true_ranges = self._calculate_true_ranges(high_prices, low_prices, close_prices)
+            if not true_ranges:
+                return None
             
-            # 최적 범위를 벗어난 경우
-            elif atr_percentage < self.optimal_atr_min:
-                # 너무 낮은 변동성 - 거래 기회 부족
-                ratio = atr_percentage / self.optimal_atr_min
-                return max(20, 80 * ratio)
-            
-            else:  # atr_percentage > self.optimal_atr_max
-                # 너무 높은 변동성 - 위험 증가
-                excess_ratio = (atr_percentage - self.optimal_atr_max) / self.optimal_atr_max
-                penalty = min(60, excess_ratio * 100)  # 최대 60점 감점
-                return max(10, 80 - penalty)
+            # EMA(지수 이동 평균) 방식의 ATR이 더 일반적이나, 여기서는 SMA(단순 이동 평균) 사용
+            # 참고: 첫 ATR은 SMA, 이후는 EMA로 계산하는 방식도 널리 쓰임
+            atr = mean(true_ranges[-self.period:])
+            return atr
                 
         except Exception as e:
-            logger.error(f"❌ 스캘핑 적합성 점수 계산 실패: {e}")
-            return 0.0
-    
-    def get_trading_signals(self, atr_data: ATRData, 
-                           current_price: float) -> Dict[str, float]:
+            logger.error(f"❌ ATR 값 계산 실패: {e}", exc_info=True)
+            return None
+
+    def get_trading_signal_levels(self, atr_data: ATRData, current_price: float) -> TradingSignalLevels:
         """
-        ATR 기반 매매 신호 생성
+        ATR 분석 데이터를 기반으로 지지/저항 레벨을 생성합니다.
         
         Args:
-            atr_data: ATR 분석 데이터
+            atr_data: `analyze_volatility`에서 얻은 ATR 데이터
             current_price: 현재가
             
         Returns:
-            매매 신호 정보 (진입가, 손절가, 목표가 등)
+            지지/저항 레벨이 담긴 `TradingSignalLevels` 객체
         """
-        try:
-            atr_value = atr_data.atr_value
+        atr = atr_data.atr_value
+        multiplier = self._get_position_size_multiplier(atr_data.volatility_level)
+        
+        return TradingSignalLevels(
+            resistance_2=current_price + (atr * 1.5),
+            resistance_1=current_price + (atr * 0.75),
+            pivot=current_price,
+            support_1=current_price - (atr * 0.75),
+            support_2=current_price - (atr * 1.5),
+            position_size_multiplier=multiplier
+        )
+
+    # --- Private Helper Methods ---
+
+    @staticmethod
+    def _calculate_true_ranges(high: List[float], low: List[float], close: List[float]) -> List[float]:
+        """True Range 값들의 리스트를 계산합니다."""
+        if len(close) < 2:
+            return []
             
-            # ATR 기반 수준 계산
-            resistance_1 = current_price + (atr_value * 0.5)
-            resistance_2 = current_price + atr_value
-            support_1 = current_price - (atr_value * 0.5)
-            support_2 = current_price - atr_value
-            
-            # 스캘핑 전략별 신호
-            signals = {
-                'current_price': current_price,
-                'atr_value': atr_value,
-                'resistance_1': resistance_1,  # 1차 저항
-                'resistance_2': resistance_2,  # 2차 저항
-                'support_1': support_1,        # 1차 지지
-                'support_2': support_2,        # 2차 지지
-                
-                # 매수 신호
-                'buy_entry': support_1,        # 매수 진입가
-                'buy_stop_loss': support_2,    # 매수 손절가
-                'buy_take_profit': resistance_1, # 매수 목표가
-                
-                # 매도 신호  
-                'sell_entry': resistance_1,     # 매도 진입가
-                'sell_stop_loss': resistance_2, # 매도 손절가
-                'sell_take_profit': support_1,  # 매도 목표가
-                
-                # 리스크 관리
-                'position_size_multiplier': self._get_position_size_multiplier(atr_data.volatility_level)
-            }
-            
-            return signals
-            
-        except Exception as e:
-            logger.error(f"❌ ATR 매매 신호 생성 실패: {e}")
-            return {}
+        true_ranges = []
+        for i in range(1, len(close)):
+            tr1 = high[i] - low[i]
+            tr2 = abs(high[i] - close[i-1])
+            tr3 = abs(low[i] - close[i-1])
+            true_ranges.append(max(tr1, tr2, tr3))
+        return true_ranges
+
+    def _classify_volatility(self, atr_percentage: float) -> str:
+        """ATR 퍼센티지를 기반으로 변동성 수준을 분류합니다."""
+        if atr_percentage < self.optimal_atr_min: return "LOW"
+        if atr_percentage <= self.optimal_atr_max: return "MEDIUM"
+        if atr_percentage < self.optimal_atr_max * 2: return "HIGH"
+        return "EXTREME"
     
-    def _get_position_size_multiplier(self, volatility_level: str) -> float:
-        """변동성 수준에 따른 포지션 크기 조절"""
+    def _calculate_scalping_suitability(self, atr_percentage: float) -> float:
+        """스캘핑 적합성 점수를 0-100 사이의 값으로 계산합니다."""
+        min_opt, max_opt = self.optimal_atr_min, self.optimal_atr_max
+        
+        if atr_percentage < min_opt:
+            return self._score_below_optimal(atr_percentage)
+        elif atr_percentage <= max_opt:
+            return self._score_in_optimal_range(atr_percentage)
+        else:
+            return self._score_above_optimal(atr_percentage)
+
+    def _score_in_optimal_range(self, atr_percentage: float) -> float:
+        """최적 범위 내에서의 점수를 계산합니다."""
+        min_opt, max_opt = self.optimal_atr_min, self.optimal_atr_max
+        center = (min_opt + max_opt) / 2
+        max_dist = (max_opt - min_opt) / 2
+        
+        # 중심에서 멀어질수록 점수 감소
+        normalized_dist = abs(atr_percentage - center) / max_dist
+        score = 100 * (1 - normalized_dist * 0.2) # 최적 범위 내에서는 최소 80점 보장
+        return max(80, score)
+
+    def _score_below_optimal(self, atr_percentage: float) -> float:
+        """최적 범위보다 낮을 때의 점수를 계산합니다. (변동성 부족)"""
+        # 0에 가까울수록 점수가 낮아짐
+        score = 80 * (atr_percentage / self.optimal_atr_min) ** 0.5 # 제곱근을 취해 완만하게 감소
+        return max(10, score)
+
+    def _score_above_optimal(self, atr_percentage: float) -> float:
+        """최적 범위보다 높을 때의 점수를 계산합니다. (과도한 변동성)"""
+        # 최적 범위를 초과하는 비율이 클수록 점수가 급격히 감소
+        excess_ratio = (atr_percentage - self.optimal_atr_max) / self.optimal_atr_max
+        penalty = excess_ratio * 120 # 패널티 강화
+        score = 80 - penalty
+        return max(0, score)
+
+    @staticmethod
+    def _get_position_size_multiplier(volatility_level: str) -> float:
+        """변동성 수준에 따른 포지션 크기 배율을 반환합니다."""
         multipliers = {
-            'LOW': 1.2,      # 낮은 변동성 → 포지션 크기 증가
-            'MEDIUM': 1.0,   # 보통 변동성 → 기본 포지션
-            'HIGH': 0.8,     # 높은 변동성 → 포지션 크기 감소
-            'EXTREME': 0.5   # 극한 변동성 → 포지션 크기 대폭 감소
+            "LOW": 1.2,
+            "MEDIUM": 1.0,
+            "HIGH": 0.8,
+            "EXTREME": 0.5,
         }
         return multipliers.get(volatility_level, 1.0)
     
+    # --- Deprecated / Helper for other modules ---
+
+    def calculate_quick_atr(self, prices: List[float], symbol: str = "Unknown") -> Dict[str, float]:
+        """
+        [다른 모듈과의 호환성을 위한 헬퍼 함수]
+        간단한 종가 리스트만으로 ATR 분석을 모의 수행합니다.
+        정확한 high/low 데이터가 없어 추정치이므로, 테스트 용도로만 사용해야 합니다.
+        """
+        if len(prices) < self.period:
+            return {'atr_percentage': 0, 'scalping_suitability': 0}
+        
+        # 가상의 high/low 데이터 생성 (단순 추정)
+        high_prices = [p * 1.005 for p in prices]
+        low_prices = [p * 0.995 for p in prices]
+        
+        analysis = self.analyze_volatility(symbol, high_prices, low_prices, prices)
+        
+        if analysis:
+            return {
+                'atr_percentage': analysis.atr_percentage,
+                'scalping_suitability': analysis.scalping_suitability
+            }
+        return {'atr_percentage': 0, 'scalping_suitability': 0}
+
     def analyze_multiple_symbols(self, symbols_data: Dict[str, Dict[str, List[float]]]) -> List[ATRData]:
         """
         여러 종목의 ATR 분석

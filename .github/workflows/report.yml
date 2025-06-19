@@ -1,11 +1,7 @@
 name: "📊 일일 트레이딩 성과 리포트"
 
 on:
-  schedule:
-    - cron: '10 7 * * 1-5'  # 월-금 16:10 (UTC 기준 07:10) - 장 마감 후
   workflow_dispatch:
-  push:
-    branches: [ main, develop ]
 
 jobs:
   daily_report:

@@ -2,8 +2,6 @@
 환경 변수 중앙 관리 모듈 (GitHub Actions 호환)
 """
 import os
-import logging
-import logging.handlers
 
 # GitHub Actions 환경을 위한 dotenv 모듈 안전 로드
 try:
@@ -58,6 +56,7 @@ def setup_github_actions_defaults():
             'TELEGRAM_BOT_TOKEN': 'test_telegram_token',
             'TELEGRAM_CHAT_ID': 'test_chat_id',
             'GEMINI_API_KEY': 'test_gemini_key',
+            'DART_API_KEY': 'test_dart_api_key',
             'GOOGLE_SPREADSHEET_ID': 'test_spreadsheet_id',
             'LOG_LEVEL': 'INFO'
         }
@@ -89,17 +88,24 @@ def safe_parse_env_value(env_value, default_value, value_type=str):
 # IS_MOCK이 'true' (대소문자 무관)이면 모의투자, 아니면 실전투자로 판단합니다.
 IS_MOCK = os.getenv('IS_MOCK', 'true').lower() == 'true'
 
-# --- KIS API 자격증명 ---
-# 모의투자 여부에 따라 적절한 KIS API 정보를 선택합니다.
+# --- KIS API 자격증명 (개선된 로직) ---
+# 우선순위: 1. 표준 변수 -> 2. IS_MOCK에 따른 접두사 변수
+# GitHub Actions와 로컬 .env 환경 모두에서 원활하게 작동하도록 개선
+KIS_APP_KEY = os.getenv('KIS_APP_KEY')
+KIS_APP_SECRET = os.getenv('KIS_APP_SECRET')
+KIS_ACCOUNT_NO = os.getenv('KIS_ACCOUNT_NO')
+
 if IS_MOCK:
-    KIS_APP_KEY = os.getenv('MOCK_KIS_APP_KEY')
-    KIS_APP_SECRET = os.getenv('MOCK_KIS_APP_SECRET')
-    KIS_ACCOUNT_NO = os.getenv('MOCK_KIS_ACCOUNT_NUMBER')
+    # 표준 변수가 없을 경우, MOCK_ 접두사 변수를 사용 (하위 호환성)
+    if not KIS_APP_KEY: KIS_APP_KEY = os.getenv('MOCK_KIS_APP_KEY')
+    if not KIS_APP_SECRET: KIS_APP_SECRET = os.getenv('MOCK_KIS_APP_SECRET')
+    if not KIS_ACCOUNT_NO: KIS_ACCOUNT_NO = os.getenv('MOCK_KIS_ACCOUNT_NUMBER')
     KIS_BASE_URL = "https://openapivts.koreainvestment.com:29443"  # 모의투자 서버
 else:
-    KIS_APP_KEY = os.getenv('LIVE_KIS_APP_KEY')
-    KIS_APP_SECRET = os.getenv('LIVE_KIS_APP_SECRET')
-    KIS_ACCOUNT_NO = os.getenv('LIVE_KIS_ACCOUNT_NUMBER')
+    # 표준 변수가 없을 경우, LIVE_ 접두사 변수를 사용 (하위 호환성)
+    if not KIS_APP_KEY: KIS_APP_KEY = os.getenv('LIVE_KIS_APP_KEY')
+    if not KIS_APP_SECRET: KIS_APP_SECRET = os.getenv('LIVE_KIS_APP_SECRET')
+    if not KIS_ACCOUNT_NO: KIS_ACCOUNT_NO = os.getenv('LIVE_KIS_ACCOUNT_NUMBER')
     KIS_BASE_URL = "https://openapi.koreainvestment.com:9443"  # 실전투자 서버
 
 # --- 외부 서비스 API 키 ---
@@ -107,6 +113,7 @@ TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
 TELEGRAM_CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
 
 GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
+DART_API_KEY = os.getenv('DART_API_KEY')
 GOOGLE_SERVICE_ACCOUNT_FILE = os.getenv('GOOGLE_SERVICE_ACCOUNT_FILE')
 GOOGLE_SPREADSHEET_ID = os.getenv('GOOGLE_SPREADSHEET_ID')
 GOOGLE_WORKSHEET_NAME = os.getenv('GOOGLE_WORKSHEET_NAME')
@@ -143,64 +150,47 @@ else:
 API_RATE_LIMIT_CALLS = MARKET_DATA_API_CALLS_PER_SEC
 API_RATE_LIMIT_PERIOD = 1
 
-# --- 로깅 설정 ---
-LOG_LEVEL = os.getenv('LOG_LEVEL', 'INFO').upper()
-LOG_FILE_PATH = os.getenv('LOG_FILE_PATH', 'trading_system.log')
-LOG_MAX_SIZE = safe_parse_env_value(os.getenv('LOG_MAX_SIZE'), '10485760', int)  # 10MB
-LOG_BACKUP_COUNT = safe_parse_env_value(os.getenv('LOG_BACKUP_COUNT'), '5', int)
-
 # --- 재시도 설정 ---
 MAX_RETRY_ATTEMPTS = safe_parse_env_value(os.getenv('MAX_RETRY_ATTEMPTS'), '3', int)
 RETRY_DELAY_SECONDS = safe_parse_env_value(os.getenv('RETRY_DELAY_SECONDS'), '1.0', float)
 
-# === 로깅 시스템 초기화 ===
-def setup_logging():
-    """구조화된 로깅 시스템 설정"""
-    # 로그 포맷 설정
-    log_format = '%(asctime)s - %(name)s - %(levelname)s - [%(filename)s:%(lineno)d] - %(message)s'
-    date_format = '%Y-%m-%d %H:%M:%S'
-    
-    # 루트 로거 설정
-    root_logger = logging.getLogger()
-    root_logger.setLevel(getattr(logging, LOG_LEVEL, logging.INFO))
-    
-    # 기존 핸들러 제거
-    for handler in root_logger.handlers[:]:
-        root_logger.removeHandler(handler)
-    
-    # 콘솔 핸들러
-    console_handler = logging.StreamHandler()
-    console_handler.setLevel(getattr(logging, LOG_LEVEL, logging.INFO))
-    console_formatter = logging.Formatter(log_format, date_format)
-    console_handler.setFormatter(console_formatter)
-    root_logger.addHandler(console_handler)
-    
-    # 파일 핸들러 (회전 로그)
-    try:
-        file_handler = logging.handlers.RotatingFileHandler(
-            LOG_FILE_PATH, 
-            maxBytes=LOG_MAX_SIZE, 
-            backupCount=LOG_BACKUP_COUNT,
-            encoding='utf-8'
-        )
-        file_handler.setLevel(logging.DEBUG)  # 파일에는 모든 로그 저장
-        file_formatter = logging.Formatter(log_format, date_format)
-        file_handler.setFormatter(file_formatter)
-        root_logger.addHandler(file_handler)
-        
-        logging.info(f"✅ 로그 파일 설정 완료: {LOG_FILE_PATH}")
-    except Exception as e:
-        logging.warning(f"⚠️ 로그 파일 설정 실패: {e}")
-    
-    # 외부 라이브러리 로그 레벨 조정
-    logging.getLogger('requests').setLevel(logging.WARNING)
-    logging.getLogger('urllib3').setLevel(logging.WARNING)
-    logging.getLogger('google').setLevel(logging.WARNING)
-    
-    return root_logger
+# === 로깅 설정 (logger_config.py로 이동) ===
+# LOG_LEVEL, LOG_FILE_PATH, LOG_MAX_SIZE, LOG_BACKUP_COUNT 등은
+# utils/logger_config.py에서 직접 환경변수를 읽어 처리합니다.
 
-# 로깅 시스템 초기화
-setup_logging()
+# --- 매매 전략 설정 ---
+# 분석할 대상 종목들을 리스트 형태로 관리합니다.
+TARGET_STOCKS = [
+    "005930",  # 삼성전자
+    "000660",  # SK하이닉스
+    "035420",  # NAVER
+    "051910",  # LG화학
+    "006400",  # 삼성SDI
+    "035720",  # 카카오
+    "068270",  # 셀트리온
+    "005380",  # 현대차
+    "096770",  # SK이노베이션
+    "017670",  # SK텔레콤
+]
+
+# --- AI 분석기 설정 ---
+AI_MAX_POSITION_SIZE = safe_parse_env_value(os.getenv('AI_MAX_POSITION_SIZE'), '0.2', float)  # 최대 20% 포지션
+AI_MIN_CONFIDENCE = safe_parse_env_value(os.getenv('AI_MIN_CONFIDENCE'), '0.6', float)     # 최소 신뢰도 60%
+AI_RISK_TOLERANCE = os.getenv('AI_RISK_TOLERANCE', "MEDIUM")  # 리스크 허용도
+AI_BUY_SCORE_THRESHOLD = safe_parse_env_value(os.getenv('AI_BUY_SCORE_THRESHOLD'), '85', int) # AI 분석 기반 매수 결정을 위한 최소 점수 (기존 75점에서 85점으로 상향)
+
+# 백테스트로 검증된 최적화 파라미터 (환경변수 또는 기본값 사용)
+AI_INITIAL_STOP_LOSS = safe_parse_env_value(os.getenv('AI_INITIAL_STOP_LOSS'), '4.0', float)
+AI_TRAILING_ACTIVATION = safe_parse_env_value(os.getenv('AI_TRAILING_ACTIVATION'), '6.0', float)
+AI_TRAILING_STOP = safe_parse_env_value(os.getenv('AI_TRAILING_STOP'), '3.0', float)
+
+# --- 척후병 전략 설정 ---
+SCOUT_INITIAL_STOP_LOSS = safe_parse_env_value(os.getenv('SCOUT_INITIAL_STOP_LOSS'), '4.0', float)
+SCOUT_TRAILING_ACTIVATION = safe_parse_env_value(os.getenv('SCOUT_TRAILING_ACTIVATION'), '6.0', float)
+SCOUT_TRAILING_STOP = safe_parse_env_value(os.getenv('SCOUT_TRAILING_STOP'), '3.0', float)
+SCOUT_MAX_BUDGET_PER_STOCK = safe_parse_env_value(os.getenv('SCOUT_MAX_BUDGET_PER_STOCK'), '0.05', float) # 종목당 최대 5%
+SCOUT_MAIN_UNIT_TRIGGER_PROFIT = safe_parse_env_value(os.getenv('SCOUT_MAIN_UNIT_TRIGGER_PROFIT'), '2.5', float) # 본대 투입 수익률 2.5%
+SCOUT_RUN_INTERVAL_MIN = safe_parse_env_value(os.getenv('SCOUT_RUN_INTERVAL_MIN'), '5', int) # 척후병 실행 간격 (분)
 
 # --- 설정값 확인용 출력 (GitHub Actions에서는 간소화) ---
 def print_startup_info():
@@ -237,6 +227,8 @@ def validate_config():
         optional_configs.append('TELEGRAM_CHAT_ID')
     if not GEMINI_API_KEY:
         optional_configs.append('GEMINI_API_KEY')
+    if not DART_API_KEY:
+        optional_configs.append('DART_API_KEY')
     if not GOOGLE_SERVICE_ACCOUNT_FILE:
         optional_configs.append('GOOGLE_SERVICE_ACCOUNT_FILE')
     if not GOOGLE_SPREADSHEET_ID:

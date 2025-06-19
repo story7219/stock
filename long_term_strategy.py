@@ -8,9 +8,9 @@ import numpy as np
 import requests
 import logging
 from datetime import datetime, timedelta
-import config
 from core_trader import CoreTrader
 import time
+import config
 
 logger = logging.getLogger(__name__)
 
@@ -19,19 +19,7 @@ class StrategyEngine:
     
     def __init__(self):
         self.trader = CoreTrader()
-        
-        self.target_stocks = [
-            "005930",  # 삼성전자
-            "000660",  # SK하이닉스
-            "035420",  # NAVER
-            "051910",  # LG화학
-            "006400",  # 삼성SDI
-            "035720",  # 카카오
-            "068270",  # 셀트리온
-            "005380",  # 현대차
-            "096770",  # SK이노베이션
-            "017670",  # SK텔레콤
-        ]
+        self.target_stocks = config.TARGET_STOCKS
         
     def get_daily_data(self, stock_code: str, days: int = 300):
         """일봉 데이터 조회 (300일) - 개선된 에러 핸들링 포함"""

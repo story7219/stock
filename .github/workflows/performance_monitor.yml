@@ -1,13 +1,7 @@
 name: "⚡ 통합 성능 모니터링 및 시스템 헬스 체크"
 
 on:
-  schedule:
-    - cron: '0 */6 * * *'    # 6시간마다 (00:00, 06:00, 12:00, 18:00) - 헬스 체크
-    - cron: '30 6 * * 1-5'   # 월-금 15:30 (장 마감 30분 후) - 트레이딩 성능
-    - cron: '0 23 * * 0'     # 일요일 08:00 (주간 종합 분석)
   workflow_dispatch:
-  push:
-    branches: [ main, develop ]
 
 jobs:
   integrated_monitoring:

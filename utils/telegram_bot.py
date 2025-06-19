@@ -1,7 +1,7 @@
 """
 텔레그램 봇 알림 기능
 """
-import requests
+import httpx  # requests 대신 httpx 사용
 import logging
 
 logger = logging.getLogger(__name__)
@@ -14,8 +14,8 @@ class TelegramNotifier:
         self.chat_id = chat_id
         self.base_url = f"https://api.telegram.org/bot{bot_token}"
         
-    def send_message(self, message):
-        """텔레그램으로 메시지 전송"""
+    async def send_message(self, message: str) -> bool:
+        """텔레그램으로 메시지 비동기 전송"""
         if not self.bot_token or not self.chat_id:
             logger.warning("텔레그램 설정이 없어 메시지를 전송하지 않습니다.")
             return False
@@ -27,10 +27,15 @@ class TelegramNotifier:
                 "text": message,
                 "parse_mode": "HTML"
             }
-            response = requests.post(url, data=data, timeout=10)
-            response.raise_for_status()
+            async with httpx.AsyncClient() as client:
+                response = await client.post(url, data=data, timeout=10)
+                response.raise_for_status()
+            
             logger.info("✅ 텔레그램 메시지 전송 성공")
             return True
+        except httpx.HTTPStatusError as e:
+            logger.error(f"❌ 텔레그램 API 오류: {e.response.status_code} - {e.response.text}")
+            return False
         except Exception as e:
             logger.error(f"❌ 텔레그램 메시지 전송 실패: {e}")
             return False 

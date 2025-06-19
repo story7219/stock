@@ -1,176 +1,249 @@
 """
-AI 트레이딩 시스템 메인 실행 파일
-- AI 시장 분석 실행
-- 자동 매매 실행
-- 시스템 설정 확인
+🤖 통합 자동매매 시스템 v2.0 (Orchestrator)
+===========================================
+
+시스템의 모든 모듈을 조립하고 전체 실행 흐름을 관장하는 중앙 관제소입니다.
+이 파일은 시스템의 유일한 진입점(Entry Point) 역할을 합니다.
+
+주요 기능:
+- 설정 및 로거 초기화
+- 핵심 컴포넌트(Trader, Provider, Analyzer, Manager) 생성 및 의존성 주입
+- 스케줄러를 이용한 주기적 작업 실행 (척후병 전략)
+- 안전한 시스템 시작 및 종료 처리
+
+실행: python main.py
 """
-import argparse
+import asyncio
 import logging
+import signal
+import sys
+import traceback
+import argparse
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from apscheduler.triggers.interval import IntervalTrigger
+
 import config
-from analysis_engine import MarketAnalyzer
+from utils.logger_config import setup_logging
 from core_trader import CoreTrader
+from market_data_provider import AIDataCollector, StockFilter
+from ai_analyzer import AIAnalyzer
+from scout_strategy_manager import ScoutStrategyManager
+from google_sheet_logger import GoogleSheetLogger
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+# --- 로거 설정 ---
+# 다른 모듈보다 먼저 설정되어야 전역적으로 적용됩니다.
+setup_logging()
+logger = logging.getLogger(__name__)
 
-def run_market_analysis(args):
-    """(업그레이드) AI가 자동으로 시장 주도주를 찾아 분석합니다."""
-    print("\n📈 AI 기반 시장 브리핑을 시작합니다.")
-    try:
-        analyzer = MarketAnalyzer()
-        trader = CoreTrader()  # trader 변수를 함수 내에서 정의
-        result = analyzer.get_trading_insights(args.image)
-        print("\n--- 🤖 AI 분석 결과 ---")
-        print(result)
-        if trader.telegram_bot:
-            trader.telegram_bot.send_message(f"--- 🤖 AI 분석 결과 ---\n{result}")
-    except Exception as e:
-        print(f"❌ 분석 실행 실패: {e}")
 
-def run_auto_trading(args):
-    print("\n🤖 자동 매매 시스템을 시작합니다.")
-    try:
-        trader = CoreTrader()
-        # access_token 대신 token_manager 확인
-        if not trader.token_manager.get_valid_token(): 
-            print("❌ API 토큰을 가져올 수 없습니다.")
+class TradingSystemOrchestrator:
+    """시스템 전체를 조율하고 관리하는 오케스트레이터 클래스"""
+
+    def __init__(self):
+        self.scheduler = AsyncIOScheduler()
+        self.shutdown_event = asyncio.Event()
+        self.trader = None
+        self.strategy_manager = None
+        self.sheet_logger = None
+        self.mode = "scout" # 기본 모드 설정
+
+    async def initialize(self, mode: str = "scout") -> bool:
+        """시스템의 모든 핵심 컴포넌트를 초기화하고 의존성을 주입합니다."""
+        self.mode = mode
+        logger.info("==================================================")
+        logger.info(f"🤖 통합 자동매매 시스템 초기화를 시작합니다... (모드: {self.mode})")
+        logger.info("==================================================")
+        try:
+            # --- 1. 환경변수 및 설정 검증 ---
+            missing_configs, _ = config.validate_config()
+            if missing_configs:
+                logger.critical(f"❌ 필수 환경변수가 설정되지 않았습니다: {missing_configs}")
+                return False
+
+            # --- 1.5. 구글 시트 로거 초기화 (안전 모드) ---
+            logger.info("🔧 [1/5] 구글 시트 로거를 초기화합니다...")
+            try:
+                if config.GOOGLE_SERVICE_ACCOUNT_FILE and config.GOOGLE_SPREADSHEET_ID:
+                    self.sheet_logger = GoogleSheetLogger(
+                        credentials_path=config.GOOGLE_SERVICE_ACCOUNT_FILE,
+                        spreadsheet_key=config.GOOGLE_SPREADSHEET_ID
+                    )
+                    await self.sheet_logger.async_initialize()
+                    
+                    # async_initialize가 성공적으로 완료되었는지 한번 더 확인
+                    if not self.sheet_logger.initialized:
+                        logger.warning("⚠️ 구글 시트 로거 초기화에 실패했습니다. 로깅 기능이 비활성화됩니다.")
+                        self.sheet_logger = None
+                else:
+                    logger.warning("⚠️ 구글 시트 관련 환경변수가 설정되지 않아 로깅 기능이 비활성화됩니다.")
+                    self.sheet_logger = None
+            except Exception as e:
+                logger.error(f"💥 구글 시트 로거 초기화 중 심각한 예외 발생: {e}. 로깅 기능이 비활성화됩니다.", exc_info=True)
+                self.sheet_logger = None
+
+            # --- 2. 핵심 컴포넌트 생성 (의존성 주입 준비) ---
+            logger.info("🔧 [2/5] 코어 트레이더를 초기화합니다...")
+            self.trader = CoreTrader(sheet_logger=self.sheet_logger)
+            if not await self.trader.async_initialize():
+                logger.critical("❌ 코어 트레이더 초기화 실패. 시스템을 시작할 수 없습니다.")
+                return False
+
+            logger.info("🔧 [3/5] 마켓 데이터 제공자를 초기화합니다...")
+            data_provider = AIDataCollector(self.trader)
+            stock_filter = StockFilter(self.trader)
+
+            logger.info("🔧 [4/5] AI 분석기를 초기화합니다...")
+            ai_analyzer = AIAnalyzer(trader=self.trader, data_provider=data_provider)
+
+            logger.info("🔧 [5/5] 전략 관리자를 초기화합니다...")
+            self.strategy_manager = ScoutStrategyManager(
+                trader=self.trader,
+                data_provider=data_provider,
+                stock_filter=stock_filter,
+                ai_analyzer=ai_analyzer,
+            )
+            
+            logger.info("✅ 모든 컴포넌트가 성공적으로 초기화되었습니다.")
+            return True
+
+        except Exception as e:
+            logger.critical("❌ 시스템 초기화 중 심각한 오류 발생", exc_info=True)
+            return False
+
+    def setup_schedules(self):
+        """스케줄러에 주기적인 작업을 등록합니다."""
+        if not self.strategy_manager:
+            logger.error("전략 관리자가 초기화되지 않아 스케줄을 설정할 수 없습니다.")
             return
+
+        logger.info(f"⏰ 스케줄러를 설정합니다: {config.SCOUT_RUN_INTERVAL_MIN}분마다 '{self.mode}' 전략 실행")
         
-        if args.action == 'balance':
-            balance = trader.get_balance()
-            if balance and balance.get('rt_cd') == '0':
-                print("✅ 잔고 조회 성공!")
-                print(f" - 예수금: {int(balance['output2'][0]['dnca_tot_amt']):,} 원")
-                for stock in balance.get('output1', []):
-                    print(f" - {stock['prdt_name']}({stock['pdno']}): {stock['hldg_qty']}주")
-            else:
-                print(f"❌ 잔고 조회 실패: {balance.get('msg1', '알 수 없는 오류') if balance else '응답 없음'}")
-
-        elif args.action in ['buy', 'sell']:
-            if not args.stock_code or not args.quantity:
-                print("❌ 종목코드(-s)와 수량(-q)을 입력해주세요.")
-                return
-            trader.place_order(args.stock_code, args.action, args.quantity, args.price)
-            
-        elif args.action == 'report':
-            # generate_daily_report 메서드가 없으므로 간단한 보고서 생성
-            balance = trader.get_balance()
-            if balance and balance.get('rt_cd') == '0':
-                report = f"📊 일일 보고서\n예수금: {int(balance['output2'][0]['dnca_tot_amt']):,} 원"
-                print(report)
-                if trader.telegram_bot:
-                    trader.telegram_bot.send_message(report)
-            else:
-                print("❌ 보고서 생성 실패: 잔고 조회 오류")
-            
-    except Exception as e:
-        print(f"❌ 트레이딩 시스템 오류: {e}")
+        # 'run' 메서드에 모드를 인자로 전달
+        job_func = lambda: self.strategy_manager.run(mode=self.mode)
         
-def show_config(args=None):  # args를 선택적 매개변수로 변경
-    print("\n⚙️ 현재 시스템 설정")
-    print(f" - 모의투자: {'Yes' if config.IS_MOCK_TRADING else 'No'}")
-    print(f" - KIS APP KEY: {'설정됨' if config.KIS_APP_KEY else '설정 필요'}")
-    print(f" - KIS APP SECRET: {'설정됨' if config.KIS_APP_SECRET else '설정 필요'}")
-    print(f" - KIS 계좌번호: {'설정됨' if config.KIS_ACCOUNT_NUMBER else '설정 필요'}")
-    print(f" - Gemini API KEY: {'설정됨' if config.GEMINI_API_KEY else '설정 필요'}")
-    print(f" - 텔레그램 토큰: {'설정됨' if config.TELEGRAM_BOT_TOKEN else '설정 필요'}")
-    print(f" - 구글 시트 파일: {'설정됨' if config.GOOGLE_SERVICE_ACCOUNT_FILE else '설정 필요'}")
-    print(f" - 구글 시트 ID: {'설정됨' if config.GOOGLE_SPREADSHEET_ID else '설정 필요'}")
+        self.scheduler.add_job(
+            job_func,
+            trigger=IntervalTrigger(minutes=config.SCOUT_RUN_INTERVAL_MIN),
+            id="strategy_run",
+            name=f"{self.mode} 전략 실행",
+            max_instances=1, # 동시에 여러 작업이 실행되지 않도록 보장
+        )
+        # 일일 리포트 생성 (오후 3시 40분)
+        self.scheduler.add_job(
+            self.strategy_manager.generate_daily_report,
+            trigger='cron',
+            hour=15,
+            minute=40,
+            id="daily_report_generation",
+            name="AI 코치 일일 리포트 생성"
+        )
 
-def run_default():
-    """기본 실행 함수 - 설정 확인 후 잔고 조회"""
-    print("🚀 AI 트레이딩 시스템을 시작합니다!")
-    
-    # 1. 설정 확인
-    show_config()
-    
-    # 2. 잔고 조회 시도
-    try:
-        print("\n💰 잔고 조회를 시작합니다...")
-        trader = CoreTrader()
+
+    async def run(self, mode: str = "scout"):
+        """시스템을 시작하고 종료 시그널을 대기합니다."""
+        if not await self.initialize(mode):
+            logger.critical("시스템 초기화 실패. 프로그램을 종료합니다.")
+            return
+
+        self.setup_schedules()
+        self.scheduler.start()
         
-        if not trader.token_manager.get_valid_token():
-            print("❌ API 토큰을 가져올 수 없습니다. .env 파일을 확인해주세요.")
-        return
+        # 초기 즉시 실행 (테스트 및 빠른 피드백 용도)
+        logger.info(f"🚀 시스템 시작 즉시 첫 번째 '{mode}' 전략 실행을 예약합니다.")
+        self.scheduler.add_job(lambda: self.strategy_manager.run(mode=mode), 'date', run_date=None)
 
-        balance = trader.get_balance()
-        if balance and balance.get('rt_cd') == '0':
-            print("✅ 잔고 조회 성공!")
-            print(f" - 예수금: {int(balance['output2'][0]['dnca_tot_amt']):,} 원")
-            holdings = balance.get('output1', [])
-            if holdings:
-                print(" - 보유 종목:")
-                for stock in holdings:
-                    if int(stock['hldg_qty']) > 0:  # 보유 수량이 0보다 큰 경우만
-                        print(f"   • {stock['prdt_name']}({stock['pdno']}): {stock['hldg_qty']}주")
-            else:
-                print(" - 보유 종목: 없음")
-        else:
-            print(f"❌ 잔고 조회 실패: {balance.get('msg1', '알 수 없는 오류') if balance else '응답 없음'}")
+        initial_message = (
+            "==================================================\n"
+            f"✅ 자동매매 시스템이 성공적으로 시작되었습니다. (모드: {mode})\n"
+            f"🕒 {config.SCOUT_RUN_INTERVAL_MIN}분 간격으로 전략을 실행합니다.\n"
+            "🛑 종료하려면 Ctrl+C를 누르세요.\n"
+            "=================================================="
+        )
+        logger.info(initial_message)
+        
+        if self.trader and self.trader.notifier:
+            await self.trader.notifier.send_message("🚀 자동매매 시스템이 시작되었습니다.")
+
+        # 종료 시그널 대기
+        await self.shutdown_event.wait()
+
+    async def shutdown(self):
+        """시스템을 안전하게 종료합니다."""
+        if self.shutdown_event.is_set():
+            return
             
-    except Exception as e:
-        print(f"❌ 시스템 오류: {e}")
-    
-    print("\n📋 사용 가능한 명령어:")
-    print(" - python main.py config          : 설정 확인")
-    print(" - python main.py trade balance   : 잔고 조회")
-    print(" - python main.py trade report    : 일일 보고서")
-    print(" - python main.py analyze 이미지파일 : AI 분석")
+        logger.info("==================================================")
+        logger.info("👋 시스템 종료를 시작합니다...")
+        logger.info("==================================================")
 
-def run_strategy_scan():
-    """투자 전략 스캔 및 실행"""
-    print("\n🎯 투자 전략 스캔을 시작합니다...")
-    try:
-        from strategy_engine import run_strategy
-        run_strategy()
-    except Exception as e:
-        logger.error(f"전략 실행 실패: {e}")
+        # 스케줄러 종료
+        if self.scheduler.running:
+            logger.info("⏰ 스케줄러를 중지합니다...")
+            self.scheduler.shutdown(wait=True)
+            logger.info("✅ 스케줄러가 성공적으로 중지되었습니다.")
 
-def run_ai_trading():
-    """AI 자동 매매 실행"""
-    print("\n🤖 AI 자동 매매를 시작합니다...")
-    try:
-        from strategy_engine import run_ai_strategy
-        run_ai_strategy()
-    except Exception as e:
-        logger.error(f"AI 매매 실행 실패: {e}")
+        # 리포트 생성 (종료 시)
+        if self.strategy_manager:
+            try:
+                logger.info("📊 최종 일일 리포트를 생성합니다...")
+                # generate_daily_report가 동기 함수이므로, 비동기 루프에서 안전하게 실행
+                await asyncio.to_thread(self.strategy_manager.generate_daily_report)
+                logger.info("✅ 최종 리포트 생성이 완료되었습니다.")
+            except Exception:
+                logger.error("💥 최종 리포트 생성 중 오류 발생.", exc_info=True)
+        
+        final_message = "👋 자동매매 시스템이 안전하게 종료되었습니다."
+        logger.info(final_message)
+        if self.trader and self.trader.notifier:
+            await self.trader.notifier.send_message(final_message)
 
-def main():
-    parser = argparse.ArgumentParser(description="AI 트레이딩 시스템")
-    subparsers = parser.add_subparsers(dest='command', required=False)
+        self.shutdown_event.set()
 
-    ana_p = subparsers.add_parser('analyze', help='AI가 시장 주도주를 자동 분석합니다.')
-    ana_p.add_argument('image', type=str, help='분석에 참고할 차트 이미지 파일 경로')
-    ana_p.set_defaults(func=run_market_analysis)
 
-    trd_p = subparsers.add_parser('trade', help='자동 매매를 실행합니다.')
-    trd_p.add_argument('action', choices=['balance', 'buy', 'sell', 'report'], help='수행할 동작')
-    trd_p.add_argument('-s', '--stock_code', type=str, help='종목코드')
-    trd_p.add_argument('-q', '--quantity', type=int, help='수량')
-    trd_p.add_argument('-p', '--price', type=int, default=0, help='가격 (지정가, 0이면 시장가)')
-    trd_p.set_defaults(func=run_auto_trading)
-    
-    cfg_p = subparsers.add_parser('config', help='현재 설정을 확인합니다.')
-    cfg_p.set_defaults(func=show_config)
+def handle_signal(sig, loop, system):
+    """운영체제 시그널을 처리하여 안전한 종료를 유도합니다."""
+    logger.info(f"🛑 시그널 {sig} 수신. 시스템 종료를 시작합니다.")
+    asyncio.create_task(system.shutdown())
 
-    # AI 매매 명령어 추가
-    ai_parser = subparsers.add_parser('ai', help='AI 자동 매매 실행')
-    
-    # 전략 실행 명령어 추가
-    strategy_parser = subparsers.add_parser('strategy', help='투자 전략 실행')
-    
+
+async def main():
+    """애플리케이션의 메인 진입점"""
+    parser = argparse.ArgumentParser(description="AI 기반 자동매매 시스템")
+    parser.add_argument(
+        "mode",
+        type=str,
+        nargs='?',
+        default="scout",
+        choices=["scout", "advanced"],
+        help="실행할 트레이딩 모드 ('scout' 또는 'advanced')"
+    )
     args = parser.parse_args()
     
-    if not args.command:
-        show_config()
-        return
-    
-    # 명령어가 없으면 기본 실행
-    if args.command == 'ai':
-        run_ai_trading()
-    elif args.command == 'strategy':
-        run_strategy_scan()
-    else:
-        args.func(args)
+    orchestrator = TradingSystemOrchestrator()
+
+    # 시그널 핸들러 설정
+    try:
+        loop = asyncio.get_running_loop()
+        for sig in (signal.SIGINT, signal.SIGTERM):
+            loop.add_signal_handler(sig, handle_signal, sig, loop, orchestrator)
+    except RuntimeError: # 'no running event loop'
+        loop = None
+
+    try:
+        await orchestrator.run(mode=args.mode)
+    except Exception:
+        logger.critical("💥 오케스트레이터에서 처리되지 않은 예외 발생", exc_info=True)
+    finally:
+        # 이미 종료 프로세스가 진행 중일 수 있으므로, 재진입을 방지합니다.
+        if not orchestrator.shutdown_event.is_set():
+            logger.info("🏁 최종 정리 작업을 수행합니다.")
+            await orchestrator.shutdown()
+        logger.info("프로그램이 완전히 종료되었습니다.")
+
 
 if __name__ == "__main__":
-    main() 
+    try:
+        asyncio.run(main())
+    except (KeyboardInterrupt, SystemExit):
+        logger.info("프로그램 실행이 중단되었습니다.")
+    sys.exit(0)

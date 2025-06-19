@@ -1,9 +1,6 @@
 name: "💾 자동 백업 및 복구 관리"
 
 on:
-  schedule:
-    - cron: '0 3 * * 0'      # 매주 일요일 12:00 (주간 백업)
-    - cron: '0 23 * * *'     # 매일 08:00 (일일 백업)
   workflow_dispatch:
     inputs:
       backup_type:
@@ -16,8 +13,6 @@ on:
           - 'weekly'
           - 'full_system'
           - 'config_only'
-  push:
-    branches: [ main, develop ]
 
 jobs:
   backup_system:
