@@ -25,7 +25,7 @@ import httpx
 import pandas_ta as ta # pandas-ta 임포트
 
 from telegram_wrapper import TelegramNotifierWrapper
-import config
+import core_legacy.config as config
 from google_sheet_logger import GoogleSheetLogger
 from abc import ABC, abstractmethod
 import pandas as pd
