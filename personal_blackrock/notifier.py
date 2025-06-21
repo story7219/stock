@@ -11,6 +11,7 @@ import os
 from typing import Optional, Dict, Any
 from datetime import datetime
 import json
+import aiohttp
 
 # 로깅 설정
 logger = logging.getLogger(__name__)
@@ -49,14 +50,29 @@ class TelegramNotifier:
                 logger.debug("텔레그램 알림이 비활성화되어 있습니다.")
                 return False
             
-            # 실제 텔레그램 API 호출 대신 로그로 대체 (개발 환경)
-            logger.info(f"📱 텔레그램 알림: {message[:100]}...")
-            print(f"📱 [텔레그램 알림] {message}")
+            # 실제 텔레그램 API 호출
+            url = f"https://api.telegram.org/bot{self.bot_token}/sendMessage"
+            payload = {
+                'chat_id': self.chat_id,
+                'text': message,
+                'parse_mode': parse_mode
+            }
             
-            return True
+            async with aiohttp.ClientSession() as session:
+                async with session.post(url, json=payload) as response:
+                    if response.status == 200:
+                        logger.info(f"✅ 텔레그램 메시지 전송 성공")
+                        print(f"📱 [텔레그램 전송 완료] {message[:50]}...")
+                        return True
+                    else:
+                        error_text = await response.text()
+                        logger.error(f"❌ 텔레그램 API 오류 {response.status}: {error_text}")
+                        print(f"📱 [텔레그램 전송 실패] {message[:50]}...")
+                        return False
             
         except Exception as e:
             logger.error(f"❌ 텔레그램 메시지 발송 실패: {e}")
+            print(f"📱 [텔레그램 오류] {str(e)}")
             return False
     
     async def send_analysis_result(self, strategy_name: str, results: list):

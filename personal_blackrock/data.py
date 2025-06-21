@@ -5,7 +5,7 @@
 캐싱을 통해 성능을 최적화하며, 일관된 데이터 인터페이스를 제공합니다.
 
 수급 분석기 import 추가
-from .supply_demand_analyzer import SupplyDemandAnalyzer, SupplyDemandData
+from .demand import SupplyDemandAnalyzer, SupplyDemandData
 """
 
 import asyncio
@@ -30,7 +30,7 @@ import warnings
 from pykrx import stock
 
 # 수급 분석기 import 추가
-from .supply_demand_analyzer import SupplyDemandAnalyzer, SupplyDemandData
+from .demand import SupplyDemandAnalyzer, SupplyDemandData
 
 warnings.filterwarnings('ignore')
 
@@ -180,8 +180,8 @@ class DataManager:
         """
         print("[데이터 매니저] 전체 시장 데이터 사전 로딩 중...")
         
-        fundamentals_cache_file = "fundamentals_cache.csv"
-        market_cap_cache_file = "market_cap_cache_preload.csv"
+        fundamentals_cache_file = "fund_cache.csv"
+        market_cap_cache_file = "market_cache.csv"
         
         try:
             self._load_fresh_market_data(fundamentals_cache_file, market_cap_cache_file)

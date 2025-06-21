@@ -27,8 +27,8 @@ from pathlib import Path
 import json
 
 from pykrx import stock
-from personal_blackrock.ai_analyzer import AIAnalyzer
-from personal_blackrock.stock_data_manager import DataManager
+from personal_blackrock.ai_analyzer import HighPerformanceAIAnalyzer
+from personal_blackrock.data import DataManager
 
 
 class AlertLevel(Enum):
@@ -120,7 +120,7 @@ class RealTimeMonitor:
             self.logger.info("✅ 새로운 DataManager 생성")
         
         # AI 분석기 초기화 (공통 DataManager 사용)
-        self.ai_analyzer = AIAnalyzer(data_manager=self.data_manager)
+        self.ai_analyzer = HighPerformanceAIAnalyzer(data_manager=self.data_manager)
         
         # 분석 설정
         self.strategies = ["윌리엄 오닐", "제시 리버모어", "워렌 버핏", "피터 린치", "일목균형표", "블랙록"]
