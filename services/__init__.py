@@ -1,14 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-서비스 모듈
-
-외부 서비스 연동 (텔레그램, 뉴스, API 등)을 제공합니다.
+UI 모듈 - 사용자 인터페이스 관련 기능들
 """
 
-from .notification import TelegramNotifier
-from .news import NewsService
+from .menu import create_main_menu
 
-__all__ = [
-    'TelegramNotifier',
-    'NewsService'
-] 
+__all__ = ['create_main_menu'] 
