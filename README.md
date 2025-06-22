@@ -1,177 +1,264 @@
-# 📊 HTS 스타일 중기투자 퀀트 분석 시스템
+# 🚀 고성능 HTS (Home Trading System)
 
-증권사 HTS(Home Trading System)처럼 전문적인 인터페이스로 구현된 주식 분석 시스템입니다.
+**비동기 처리 | 멀티레벨 캐싱 | 성능 최적화**
 
-## 🚀 주요 기능
+투자 대가들의 전략을 기반으로 한 AI 기반 주식 분석 및 추천 시스템입니다.
 
-### 📈 HTS 스타일 전문 인터페이스
-- **어두운 테마**: 증권사 HTS와 동일한 다크 모드
-- **실시간 차트**: matplotlib 기반 전문 차트
-- **종목 현황판**: 호가창 스타일의 종목 리스트
-- **상세 분석**: 개별 종목 심층 분석
+## ✨ 주요 특징
 
-### 🎯 퀀트 분석 기능
-- **Value 투자**: PER 기반 가치 평가
-- **Quality 투자**: ROE 기반 품질 평가  
-- **Momentum 투자**: 수익률 기반 모멘텀 평가
-- **Low Volatility**: 변동성 기반 안정성 평가
+### 🎯 투자 대가별 전략 분석
+- **Warren Buffett**: 가치투자 전략 (안정성, 장기 추세 분석)
+- **Peter Lynch**: 성장투자 전략 (모멘텀, 섹터 분석)
+- **William O'Neil**: CAN SLIM 전략 (종합적 기술 분석)
 
-### 🌍 글로벌 시장 지원
-- **한국 시장**: KOSPI/KOSDAQ 종목 분석
-- **미국 시장**: NASDAQ/NYSE 종목 분석
-- **비교 분석**: 시장간 투자 기회 비교
+### 🚀 고성능 아키텍처
+- **비동기 처리**: asyncio 기반 병렬 데이터 처리
+- **멀티레벨 캐싱**: 메모리 → Redis → 디스크 계층화
+- **커넥션 풀링**: 데이터베이스 연결 최적화
+- **메모리 최적화**: 약한 참조, __slots__ 사용
 
-## 📁 파일 구조
+### 📊 실시간 모니터링
+- CPU, 메모리, 디스크, 네트워크 사용률 모니터링
+- 성능 메트릭 실시간 수집 및 분석
+- 자동 메모리 정리 및 최적화
 
-```
-📦 test_stock/
-├── 📄 mid_term.py          # 핵심 분석 엔진
-├── 📄 hts_gui.py           # HTS 스타일 GUI
-├── 📄 run_hts.py           # GUI 실행기
-├── 📄 create_sample_data.py # 샘플 데이터 생성기
-├── 📁 data/
-│   └── 📄 stock_data.csv   # 주식 데이터
-├── 📁 results/
-│   └── 📁 visualizations/ # 생성된 차트들
-└── 📄 README.md           # 이 파일
-```
+### 🎨 현대적 UI
+- Tkinter 기반 반응형 GUI
+- 실시간 차트 및 데이터 시각화
+- 지연 로딩 및 가상화된 컴포넌트
 
-## 🛠️ 설치 및 실행
+## 📦 설치 및 실행
 
-### 1. 필요한 라이브러리 설치
+### 필수 요구사항
+- Python 3.10 이상
+- Windows 10/11 (현재 버전)
+
+### 1. 저장소 클론
 ```bash
-pip install pandas matplotlib numpy tkinter scikit-learn yfinance seaborn
+git clone <repository-url>
+cd test_stock
 ```
 
-### 2. 샘플 데이터 생성
+### 2. 가상환경 생성 (권장)
 ```bash
-python create_sample_data.py
+python -m venv venv
+venv\Scripts\activate  # Windows
 ```
 
-### 3. HTS GUI 실행
+### 3. 의존성 설치
 ```bash
-python run_hts.py
+pip install -r requirements.txt
 ```
 
-## 📊 HTS 인터페이스 구성
+### 4. 실행
+```bash
+# Python으로 직접 실행
+python main.py
 
-### 🔝 헤더 영역
-- **시스템 타이틀**: 중기투자 퀀트 분석 시스템
-- **현재 시간**: 실시간 시간 표시
-- **분석 시작 버튼**: 🚀 분석 시작
-
-### 📈 메인 화면 (좌측)
-#### 종목 현황판
-- 순위별 추천 종목 표시
-- HTS 호가창 스타일 테이블
-- 실시간 색상 구분 (상승/하락)
-
-#### 분석 차트 (2x2 레이아웃)
-1. **투자 점수 분포**: 막대 그래프
-2. **PER vs ROE**: 산점도 분석
-3. **수익률 비교**: 3개월/6개월 비교
-4. **시장별 분포**: 파이 차트
-
-### 🔍 상세 정보 (우측)
-- **종목 기본 정보**: 시장, 현재가, 시가총액
-- **밸류에이션 지표**: PER, ROE, 가치 점수
-- **수익률 현황**: 3/6개월 수익률, 변동성
-- **종합 평가**: 각 팩터별 점수
-- **투자 의견**: 매수/관심/관망 추천
-
-## 🎨 HTS 스타일 디자인
-
-### 색상 체계
-- **배경**: `#1e1e1e` (어두운 회색)
-- **패널**: `#2d2d2d` (중간 회색)
-- **텍스트**: `#ffffff` (흰색)
-- **상승/매수**: `#ff4444` (빨간색)
-- **하락/매도**: `#4488ff` (파란색)
-- **중립**: `#44ff88` (녹색)
-- **강조**: `#ffff44` (노란색)
-
-### 폰트
-- **기본 폰트**: 맑은 고딕
-- **크기**: 헤더 16pt, 본문 10-12pt
-- **스타일**: 굵게, 기울임 등 상황별 적용
-
-## 📊 분석 알고리즘
-
-### 종합점수 계산 공식
-```
-최종점수 = (가치점수 × 25%) + (품질점수 × 30%) + (모멘텀점수 × 30%) + (안정성점수 × 15%)
+# 또는 배치 파일 사용 (Windows)
+run_hts.bat
 ```
 
-### 각 팩터별 계산
-- **가치점수**: (1 - PER정규화) × 100
-- **품질점수**: ROE정규화 × 100  
-- **모멘텀점수**: ((3M수익률 + 6M수익률) / 2) × 100
-- **안정성점수**: (1 - 변동성정규화) × 100
+## 🏗️ 프로젝트 구조
 
-### 필터링 조건
-- **최소 시가총액**: 1,000억 이상
-- **최대 PER**: 50배 이하
-- **최소 ROE**: 5% 이상
-- **수익률 범위**: 3M(-20%~), 6M(-30%~)
-- **최대 변동성**: 60% 이하
-
-## 🎯 투자 등급
-
-| 점수 범위 | 등급 | 색상 | 의견 |
-|-----------|------|------|------|
-| 70점 이상 | 🟢 우수 | 빨간색 | 매수 추천 |
-| 50-69점 | 🟡 양호 | 노란색 | 관심 종목 |
-| 50점 미만 | 🔴 보통 | 파란색 | 관망 |
-
-## 📁 결과 파일
-
-### CSV 파일
-- `mid_term_recommend.csv`: 추천 종목 목록
-- 한글 헤더, UTF-8 인코딩
-- Excel에서 바로 열기 가능
-
-### 차트 파일
-- `hts_style_analysis.png`: 메인 분석 차트
-- `stock_detail_[종목코드].png`: 개별 종목 상세 차트
-- 고해상도 PNG 포맷 (300 DPI)
-
-## 🔧 커스터마이징
-
-### 분석 기준 변경
-`mid_term.py`의 `criteria` 딕셔너리에서 수정:
-```python
-self.criteria = {
-    'min_market_cap': 1e11,    # 최소 시가총액
-    'max_per': 50,             # 최대 PER
-    'min_roe': 5,              # 최소 ROE
-    'top_n_per_market': 10     # 시장별 선택 종목 수
-}
+```
+test_stock/
+├── config/                 # 설정 관리
+│   └── settings.py         # 환경변수 및 앱 설정
+├── core/                   # 핵심 시스템
+│   ├── cache_manager.py    # 멀티레벨 캐싱 시스템
+│   ├── database_manager.py # 비동기 DB 관리
+│   └── performance_monitor.py # 성능 모니터링
+├── ui_interfaces/          # 사용자 인터페이스
+│   ├── optimized_hts_gui.py # 메인 GUI 시스템
+│   ├── chart_manager.py    # 차트 렌더링
+│   ├── data_manager.py     # 데이터 처리
+│   └── ai_manager.py       # AI 분석 엔진
+├── tests/                  # 테스트 코드
+│   └── test_hts_system.py  # 통합 테스트
+├── main.py                 # 메인 실행 파일
+├── requirements.txt        # 의존성 패키지
+├── run_hts.bat            # Windows 실행 스크립트
+└── README.md              # 프로젝트 문서
 ```
 
-### 색상 테마 변경
-`hts_gui.py`의 `colors` 딕셔너리에서 수정:
-```python
-self.colors = {
-    'bg': '#1e1e1e',           # 배경색
-    'text': '#ffffff',         # 텍스트색
-    'red': '#ff4444',          # 상승색
-    'blue': '#4488ff'          # 하락색
-}
+## 🔧 주요 구성 요소
+
+### CacheManager (core/cache_manager.py)
+- 3단계 캐시 시스템: 메모리 → Redis → 디스크
+- TTL 기반 자동 만료
+- 캐시 히트율 및 성능 통계 수집
+
+### DatabaseManager (core/database_manager.py)
+- SQLAlchemy 기반 비동기 ORM
+- 커넥션 풀링으로 성능 최적화
+- 대량 데이터 배치 처리
+
+### PerformanceMonitor (core/performance_monitor.py)
+- 실시간 시스템 리소스 모니터링
+- 메모리 누수 감지 및 자동 정리
+- 성능 메트릭 수집 및 분석
+
+### DataManager (ui_interfaces/data_manager.py)
+- 주식 데이터 수집 및 처리
+- 기술적 지표 계산 (RSI, MA, MACD, 볼린저 밴드)
+- 실시간 데이터 시뮬레이션
+
+### AIManager (ui_interfaces/ai_manager.py)
+- 투자 대가별 전략 구현
+- 종목 스크리닝 및 분석
+- 시장 심리 분석
+
+## 🎯 사용법
+
+### 1. 기본 실행
+프로그램을 실행하면 메인 GUI가 나타납니다:
+- 좌측: 주식 목록 및 필터링
+- 중앙: 차트 및 기술적 지표
+- 우측: AI 분석 결과 및 추천
+
+### 2. 투자 전략 선택
+AI 분석 탭에서 원하는 투자 대가의 전략을 선택:
+- Warren Buffett: 안정적인 가치투자
+- Peter Lynch: 성장주 발굴
+- William O'Neil: 기술적 분석 기반
+
+### 3. 종목 분석
+- 종목 코드 입력 또는 목록에서 선택
+- AI 분석 버튼 클릭
+- 상세한 분석 결과 및 추천 이유 확인
+
+### 4. 시장 모니터링
+- 실시간 성능 메트릭 확인
+- 시장 심리 분석 결과 모니터링
+- 섹터별 분석 및 비교
+
+## 🔬 테스트
+
+### 단위 테스트 실행
+```bash
+python -m pytest tests/ -v
 ```
 
-## 🚨 주의사항
+### 통합 테스트 실행
+```bash
+python tests/test_hts_system.py
+```
 
-1. **투자 참고용**: 실제 투자 결정은 신중히 하세요
-2. **데이터 정확성**: 실제 데이터로 교체 필요
-3. **리스크 관리**: 분산투자 권장
-4. **정기 업데이트**: 데이터 주기적 갱신 필요
+### 성능 테스트
+```bash
+python -m pytest tests/test_hts_system.py::TestHTSPerformance -v
+```
 
-## 📞 문의사항
+## ⚙️ 설정
 
-- 기술적 문제: 코드 리뷰 요청
-- 기능 개선: 이슈 등록
-- 사용법 문의: README 참조
+### 환경변수 설정
+`.env` 파일을 생성하여 다음 설정을 추가할 수 있습니다:
+
+```env
+# 데이터베이스 설정
+DATABASE_URL=sqlite:///./hts_data.db
+DATABASE_POOL_SIZE=20
+
+# Redis 설정 (선택사항)
+REDIS_URL=redis://localhost:6379
+REDIS_PASSWORD=
+
+# 캐시 설정
+CACHE_DEFAULT_TTL=3600
+CACHE_MAX_SIZE=10000
+
+# 로깅 설정
+LOG_LEVEL=INFO
+LOG_FILE=hts_application.log
+
+# 성능 설정
+PERFORMANCE_MONITOR_INTERVAL=1.0
+MAX_MEMORY_USAGE_PERCENT=80
+```
+
+### 성능 튜닝
+- `CACHE_MAX_SIZE`: 메모리 캐시 최대 크기
+- `DATABASE_POOL_SIZE`: DB 커넥션 풀 크기
+- `PERFORMANCE_MONITOR_INTERVAL`: 모니터링 주기
+- `MAX_MEMORY_USAGE_PERCENT`: 메모리 사용률 임계값
+
+## 🚨 문제 해결
+
+### 일반적인 문제들
+
+#### 1. 패키지 설치 오류
+```bash
+# pip 업그레이드
+python -m pip install --upgrade pip
+
+# 캐시 클리어 후 재설치
+pip cache purge
+pip install -r requirements.txt --no-cache-dir
+```
+
+#### 2. 메모리 부족 오류
+- `MAX_MEMORY_USAGE_PERCENT` 값을 낮춤 (예: 70)
+- `CACHE_MAX_SIZE` 값을 줄임
+- 가상 메모리 설정 확인
+
+#### 3. 데이터베이스 연결 오류
+- `DATABASE_URL` 설정 확인
+- 데이터베이스 파일 권한 확인
+- `DATABASE_POOL_SIZE` 값 조정
+
+#### 4. GUI 응답 없음
+- 메인 스레드 블로킹 확인
+- 비동기 작업 상태 확인
+- 로그 파일에서 오류 메시지 확인
+
+### 로그 확인
+```bash
+# 애플리케이션 로그
+tail -f hts_application.log
+
+# 에러 로그만 필터링
+grep ERROR hts_application.log
+```
+
+## 🤝 기여하기
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## 📝 라이선스
+
+이 프로젝트는 MIT 라이선스 하에 배포됩니다. 자세한 내용은 `LICENSE` 파일을 참조하세요.
+
+## 🔮 향후 계획
+
+### v1.1 (예정)
+- [ ] 실제 주식 API 연동 (yfinance, Alpha Vantage)
+- [ ] 백테스팅 기능 추가
+- [ ] 포트폴리오 관리 기능
+
+### v1.2 (예정)
+- [ ] 웹 인터페이스 추가 (FastAPI + React)
+- [ ] 모바일 앱 지원
+- [ ] 클라우드 배포 지원
+
+### v2.0 (장기)
+- [ ] 머신러닝 모델 통합
+- [ ] 실시간 뉴스 분석
+- [ ] 소셜 미디어 감성 분석
+
+## 📞 지원
+
+문제가 발생하거나 질문이 있으시면:
+- GitHub Issues에 등록
+- 이메일: [your-email@example.com]
+- 문서: [프로젝트 위키](wiki-url)
 
 ---
 
-**⚠️ 면책조항**: 이 시스템은 교육 및 연구 목적으로 제작되었습니다. 실제 투자에 사용 시 발생하는 손실에 대해 책임지지 않습니다. 
+**⚠️ 투자 주의사항**
+
+이 시스템은 교육 및 연구 목적으로 개발되었습니다. 실제 투자 결정은 본인의 판단과 책임 하에 이루어져야 하며, 과거 성과가 미래 수익을 보장하지 않습니다. 투자 전 충분한 검토와 전문가 상담을 권장합니다. 

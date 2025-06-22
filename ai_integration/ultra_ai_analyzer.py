@@ -138,9 +138,9 @@ class SmartCache:
         self._init_sqlite()
     
     def _init_sqlite(self):
-        """SQLite 캐시 초기화"""
+        """SQLite 캐시 데이터베이스 초기화"""
         try:
-            cache_dir = Path("cache")
+            cache_dir = Path.home() / ".hts_cache"
             cache_dir.mkdir(exist_ok=True)
             self.db_path = cache_dir / "smart_cache.db"
             
@@ -191,9 +191,9 @@ class SmartCache:
                         self._memory_cache.move_to_end(key)
                         return self._memory_cache[key]
                 else:
-                    # 만료된 캐시 제거
-                    del self._memory_cache[key]
-                    del self._cache_times[key]
+                        # 만료된 캐시 제거
+                        del self._memory_cache[key]
+                        del self._cache_times[key]
             
             # SQLite 캐시 확인
             if self.db_path:

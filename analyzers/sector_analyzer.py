@@ -4,6 +4,13 @@
 from typing import Dict, List, Any
 import pandas as pd
 from datetime import datetime
+import asyncio
+import aiohttp
+import requests
+from bs4 import BeautifulSoup
+import json
+import re
+from urllib.parse import quote
 
 class SectorAnalyzer:
     """섹터/산업 비교 분석"""
@@ -35,6 +42,33 @@ class SectorAnalyzer:
             '철강': {'per': 14.5, 'pbr': 1.1, 'roe': 6.5},
             '에너지': {'per': 13.8, 'pbr': 1.0, 'roe': 7.8},
             '통신': {'per': 11.2, 'pbr': 1.3, 'roe': 9.2}
+        }
+        
+        # 인베스팅닷컴 섹터 URL 매핑 (실제 URL로 수정)
+        self.investing_sector_urls = {
+            '반도체': 'https://www.investing.com/indices/kospi-200',
+            'IT서비스': 'https://www.investing.com/indices/kosdaq-150',
+            '화학': 'https://www.investing.com/indices/kospi-200',
+            '금융': 'https://www.investing.com/indices/kospi-200',
+            '바이오': 'https://www.investing.com/indices/kosdaq-150',
+            '건설': 'https://www.investing.com/indices/kospi-200',
+            '자동차': 'https://www.investing.com/indices/kospi-200',
+            '철강': 'https://www.investing.com/indices/kospi-200',
+            '에너지': 'https://www.investing.com/indices/kospi-200',
+            '통신': 'https://www.investing.com/indices/kospi-200'
+        }
+        
+        # 대안 URL (야후 파이낸스 한국 섹터)
+        self.alternative_urls = {
+            '반도체': 'https://finance.yahoo.com/quote/%5EKS11',
+            'IT서비스': 'https://finance.yahoo.com/quote/%5EKOSDAQ',
+            '화학': 'https://finance.yahoo.com/quote/%5EKS11',
+            '금융': 'https://finance.yahoo.com/quote/%5EKS11',
+            '바이오': 'https://finance.yahoo.com/quote/%5EKOSDAQ'
+        }
+        
+        self.headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
         }
     
     def analyze_sector_comparison(self, stock_code: str, stock_data: Dict[str, Any]) -> Dict[str, Any]:
@@ -132,8 +166,282 @@ class SectorAnalyzer:
         }
     
     def _analyze_sector_trend(self, sector: str) -> Dict[str, Any]:
-        """섹터 트렌드 분석"""
-        # 섹터별 트렌드 정보 (실제로는 외부 데이터 연동 필요)
+        """섹터 트렌드 분석 - 인베스팅닷컴 실시간 데이터 활용"""
+        try:
+            # 실시간 섹터 데이터 수집
+            real_time_data = self._get_investing_sector_data(sector)
+            
+            if real_time_data:
+                return self._create_trend_analysis(sector, real_time_data)
+            else:
+                # 실시간 데이터 실패시 기본 데이터 사용
+                return self._get_default_sector_trend(sector)
+                
+        except Exception as e:
+            print(f"섹터 트렌드 분석 오류: {e}")
+            return self._get_default_sector_trend(sector)
+    
+    def _get_investing_sector_data(self, sector: str) -> Dict[str, Any]:
+        """인베스팅닷컴에서 섹터 데이터 수집 (대안 포함)"""
+        try:
+            # 1차 시도: 인베스팅닷컴
+            sector_data = self._try_investing_com(sector)
+            if sector_data:
+                return sector_data
+            
+            # 2차 시도: 야후 파이낸스
+            sector_data = self._try_yahoo_finance(sector)
+            if sector_data:
+                return sector_data
+            
+            # 3차 시도: 네이버 금융 (한국 지수)
+            sector_data = self._try_naver_finance(sector)
+            if sector_data:
+                return sector_data
+                
+            return None
+            
+        except Exception as e:
+            print(f"전체 섹터 데이터 수집 오류 ({sector}): {e}")
+            return None
+    
+    def _try_investing_com(self, sector: str) -> Dict[str, Any]:
+        """인베스팅닷컴 시도"""
+        try:
+            sector_url = self.investing_sector_urls.get(sector)
+            if not sector_url:
+                return None
+            
+            session = requests.Session()
+            session.headers.update(self.headers)
+            
+            response = session.get(sector_url, timeout=10)
+            if response.status_code != 200:
+                return None
+            
+            soup = BeautifulSoup(response.text, 'html.parser')
+            sector_data = {'source': 'Investing.com'}
+            
+            # 다양한 셀렉터 시도
+            price_selectors = [
+                '[data-test="instrument-price-last"]',
+                '.text-2xl',
+                '.pid-169-last',
+                '.last-price-value'
+            ]
+            
+            for selector in price_selectors:
+                price_elem = soup.select_one(selector)
+                if price_elem:
+                    sector_data['current_price'] = price_elem.get_text(strip=True)
+                    break
+            
+            # 등락률 추출
+            change_selectors = [
+                '[data-test="instrument-price-change-percent"]',
+                '.pid-169-pc',
+                '.change-percent'
+            ]
+            
+            for selector in change_selectors:
+                change_elem = soup.select_one(selector)
+                if change_elem:
+                    change_text = change_elem.get_text(strip=True)
+                    sector_data['change_percent'] = change_text
+                    
+                    if '+' in change_text:
+                        sector_data['trend_direction'] = '상승'
+                    elif '-' in change_text:
+                        sector_data['trend_direction'] = '하락'
+                    else:
+                        sector_data['trend_direction'] = '보합'
+                    break
+            
+            return sector_data if sector_data.get('current_price') else None
+            
+        except Exception as e:
+            print(f"인베스팅닷컴 시도 실패 ({sector}): {e}")
+            return None
+    
+    def _try_yahoo_finance(self, sector: str) -> Dict[str, Any]:
+        """야후 파이낸스 시도"""
+        try:
+            import yfinance as yf
+            
+            # 섹터별 대표 티커
+            tickers = {
+                '반도체': '^KS11',  # 코스피200
+                'IT서비스': '^KOSDAQ',  # 코스닥
+                '화학': '^KS11',
+                '금융': '^KS11',
+                '바이오': '^KOSDAQ'
+            }
+            
+            ticker = tickers.get(sector, '^KS11')
+            stock = yf.Ticker(ticker)
+            info = stock.info
+            
+            if not info:
+                return None
+            
+            sector_data = {
+                'source': 'Yahoo Finance',
+                'current_price': str(info.get('regularMarketPrice', 'N/A')),
+                'change_percent': f"{info.get('regularMarketChangePercent', 0):.2f}%"
+            }
+            
+            change_percent = info.get('regularMarketChangePercent', 0)
+            if change_percent > 0:
+                sector_data['trend_direction'] = '상승'
+            elif change_percent < 0:
+                sector_data['trend_direction'] = '하락'
+            else:
+                sector_data['trend_direction'] = '보합'
+            
+            return sector_data
+            
+        except Exception as e:
+            print(f"야후 파이낸스 시도 실패 ({sector}): {e}")
+            return None
+    
+    def _try_naver_finance(self, sector: str) -> Dict[str, Any]:
+        """네이버 금융 시도"""
+        try:
+            # 코스피200 지수 정보
+            url = "https://finance.naver.com/sise/sise_index.naver?code=KPI200"
+            
+            session = requests.Session()
+            session.headers.update(self.headers)
+            
+            response = session.get(url, timeout=10)
+            if response.status_code != 200:
+                return None
+            
+            soup = BeautifulSoup(response.text, 'html.parser')
+            
+            sector_data = {'source': '네이버 금융'}
+            
+            # 현재가
+            price_elem = soup.select_one('.no_today .blind')
+            if price_elem:
+                sector_data['current_price'] = price_elem.get_text(strip=True)
+            
+            # 등락률
+            change_elem = soup.select_one('.no_exday .blind')
+            if change_elem:
+                change_text = change_elem.get_text(strip=True)
+                sector_data['change_percent'] = change_text
+                
+                if '+' in change_text:
+                    sector_data['trend_direction'] = '상승'
+                elif '-' in change_text:
+                    sector_data['trend_direction'] = '하락'
+                else:
+                    sector_data['trend_direction'] = '보합'
+            
+            return sector_data if sector_data.get('current_price') else None
+            
+        except Exception as e:
+            print(f"네이버 금융 시도 실패 ({sector}): {e}")
+            return None
+    
+    def _create_trend_analysis(self, sector: str, real_data: Dict[str, Any]) -> Dict[str, Any]:
+        """실시간 데이터 기반 트렌드 분석 생성"""
+        try:
+            change_percent = real_data.get('change_percent', '0%')
+            trend_direction = real_data.get('trend_direction', '보합')
+            
+            # 등락률에 따른 트렌드 강도 판단
+            if '%' in change_percent:
+                percent_value = float(re.findall(r'[-+]?\d*\.?\d+', change_percent)[0])
+                
+                if percent_value >= 2.0:
+                    trend_strength = '강세'
+                elif percent_value >= 1.0:
+                    trend_strength = '상승'
+                elif percent_value >= -1.0:
+                    trend_strength = '보합'
+                elif percent_value >= -2.0:
+                    trend_strength = '하락'
+                else:
+                    trend_strength = '약세'
+            else:
+                trend_strength = '보합'
+            
+            # 섹터별 맞춤 분석
+            outlook = self._generate_sector_outlook(sector, trend_direction, trend_strength)
+            risk_factors = self._get_sector_risks(sector, trend_direction)
+            growth_drivers = self._get_growth_drivers(sector, trend_strength)
+            
+            return {
+                'trend': trend_strength,
+                'direction': trend_direction,
+                'change_percent': change_percent,
+                'outlook': outlook,
+                'risk_factors': risk_factors,
+                'growth_drivers': growth_drivers,
+                'recent_news': real_data.get('recent_news', []),
+                'data_source': 'Investing.com 실시간',
+                'update_time': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            }
+            
+        except Exception as e:
+            print(f"트렌드 분석 생성 오류: {e}")
+            return self._get_default_sector_trend(sector)
+    
+    def _generate_sector_outlook(self, sector: str, direction: str, strength: str) -> str:
+        """섹터별 맞춤 전망 생성"""
+        base_outlooks = {
+            '반도체': f"메모리 반도체 {direction} 추세, AI 수요 지속",
+            'IT서비스': f"디지털 전환 {direction} 모멘텀, 클라우드 확산",
+            '화학': f"원자재 가격 {direction}, 친환경 소재 수요 증가",
+            '금융': f"금리 환경 변화로 {direction} 영향, 디지털 금융 성장",
+            '바이오': f"신약 개발 {direction} 흐름, 고령화 수혜 지속"
+        }
+        
+        base = base_outlooks.get(sector, f"{sector} 업종 {direction} 추세")
+        return f"{base} ({strength} 신호)"
+    
+    def _get_sector_risks(self, sector: str, direction: str) -> List[str]:
+        """섹터별 리스크 요인"""
+        common_risks = {
+            '반도체': ['중국 리스크', '재고 조정'],
+            'IT서비스': ['규제 강화', '경쟁 심화'],
+            '화학': ['유가 변동성', '환경 규제'],
+            '금융': ['부실 우려', '핀테크 위협'],
+            '바이오': ['규제 리스크', '개발 실패']
+        }
+        
+        risks = common_risks.get(sector, ['거시경제 불확실성'])
+        
+        # 방향성에 따른 추가 리스크
+        if direction == '하락':
+            risks.append('단기 조정 위험')
+        elif direction == '상승':
+            risks.append('과열 우려')
+            
+        return risks
+    
+    def _get_growth_drivers(self, sector: str, strength: str) -> List[str]:
+        """섹터별 성장 동력"""
+        drivers = {
+            '반도체': ['AI/HPC 수요', '서버 메모리'],
+            'IT서비스': ['AI 서비스', '클라우드'],
+            '화학': ['친환경 소재', '배터리 소재'],
+            '금융': ['디지털 뱅킹', '자산관리'],
+            '바이오': ['항체 치료제', '맞춤 의료']
+        }
+        
+        base_drivers = drivers.get(sector, ['구조적 성장'])
+        
+        # 강도에 따른 추가 동력
+        if strength in ['강세', '상승']:
+            base_drivers.append('모멘텀 지속')
+            
+        return base_drivers
+    
+    def _get_default_sector_trend(self, sector: str) -> Dict[str, Any]:
+        """기본 섹터 트렌드 (백업용)"""
         sector_trends = {
             '반도체': {
                 'trend': '강세',
@@ -167,12 +475,15 @@ class SectorAnalyzer:
             }
         }
         
-        return sector_trends.get(sector, {
+        default_trend = sector_trends.get(sector, {
             'trend': '중립',
             'outlook': '업종별 차별화 진행',
             'risk_factors': ['거시경제 불확실성'],
             'growth_drivers': ['구조적 성장 동력']
         })
+        
+        default_trend['data_source'] = '기본 데이터 (백업)'
+        return default_trend
     
     def _analyze_competitive_advantage(self, stock_code: str, sector: str) -> Dict[str, Any]:
         """경쟁 우위 분석"""
