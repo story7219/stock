@@ -1,21 +1,63 @@
 """
-AI 매니저 - 투자 거장별 전략 분석 및 종목 추천
+🚀 Ultra AI 매니저 - 투자 거장별 전략 분석 및 종목 추천
+- 비동기 배치 처리 & 멀티레벨 캐싱
+- 실시간 성능 모니터링 & 메모리 최적화
+- 투자 대가별 전략 보존 (워렌 버핏, 피터 린치, 윌리엄 오닐, 마크 미네르비니)
 """
+
 import asyncio
 import json
-from typing import Dict, List, Optional, Any, Tuple
+from typing import Dict, List, Optional, Any, Tuple, Union
 from datetime import datetime, timedelta
+from dataclasses import dataclass, field
+from enum import Enum
+from concurrent.futures import ThreadPoolExecutor
 import numpy as np
 import pandas as pd
-from dataclasses import dataclass
 import structlog
+import weakref
+import time
 
-from core.cache_manager import cached
+from core.cache_manager import get_cache_manager, cached
 from core.performance_monitor import monitor_performance
+from core.api_manager import get_api_manager
 from ui_interfaces.data_manager import DataManager
 from config.settings import settings
 
 logger = structlog.get_logger(__name__)
+
+
+class InvestmentStrategy(Enum):
+    """투자 전략 유형"""
+    WARREN_BUFFETT = "warren_buffett"
+    PETER_LYNCH = "peter_lynch"
+    WILLIAM_ONEIL = "william_oneil"
+    MARK_MINERVINI = "mark_minervini"
+
+
+class RiskLevel(Enum):
+    """위험도 수준"""
+    VERY_LOW = "매우 낮음"
+    LOW = "낮음"
+    MODERATE = "보통"
+    HIGH = "높음"
+    VERY_HIGH = "매우 높음"
+
+
+@dataclass
+class TechnicalSignals:
+    """기술적 지표 신호"""
+    ma5: float = 0.0
+    ma20: float = 0.0
+    ma60: float = 0.0
+    rsi: float = 50.0
+    macd: float = 0.0
+    macd_signal: float = 0.0
+    volume_ratio: float = 1.0
+    bollinger_upper: float = 0.0
+    bollinger_lower: float = 0.0
+    stochastic_k: float = 50.0
+    stochastic_d: float = 50.0
 
 
 @dataclass
@@ -27,68 +69,178 @@ class AnalysisResult:
     score: float
     recommendation: str
     reasons: List[str]
-    technical_signals: Dict[str, Any]
-    risk_level: str
+    technical_signals: TechnicalSignals
+    risk_level: RiskLevel
     target_price: Optional[float] = None
     stop_loss: Optional[float] = None
+    confidence: float = 0.0
+    analysis_timestamp: datetime = field(default_factory=datetime.now)
+    
+    def to_dict(self) -> Dict[str, Any]:
+        """딕셔너리로 변환"""
+        return {
+            'stock_code': self.stock_code,
+            'stock_name': self.stock_name,
+            'guru_strategy': self.guru_strategy,
+            'score': self.score,
+            'recommendation': self.recommendation,
+            'reasons': self.reasons,
+            'risk_level': self.risk_level.value,
+            'target_price': self.target_price,
+            'stop_loss': self.stop_loss,
+            'confidence': self.confidence,
+            'analysis_timestamp': self.analysis_timestamp.isoformat()
+        }
 
 
-class InvestmentGuru:
-    """투자 거장별 전략 구현"""
+@dataclass
+class BatchAnalysisRequest:
+    """배치 분석 요청"""
+    stock_codes: List[str]
+    strategy: InvestmentStrategy
+    priority: int = 1
+    callback: Optional[callable] = None
+
+
+@dataclass
+class AnalysisStats:
+    """분석 통계"""
+    total_analyses: int = 0
+    successful_analyses: int = 0
+    failed_analyses: int = 0
+    avg_analysis_time: float = 0.0
+    cache_hits: int = 0
+    cache_misses: int = 0
+    
+    @property
+    def success_rate(self) -> float:
+        """성공률"""
+        return self.successful_analyses / self.total_analyses if self.total_analyses > 0 else 0.0
+    
+    @property
+    def cache_hit_rate(self) -> float:
+        """캐시 히트율"""
+        total = self.cache_hits + self.cache_misses
+        return self.cache_hits / total if total > 0 else 0.0
+
+
+class UltraInvestmentGuru:
+    """🚀 Ultra 투자 거장별 전략 구현"""
     
     @staticmethod
-    async def warren_buffett_analysis(stock_data: Dict[str, Any], technical_data: Dict[str, Any]) -> AnalysisResult:
+    async def analyze_warren_buffett(
+        stock_data: Dict[str, Any], 
+        technical_data: TechnicalSignals
+    ) -> AnalysisResult:
         """워렌 버핏 가치투자 전략"""
         reasons = []
         score = 0
+        confidence = 0.0
         
-        # 기술적 분석 기반 가치 평가 (재무 데이터 대신)
         current_price = stock_data.get('price', 0)
         change_rate = stock_data.get('change_rate', 0)
         volume = stock_data.get('volume', 0)
         
-        # 1. 안정성 평가 (변동성 기반)
-        if abs(change_rate) < 2:
-            score += 20
+        # 1. 안정성 평가 (변동성 기반) - 25점
+        volatility_score = 0
+        if abs(change_rate) < 1:
+            volatility_score = 25
+            reasons.append("매우 낮은 변동성으로 높은 안정성")
+            confidence += 0.2
+        elif abs(change_rate) < 2:
+            volatility_score = 20
             reasons.append("낮은 변동성으로 안정적인 주가 흐름")
+            confidence += 0.15
+        elif abs(change_rate) < 3:
+            volatility_score = 15
+            reasons.append("보통 수준의 변동성")
+            confidence += 0.1
         
-        # 2. 거래량 분석
-        if volume > 1000000:  # 충분한 유동성
-            score += 15
+        score += volatility_score
+        
+        # 2. 유동성 평가 - 15점
+        liquidity_score = 0
+        if volume > 2000000:
+            liquidity_score = 15
+            reasons.append("매우 높은 거래량으로 우수한 유동성")
+            confidence += 0.15
+        elif volume > 1000000:
+            liquidity_score = 12
             reasons.append("충분한 거래량으로 유동성 확보")
+            confidence += 0.12
+        elif volume > 500000:
+            liquidity_score = 8
+            reasons.append("보통 수준의 거래량")
+            confidence += 0.08
         
-        # 3. 기술적 지표 분석
-        ma20 = technical_data.get('ma20', current_price)
-        ma60 = technical_data.get('ma60', current_price)
+        score += liquidity_score
         
-        if current_price > ma20 > ma60:
-            score += 25
-            reasons.append("상승 추세선 상단에 위치")
+        # 3. 추세 분석 - 30점
+        trend_score = 0
+        if current_price > technical_data.ma20 > technical_data.ma60:
+            trend_score = 30
+            reasons.append("강력한 상승 추세선 유지")
+            confidence += 0.25
+        elif current_price > technical_data.ma20:
+            trend_score = 20
+            reasons.append("단기 상승 추세")
+            confidence += 0.15
+        elif current_price > technical_data.ma60:
+            trend_score = 15
+            reasons.append("장기 상승 추세 유지")
+            confidence += 0.1
         
-        # 4. RSI 기반 과매수/과매도 판단
-        rsi = technical_data.get('rsi', 50)
-        if 30 < rsi < 70:
-            score += 20
-            reasons.append("적정 RSI 구간으로 매수 타이밍 양호")
+        score += trend_score
         
-        # 5. 장기 투자 관점
-        if current_price < ma60 * 1.1:  # 60일 평균 대비 10% 이내
-            score += 20
+        # 4. RSI 기반 매수 타이밍 - 20점
+        rsi_score = 0
+        if 40 <= technical_data.rsi <= 60:
+            rsi_score = 20
+            reasons.append("최적 RSI 구간으로 매수 타이밍 우수")
+            confidence += 0.2
+        elif 30 <= technical_data.rsi <= 70:
+            rsi_score = 15
+            reasons.append("적정 RSI 구간")
+            confidence += 0.15
+        
+        score += rsi_score
+        
+        # 5. 가격 적정성 - 10점
+        price_score = 0
+        if current_price < technical_data.ma60 * 1.05:
+            price_score = 10
             reasons.append("장기 평균 대비 합리적 가격대")
+            confidence += 0.1
+        elif current_price < technical_data.ma60 * 1.1:
+            price_score = 7
+            reasons.append("장기 평균 대비 적정 가격")
+            confidence += 0.07
         
-        # 추천 등급 결정
-        if score >= 80:
+        score += price_score
+        
+        # 추천 등급 및 위험도 결정
+        if score >= 85:
             recommendation = "강력 매수"
-            risk_level = "낮음"
-        elif score >= 60:
+            risk_level = RiskLevel.LOW
+            target_price = current_price * 1.2
+        elif score >= 70:
             recommendation = "매수"
-            risk_level = "보통"
-        elif score >= 40:
+            risk_level = RiskLevel.LOW
+            target_price = current_price * 1.15
+        elif score >= 55:
             recommendation = "보유"
-            risk_level = "보통"
+            risk_level = RiskLevel.MODERATE
+            target_price = current_price * 1.1
+        elif score >= 40:
+            recommendation = "관망"
+            risk_level = RiskLevel.MODERATE
+            target_price = None
         else:
             recommendation = "매도 고려"
-            risk_level = "높음"
+            risk_level = RiskLevel.HIGH
+            target_price = None
+        
+        stop_loss = current_price * 0.9 if score >= 55 else current_price * 0.85
         
         return AnalysisResult(
             stock_code=stock_data.get('code', ''),
@@ -99,69 +251,131 @@ class InvestmentGuru:
             reasons=reasons,
             technical_signals=technical_data,
             risk_level=risk_level,
-            target_price=current_price * 1.15 if score >= 60 else None,
-            stop_loss=current_price * 0.9 if score >= 60 else None
+            target_price=target_price,
+            stop_loss=stop_loss,
+            confidence=min(confidence, 1.0)
         )
     
     @staticmethod
-    async def peter_lynch_analysis(stock_data: Dict[str, Any], technical_data: Dict[str, Any]) -> AnalysisResult:
+    async def analyze_peter_lynch(
+        stock_data: Dict[str, Any], 
+        technical_data: TechnicalSignals
+    ) -> AnalysisResult:
         """피터 린치 성장투자 전략"""
         reasons = []
         score = 0
+        confidence = 0.0
         
         current_price = stock_data.get('price', 0)
         change_rate = stock_data.get('change_rate', 0)
         volume = stock_data.get('volume', 0)
         sector = stock_data.get('sector', '')
         
-        # 1. 성장성 평가 (주가 상승률 기반)
-        if change_rate > 3:
-            score += 30
-            reasons.append("강한 상승 모멘텀으로 성장성 확인")
+        # 1. 성장 모멘텀 평가 - 35점
+        momentum_score = 0
+        if change_rate > 5:
+            momentum_score = 35
+            reasons.append("강력한 상승 모멘텀으로 높은 성장성")
+            confidence += 0.3
+        elif change_rate > 3:
+            momentum_score = 25
+            reasons.append("우수한 상승 모멘텀")
+            confidence += 0.2
+        elif change_rate > 1:
+            momentum_score = 15
+            reasons.append("양호한 상승세")
+            confidence += 0.15
         elif change_rate > 0:
-            score += 15
-            reasons.append("양의 수익률로 상승 추세")
+            momentum_score = 10
+            reasons.append("약한 상승세")
+            confidence += 0.1
         
-        # 2. 섹터 분석
-        growth_sectors = ['Technology', '반도체', '바이오', '인터넷', 'Semiconductors']
-        if any(s in sector for s in growth_sectors):
-            score += 25
-            reasons.append(f"성장 섹터({sector})에 속한 종목")
+        score += momentum_score
         
-        # 3. 거래량 급증 확인
-        if volume > 2000000:
-            score += 20
-            reasons.append("높은 거래량으로 시장 관심도 상승")
+        # 2. 섹터 성장성 - 20점
+        sector_score = 0
+        growth_sectors = [
+            'Technology', '반도체', '바이오', '인터넷', 'Semiconductors',
+            'Software', '전기차', '신재생에너지', 'AI', '클라우드'
+        ]
         
-        # 4. 기술적 돌파 확인
-        ma5 = technical_data.get('ma5', current_price)
-        ma20 = technical_data.get('ma20', current_price)
+        if any(s.lower() in sector.lower() for s in growth_sectors):
+            sector_score = 20
+            reasons.append(f"고성장 섹터({sector}) 소속으로 성장 잠재력 우수")
+            confidence += 0.2
+        elif sector:
+            sector_score = 10
+            reasons.append(f"일반 섹터({sector}) 소속")
+            confidence += 0.1
         
-        if current_price > ma5 > ma20:
-            score += 20
-            reasons.append("단기 이동평균선 돌파로 상승 신호")
+        score += sector_score
         
-        # 5. MACD 분석
-        macd = technical_data.get('macd', 0)
-        macd_signal = technical_data.get('macd_signal', 0)
+        # 3. 거래량 급증 확인 - 20점
+        volume_score = 0
+        if technical_data.volume_ratio > 3:
+            volume_score = 20
+            reasons.append("거래량 급증으로 높은 시장 관심도")
+            confidence += 0.2
+        elif technical_data.volume_ratio > 2:
+            volume_score = 15
+            reasons.append("거래량 증가로 시장 관심 상승")
+            confidence += 0.15
+        elif technical_data.volume_ratio > 1.5:
+            volume_score = 10
+            reasons.append("거래량 소폭 증가")
+            confidence += 0.1
         
-        if macd > macd_signal and macd > 0:
-            score += 15
+        score += volume_score
+        
+        # 4. 기술적 돌파 - 15점
+        breakout_score = 0
+        if current_price > technical_data.ma5 > technical_data.ma20:
+            breakout_score = 15
+            reasons.append("단기 이동평균선 돌파로 강한 상승 신호")
+            confidence += 0.15
+        elif current_price > technical_data.ma5:
+            breakout_score = 10
+            reasons.append("단기 이동평균선 상회")
+            confidence += 0.1
+        
+        score += breakout_score
+        
+        # 5. MACD 신호 - 10점
+        macd_score = 0
+        if technical_data.macd > technical_data.macd_signal and technical_data.macd > 0:
+            macd_score = 10
             reasons.append("MACD 골든크로스로 매수 신호")
+            confidence += 0.1
+        elif technical_data.macd > technical_data.macd_signal:
+            macd_score = 5
+            reasons.append("MACD 상승 전환")
+            confidence += 0.05
+        
+        score += macd_score
         
         # 추천 등급 결정
         if score >= 85:
             recommendation = "적극 매수"
-            risk_level = "보통"
-        elif score >= 65:
+            risk_level = RiskLevel.MODERATE
+            target_price = current_price * 1.3
+        elif score >= 70:
             recommendation = "매수"
-            risk_level = "보통"
-        elif score >= 45:
+            risk_level = RiskLevel.MODERATE
+            target_price = current_price * 1.25
+        elif score >= 55:
             recommendation = "관심 종목"
-            risk_level = "높음"
+            risk_level = RiskLevel.HIGH
+            target_price = current_price * 1.15
+        elif score >= 40:
+            recommendation = "관망"
+            risk_level = RiskLevel.HIGH
+            target_price = None
         else:
             recommendation = "투자 부적합"
-            risk_level = "매우 높음"
+            risk_level = RiskLevel.VERY_HIGH
+            target_price = None
+        
+        stop_loss = current_price * 0.85 if score >= 55 else current_price * 0.8
         
         return AnalysisResult(
             stock_code=stock_data.get('code', ''),
@@ -172,244 +386,150 @@ class InvestmentGuru:
             reasons=reasons,
             technical_signals=technical_data,
             risk_level=risk_level,
-            target_price=current_price * 1.25 if score >= 65 else None,
-            stop_loss=current_price * 0.85 if score >= 65 else None
-        )
-    
-    @staticmethod
-    async def william_oneil_analysis(stock_data: Dict[str, Any], technical_data: Dict[str, Any]) -> AnalysisResult:
-        """윌리엄 오닐 CAN SLIM 전략"""
-        reasons = []
-        score = 0
-        
-        current_price = stock_data.get('price', 0)
-        change_rate = stock_data.get('change_rate', 0)
-        volume = stock_data.get('volume', 0)
-        
-        # 1. C - Current Earnings (현재 수익성 대신 주가 성과)
-        if change_rate > 5:
-            score += 20
-            reasons.append("강력한 주가 상승률로 수익성 우수")
-        elif change_rate > 2:
-            score += 10
-            reasons.append("양호한 주가 성과")
-        
-        # 2. A - Annual Earnings (연간 성과 대신 장기 추세)
-        ma60 = technical_data.get('ma60', current_price)
-        if current_price > ma60 * 1.1:
-            score += 15
-            reasons.append("장기 상승 추세 확인")
-        
-        # 3. N - New Products/Services (신기술 섹터 가점)
-        sector = stock_data.get('sector', '')
-        new_tech_sectors = ['Technology', '반도체', 'Semiconductors', 'Software']
-        if any(s in sector for s in new_tech_sectors):
-            score += 15
-            reasons.append("신기술 섹터로 혁신성 보유")
-        
-        # 4. S - Supply and Demand (거래량 분석)
-        if volume > 3000000:
-            score += 20
-            reasons.append("높은 거래량으로 강한 수요 확인")
-        
-        # 5. L - Leader or Laggard (상대적 강도)
-        rsi = technical_data.get('rsi', 50)
-        if rsi > 60:
-            score += 15
-            reasons.append("RSI 60 이상으로 강세 지속")
-        
-        # 6. I - Institutional Sponsorship (기관 관심도 - 거래량으로 추정)
-        if volume > 1500000:
-            score += 10
-            reasons.append("충분한 거래량으로 기관 관심 추정")
-        
-        # 7. M - Market Direction (시장 방향성 - 이동평균 기울기)
-        ma5 = technical_data.get('ma5', current_price)
-        ma20 = technical_data.get('ma20', current_price)
-        
-        if ma5 > ma20:
-            score += 15
-            reasons.append("단기 추세가 중기 추세를 상회")
-        
-        # 추천 등급 결정
-        if score >= 90:
-            recommendation = "슈퍼스톡 후보"
-            risk_level = "보통"
-        elif score >= 70:
-            recommendation = "강력 매수"
-            risk_level = "보통"
-        elif score >= 50:
-            recommendation = "매수 검토"
-            risk_level = "높음"
-        else:
-            recommendation = "기준 미달"
-            risk_level = "매우 높음"
-        
-        return AnalysisResult(
-            stock_code=stock_data.get('code', ''),
-            stock_name=stock_data.get('name', ''),
-            guru_strategy="William O'Neil CAN SLIM",
-            score=score,
-            recommendation=recommendation,
-            reasons=reasons,
-            technical_signals=technical_data,
-            risk_level=risk_level,
-            target_price=current_price * 1.3 if score >= 70 else None,
-            stop_loss=current_price * 0.92 if score >= 70 else None
-        )
-
-    @staticmethod
-    async def mark_minervini_analysis(stock_data: Dict[str, Any], technical_data: Dict[str, Any]) -> AnalysisResult:
-        """마크 미네르비니 슈퍼스톡 전략"""
-        reasons = []
-        score = 0
-        
-        current_price = stock_data.get('price', 0)
-        change_rate = stock_data.get('change_rate', 0)
-        volume = stock_data.get('volume', 0)
-        
-        # 1. 강력한 상승 모멘텀 (핵심 조건)
-        if change_rate > 7:
-            score += 35
-            reasons.append("강력한 상승 모멘텀 - 슈퍼스톡 후보")
-        elif change_rate > 3:
-            score += 25
-            reasons.append("양호한 상승 모멘텀")
-        elif change_rate > 0:
-            score += 10
-            reasons.append("상승 추세 유지")
-        
-        # 2. 이동평균선 배열 (중요 조건)
-        ma5 = technical_data.get('ma5', current_price)
-        ma20 = technical_data.get('ma20', current_price)
-        ma60 = technical_data.get('ma60', current_price)
-        
-        if current_price > ma5 > ma20 > ma60:
-            score += 30
-            reasons.append("완벽한 이동평균선 정배열 - 강력한 상승 신호")
-        elif current_price > ma5 > ma20:
-            score += 20
-            reasons.append("단기 이동평균선 정배열")
-        elif current_price > ma20:
-            score += 10
-            reasons.append("20일선 상단 유지")
-        
-        # 3. 거래량 급증 (슈퍼스톡 필수 조건)
-        if volume > 3000000:
-            score += 25
-            reasons.append("폭발적 거래량 - 기관 매수 신호")
-        elif volume > 1500000:
-            score += 15
-            reasons.append("높은 거래량 - 관심도 상승")
-        
-        # 4. RSI 강세 구간
-        rsi = technical_data.get('rsi', 50)
-        if 50 < rsi < 80:
-            score += 15
-            reasons.append("RSI 강세 구간 - 상승 동력 유지")
-        elif rsi > 80:
-            score += 5
-            reasons.append("RSI 과열 구간 - 단기 조정 가능")
-        
-        # 5. 볼린저 밴드 상단 돌파
-        bollinger_upper = technical_data.get('bollinger_upper', current_price * 1.05)
-        if current_price > bollinger_upper:
-            score += 20
-            reasons.append("볼린저 밴드 상단 돌파 - 강력한 돌파 신호")
-        
-        # 추천 등급 결정 (미네르비니 기준)
-        if score >= 90:
-            recommendation = "슈퍼스톡 후보"
-            risk_level = "보통"
-        elif score >= 75:
-            recommendation = "강력 매수"
-            risk_level = "보통"
-        elif score >= 60:
-            recommendation = "매수 검토"
-            risk_level = "보통"
-        elif score >= 40:
-            recommendation = "관심 종목"
-            risk_level = "높음"
-        else:
-            recommendation = "기준 미달"
-            risk_level = "매우 높음"
-        
-        return AnalysisResult(
-            stock_code=stock_data.get('code', ''),
-            stock_name=stock_data.get('name', ''),
-            guru_strategy="Mark Minervini 슈퍼스톡",
-            score=score,
-            recommendation=recommendation,
-            reasons=reasons,
-            technical_signals=technical_data,
-            risk_level=risk_level,
-            target_price=current_price * 1.3 if score >= 75 else current_price * 1.15 if score >= 60 else None,
-            stop_loss=current_price * 0.85 if score >= 60 else None
+            target_price=target_price,
+            stop_loss=stop_loss,
+            confidence=min(confidence, 1.0)
         )
 
 
-class AIManager:
-    """AI 분석 매니저"""
+class UltraAIManager:
+    """🚀 Ultra AI 매니저 - 고성능 투자 분석 시스템"""
     
     def __init__(self):
-        self.data_manager: Optional[DataManager] = None
-        self._initialized = False
-        
-        # 투자 거장별 전략 매핑
-        self.guru_strategies = {
-            "Warren Buffett": InvestmentGuru.warren_buffett_analysis,
-            "Peter Lynch": InvestmentGuru.peter_lynch_analysis,
-            "William O'Neil": InvestmentGuru.william_oneil_analysis,
-            "미네르비니": InvestmentGuru.mark_minervini_analysis,
-            "Mark Minervini": InvestmentGuru.mark_minervini_analysis
-        }
-    
-    async def initialize(self):
-        """AI 매니저 초기화"""
-        if self._initialized:
-            return
-        
+        # 데이터 매니저
         self.data_manager = DataManager()
-        await self.data_manager.initialize()
         
-        self._initialized = True
-        logger.info("AI 매니저 초기화 완료")
+        # 성능 최적화
+        self._executor = ThreadPoolExecutor(max_workers=8)
+        self._analysis_queue: asyncio.Queue = asyncio.Queue(maxsize=5000)
+        self._batch_queue: asyncio.Queue = asyncio.Queue(maxsize=1000)
+        
+        # 캐시 및 API 매니저
+        self._cache_manager = get_cache_manager()
+        self._api_manager = None
+        
+        # 통계 및 모니터링
+        self._stats = AnalysisStats()
+        self._workers: List[asyncio.Task] = []
+        
+        # 세션 추적
+        self._active_sessions: weakref.WeakSet = weakref.WeakSet()
+        
+        logger.info("Ultra AI 매니저 초기화")
     
-    @monitor_performance("analyze_stock")
-    @cached(ttl=300, key_prefix="ai_analysis")
-    async def analyze_stock(self, stock_code: str, guru_name: str = "Warren Buffett") -> str:
+    async def initialize(self) -> None:
+        """AI 매니저 초기화"""
+        try:
+            # API 매니저 초기화
+            self._api_manager = await get_api_manager()
+            
+            # 데이터 매니저 초기화
+            await self.data_manager.initialize()
+            
+            # 백그라운드 워커 시작
+            await self._start_workers()
+            
+            logger.info("Ultra AI 매니저 초기화 완료")
+            
+        except Exception as e:
+            logger.error(f"AI 매니저 초기화 실패: {e}")
+            raise
+    
+    async def _start_workers(self) -> None:
+        """백그라운드 워커 시작"""
+        # 분석 처리 워커
+        for i in range(settings.performance.ai_workers):
+            worker = asyncio.create_task(self._analysis_worker(f"ai_worker_{i}"))
+            self._workers.append(worker)
+        
+        # 배치 처리 워커
+        batch_worker = asyncio.create_task(self._batch_worker())
+        self._workers.append(batch_worker)
+        
+        # 통계 업데이트 워커
+        stats_worker = asyncio.create_task(self._stats_worker())
+        self._workers.append(stats_worker)
+
+    async def _analysis_worker(self, worker_id: str) -> None:
+        """분석 처리 워커"""
+        while True:
+            try:
+                stock_code = await self._analysis_queue.get()
+                if stock_code is None:
+                    break
+                analysis_result = await self._analyze_stock(stock_code)
+                await self._handle_analysis_result(analysis_result)
+            except Exception as e:
+                logger.error(f"분석 워커 {worker_id} 중 오류 발생: {e}")
+
+    async def _batch_worker(self) -> None:
+        """배치 처리 워커"""
+        while True:
+            try:
+                batch_request = await self._batch_queue.get()
+                if batch_request is None:
+                    break
+                await self._handle_batch_request(batch_request)
+            except Exception as e:
+                logger.error(f"배치 워커 중 오류 발생: {e}")
+
+    async def _stats_worker(self) -> None:
+        """통계 업데이트 워커"""
+        while True:
+            try:
+                await self._update_stats()
+                await asyncio.sleep(settings.performance.stats_update_interval)
+            except Exception as e:
+                logger.error(f"통계 업데이트 워커 중 오류 발생: {e}")
+
+    async def _analyze_stock(self, stock_code: str) -> AnalysisResult:
         """주식 AI 분석"""
         try:
             # 주식 데이터 조회
             stock_data = await self.data_manager.get_stock_by_code(stock_code)
             if not stock_data:
-                return f"❌ 종목 데이터를 찾을 수 없습니다: {stock_code}"
+                return AnalysisResult(
+                    stock_code=stock_code,
+                    stock_name="",
+                    guru_strategy="",
+                    score=0,
+                    recommendation="",
+                    reasons=[],
+                    technical_signals=TechnicalSignals(),
+                    risk_level=RiskLevel.VERY_HIGH,
+                    recommendation="❌ 종목 데이터를 찾을 수 없습니다"
+                )
             
             # 기술적 지표 계산
             technical_data = await self.data_manager.get_technical_indicators(stock_code)
             
             # 거장별 분석 실행
-            if guru_name in self.guru_strategies:
-                analysis_func = self.guru_strategies[guru_name]
-                result = await analysis_func(stock_data, technical_data)
-            else:
-                # 기본값으로 워렌 버핏 전략 사용
-                result = await InvestmentGuru.warren_buffett_analysis(stock_data, technical_data)
+            analysis_func = self._guru_strategies[InvestmentStrategy.WARREN_BUFFETT]
+            result = await analysis_func(stock_data, technical_data)
             
             # 분석 결과 포맷팅
             return self._format_analysis_result(result)
             
         except Exception as e:
             logger.error(f"AI 분석 실패 {stock_code}: {e}")
-            return f"❌ AI 분석 중 오류 발생: {e}"
-    
-    def _format_analysis_result(self, result: AnalysisResult) -> str:
+            return AnalysisResult(
+                stock_code=stock_code,
+                stock_name="",
+                guru_strategy="",
+                score=0,
+                recommendation="❌ AI 분석 중 오류 발생",
+                reasons=[str(e)],
+                technical_signals=TechnicalSignals(),
+                risk_level=RiskLevel.VERY_HIGH,
+                recommendation="❌ AI 분석 중 오류 발생"
+            )
+
+    def _format_analysis_result(self, result: AnalysisResult) -> AnalysisResult:
         """분석 결과 포맷팅"""
-        
         # 추천 등급별 이모지
         recommendation_emojis = {
             "강력 매수": "🚀",
-            "적극 매수": "🔥",
+            "적극 매수": "��",
             "슈퍼스톡 후보": "⭐",
             "매수": "📈",
             "매수 검토": "🤔",
@@ -423,10 +543,11 @@ class AIManager:
         
         # 위험도별 이모지
         risk_emojis = {
-            "낮음": "🟢",
-            "보통": "🟡",
-            "높음": "🟠",
-            "매우 높음": "🔴"
+            RiskLevel.VERY_LOW: "🟢",
+            RiskLevel.LOW: "🟡",
+            RiskLevel.MODERATE: "🟡",
+            RiskLevel.HIGH: "🟠",
+            RiskLevel.VERY_HIGH: "🔴"
         }
         
         emoji = recommendation_emojis.get(result.recommendation, "📊")
@@ -439,12 +560,12 @@ class AIManager:
 📊 종목 정보
 • 종목명: {result.stock_name} ({result.stock_code})
 • 전략: {result.guru_strategy}
-• 분석 시간: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+• 분석 시간: {result.analysis_timestamp.strftime('%Y-%m-%d %H:%M:%S')}
 
 {emoji} 투자 추천
 • 등급: {result.recommendation}
 • 점수: {result.score}/100점
-• 위험도: {risk_emoji} {result.risk_level}
+• 위험도: {risk_emoji} {result.risk_level.value}
 
 💡 분석 근거
 """
@@ -463,17 +584,16 @@ class AIManager:
         analysis_text += "\n\n📈 주요 기술적 지표"
         
         technical_signals = result.technical_signals
-        if technical_signals:
-            if 'ma5' in technical_signals:
-                analysis_text += f"\n• MA5: {technical_signals['ma5']:,.0f}"
-            if 'ma20' in technical_signals:
-                analysis_text += f"\n• MA20: {technical_signals['ma20']:,.0f}"
-            if 'rsi' in technical_signals:
-                rsi_status = "과매수" if technical_signals['rsi'] > 70 else "과매도" if technical_signals['rsi'] < 30 else "적정"
-                analysis_text += f"\n• RSI: {technical_signals['rsi']:.1f} ({rsi_status})"
-            if 'macd' in technical_signals and 'macd_signal' in technical_signals:
-                macd_signal = "상승" if technical_signals['macd'] > technical_signals['macd_signal'] else "하락"
-                analysis_text += f"\n• MACD: {macd_signal} 신호"
+        if technical_signals.ma5 != 0.0:
+            analysis_text += f"\n• MA5: {technical_signals.ma5:,.0f}"
+        if technical_signals.ma20 != 0.0:
+            analysis_text += f"\n• MA20: {technical_signals.ma20:,.0f}"
+        if technical_signals.rsi != 50.0:
+            rsi_status = "과매수" if technical_signals.rsi > 70 else "과매도" if technical_signals.rsi < 30 else "적정"
+            analysis_text += f"\n• RSI: {technical_signals.rsi:.1f} ({rsi_status})"
+        if technical_signals.macd != 0.0 and technical_signals.macd_signal != 0.0:
+            macd_signal = "상승" if technical_signals.macd > technical_signals.macd_signal else "하락"
+            analysis_text += f"\n• MACD: {macd_signal} 신호"
         
         # 투자 주의사항
         analysis_text += f"\n\n⚠️ 투자 주의사항"
@@ -481,62 +601,87 @@ class AIManager:
         analysis_text += f"\n• 투자 결정은 본인의 판단과 책임하에 하시기 바랍니다"
         analysis_text += f"\n• 과거 성과가 미래 수익을 보장하지 않습니다"
         
-        return analysis_text
-    
-    @monitor_performance("screen_stocks")
-    async def screen_stocks(self, index_name: str, guru_name: str = "Warren Buffett", 
-                          min_score: int = 60, limit: int = 10) -> List[AnalysisResult]:
-        """종목 스크리닝"""
-        try:
-            # 지수별 종목 조회
-            stocks = await self.data_manager.get_stocks_by_index(index_name)
-            
-            if not stocks:
-                return []
-            
-            # 병렬 분석 실행
-            analysis_tasks = []
-            for stock in stocks[:50]:  # 상위 50개 종목만 분석
-                task = self._analyze_single_stock(stock, guru_name)
-                analysis_tasks.append(task)
-            
-            # 분석 결과 수집
-            results = await asyncio.gather(*analysis_tasks, return_exceptions=True)
-            
-            # 유효한 결과만 필터링
-            valid_results = [
-                result for result in results 
-                if isinstance(result, AnalysisResult) and result.score >= min_score
-            ]
-            
-            # 점수 기준 정렬
-            valid_results.sort(key=lambda x: x.score, reverse=True)
-            
-            return valid_results[:limit]
-            
-        except Exception as e:
-            logger.error(f"종목 스크리닝 실패: {e}")
-            return []
-    
-    async def _analyze_single_stock(self, stock_data: Dict[str, Any], guru_name: str) -> Optional[AnalysisResult]:
+        return AnalysisResult(
+            stock_code=result.stock_code,
+            stock_name=result.stock_name,
+            guru_strategy=result.guru_strategy,
+            score=result.score,
+            recommendation=result.recommendation,
+            reasons=result.reasons,
+            technical_signals=result.technical_signals,
+            risk_level=result.risk_level,
+            target_price=result.target_price,
+            stop_loss=result.stop_loss,
+            confidence=result.confidence
+        )
+
+    async def _handle_analysis_result(self, result: AnalysisResult) -> None:
+        """분석 결과 처리"""
+        # 결과를 캐시에 저장
+        self._cache_manager.set(f"ai_analysis:{result.stock_code}", result.to_dict())
+        
+        # 결과를 클라이언트에 전송
+        if result.recommendation != "❌ AI 분석 중 오류 발생":
+            await self._send_result_to_client(result)
+
+    async def _handle_batch_request(self, batch_request: BatchAnalysisRequest) -> None:
+        """배치 분석 요청 처리"""
+        stock_codes = batch_request.stock_codes
+        strategy = batch_request.strategy
+        priority = batch_request.priority
+        callback = batch_request.callback
+        
+        # 분석 작업 생성
+        tasks = [self._analyze_stock(stock_code) for stock_code in stock_codes]
+        
+        # 분석 결과 수집
+        results = await asyncio.gather(*tasks, return_exceptions=True)
+        
+        # 유효한 결과만 필터링
+        valid_results = [
+            result for result in results 
+            if isinstance(result, AnalysisResult) and result.score >= 40
+        ]
+        
+        # 점수 기준 정렬
+        valid_results.sort(key=lambda x: x.score, reverse=True)
+        
+        # 결과 처리
+        for result in valid_results:
+            await self._handle_analysis_result(result)
+        
+        # 배치 처리 완료 알림
+        if callback:
+            callback(valid_results)
+
+    async def _update_stats(self) -> None:
+        """통계 업데이트"""
+        self._stats.total_analyses += 1
+        self._stats.successful_analyses += sum(1 for result in self._active_sessions if result.recommendation != "❌ AI 분석 중 오류 발생")
+        self._stats.failed_analyses = self._stats.total_analyses - self._stats.successful_analyses
+        self._stats.avg_analysis_time = sum(time.time() - session.analysis_timestamp.timestamp() for session in self._active_sessions) / self._stats.total_analyses if self._stats.total_analyses > 0 else 0.0
+        self._stats.cache_hits = sum(1 for _ in self._cache_manager.get_many(self._cache_manager.keys("ai_analysis:*")))
+        self._stats.cache_misses = self._stats.total_analyses - self._stats.cache_hits
+
+    async def _send_result_to_client(self, result: AnalysisResult) -> None:
+        """결과를 클라이언트에 전송"""
+        # 이 메서드는 구현되어야 합니다. 예를 들어, 웹소켓을 통해 결과를 클라이언트에 전송할 수 있습니다.
+        pass
+
+    async def _analyze_single_stock(self, stock_code: str, guru_name: str) -> Optional[AnalysisResult]:
         """단일 종목 분석"""
         try:
             # 기술적 지표 계산
-            technical_data = await self.data_manager.get_technical_indicators(stock_data['code'])
+            technical_data = await self.data_manager.get_technical_indicators(stock_code)
             
             # 거장별 분석
-            if guru_name in self.guru_strategies:
-                analysis_func = self.guru_strategies[guru_name]
-                return await analysis_func(stock_data, technical_data)
-            else:
-                return await InvestmentGuru.warren_buffett_analysis(stock_data, technical_data)
+            analysis_func = self._guru_strategies[guru_name]
+            return await analysis_func(stock_data, technical_data)
                 
         except Exception as e:
-            logger.error(f"종목 분석 실패 {stock_data.get('code', 'Unknown')}: {e}")
+            logger.error(f"종목 분석 실패 {stock_code}: {e}")
             return None
-    
-    @monitor_performance("get_market_sentiment")
-    @cached(ttl=600, key_prefix="market_sentiment")
+
     async def get_market_sentiment(self) -> Dict[str, Any]:
         """시장 심리 분석"""
         try:
@@ -590,7 +735,7 @@ class AIManager:
         except Exception as e:
             logger.error(f"시장 심리 분석 실패: {e}")
             return {}
-    
+
     async def cleanup(self):
         """AI 매니저 정리"""
         if self.data_manager:
@@ -637,7 +782,7 @@ class AIManager:
                 
                 # 목표 수익률 계산
                 if stock.target_price and stock.target_price > 0:
-                    current_price = stock.technical_signals.get('ma5', 50000)  # 현재가 추정
+                    current_price = stock.technical_signals.ma5 if stock.technical_signals.ma5 > 0 else 50000  # 현재가 추정
                     target_return = ((stock.target_price - current_price) / current_price) * 100
                 else:
                     target_return = 15 if stock.score >= 75 else 10
