@@ -296,14 +296,14 @@ class OptimizedHTS:
         
         self.chart_title_label = Label(
             title_frame,
-            text="AI 분석 후 종목을 선택하세요",
+            text="📈 실시간 차트 분석",
             font=("맑은 고딕", 16, "bold"),
             bg=PremiumColors.WHITE,
             fg=PremiumColors.TEXT_PRIMARY
         )
         self.chart_title_label.pack(pady=20)
         
-        # 차트 영역
+        # 차트 영역 - 차트 매니저를 통해 생성
         self.chart_frame = Frame(center_frame, bg=PremiumColors.WHITE)
         self.chart_frame.pack(fill="both", expand=True, padx=10, pady=10)
         
@@ -418,26 +418,34 @@ class OptimizedHTS:
     def on_ai_analyze_click(self):
         """AI 분석 버튼 클릭 이벤트"""
         try:
-            # 선택된 지수와 전략 가져오기
-            selected_index = self.index_combo.get()
-            selected_strategy = self.strategy_combo.get()
+            # 현재 선택된 지수와 전략 사용
+            selected_index = self.current_index
+            selected_strategy = self.current_strategy
             
             if not selected_index or not selected_strategy:
                 messagebox.showwarning("경고", "지수와 전략을 모두 선택해주세요.")
                 return
             
             # 분석 중 표시
-            self.ai_result_text.delete(1.0, tk.END)
-            self.ai_result_text.insert(tk.END, "🔄 AI 분석 중... 잠시만 기다려주세요.")
+            self.analysis_result_text.config(state="normal")
+            self.analysis_result_text.delete(1.0, tk.END)
+            self.analysis_result_text.insert(tk.END, "🔄 AI 분석 중... 잠시만 기다려주세요.")
+            self.analysis_result_text.config(state="disabled")
             self.root.update()
             
             # 비동기 분석 실행
-            asyncio.run(self._run_ai_analysis(selected_index, selected_strategy))
+            if self.loop and not self.loop.is_closed():
+                asyncio.run_coroutine_threadsafe(
+                    self._run_ai_analysis(selected_index, selected_strategy), 
+                    self.loop
+                )
             
         except Exception as e:
             logger.error(f"AI 분석 버튼 클릭 오류: {e}")
-            self.ai_result_text.delete(1.0, tk.END)
-            self.ai_result_text.insert(tk.END, f"⚠️ AI 분석 중 오류가 발생했습니다: {str(e)}")
+            self.analysis_result_text.config(state="normal")
+            self.analysis_result_text.delete(1.0, tk.END)
+            self.analysis_result_text.insert(tk.END, f"⚠️ AI 분석 중 오류가 발생했습니다: {str(e)}")
+            self.analysis_result_text.config(state="disabled")
 
     async def _run_ai_analysis(self, index_name: str, strategy: str):
         """비동기 AI 분석 실행"""
@@ -445,16 +453,27 @@ class OptimizedHTS:
             # 투자 대가별 분석 호출
             analysis_result = await self.ai_manager.get_guru_analysis(index_name, strategy)
             
-            # 결과 표시
-            self.ai_result_text.delete(1.0, tk.END)
-            self.ai_result_text.insert(tk.END, analysis_result)
+            # 결과를 GUI 스레드에서 표시
+            def update_result():
+                self.analysis_result_text.config(state="normal")
+                self.analysis_result_text.delete(1.0, tk.END)
+                self.analysis_result_text.insert(tk.END, analysis_result)
+                self.analysis_result_text.config(state="disabled")
+            
+            self.root.after(0, update_result)
             
             logger.info(f"AI 분석 완료: {index_name}, {strategy}")
             
         except Exception as e:
             logger.error(f"AI 분석 실행 오류: {e}")
-            self.ai_result_text.delete(1.0, tk.END)
-            self.ai_result_text.insert(tk.END, f"⚠️ AI 분석 실행 중 오류가 발생했습니다: {str(e)}")
+            
+            def update_error():
+                self.analysis_result_text.config(state="normal")
+                self.analysis_result_text.delete(1.0, tk.END)
+                self.analysis_result_text.insert(tk.END, f"⚠️ AI 분석 실행 중 오류가 발생했습니다: {str(e)}")
+                self.analysis_result_text.config(state="disabled")
+            
+            self.root.after(0, update_error)
     
     def schedule_async_task(self, coro):
         """비동기 작업 스케줄링"""
@@ -532,6 +551,21 @@ class OptimizedHTS:
                         state="normal",
                         bg=PremiumColors.ERROR
                     )
+                    
+                    # 차트 매니저가 초기화되었으면 차트 생성
+                    if self.chart_manager and hasattr(self, 'chart_frame'):
+                        try:
+                            # 기존 차트 위젯 제거
+                            for widget in self.chart_frame.winfo_children():
+                                widget.destroy()
+                            
+                            # 새 차트 위젯 생성
+                            chart_widget = self.chart_manager.create_chart_widget(self.chart_frame)
+                            chart_widget.pack(fill="both", expand=True)
+                            
+                            logger.info("차트 위젯 생성 완료")
+                        except Exception as chart_error:
+                            logger.error(f"차트 생성 실패: {chart_error}")
                 else:
                     self.init_status_label.config(
                         text="🔄 시스템 초기화 중...",
