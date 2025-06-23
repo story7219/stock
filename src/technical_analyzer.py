@@ -1,21 +1,21 @@
 """
 기술적 분석 모듈
-고급 기술적 지표 계산 및 차트 분석
+기술적 지표 계산 및 차트 분석
 """
 
+import asyncio
 import logging
-import numpy as np
-import pandas as pd
 from typing import List, Dict, Optional, Tuple, Any
-from dataclasses import dataclass
 from datetime import datetime, timedelta
+from dataclasses import dataclass
+import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 from matplotlib.patches import Rectangle
-import seaborn as sns
-import plotly.graph_objects as go
-from plotly.subplots import make_subplots
-import plotly.express as px
+import warnings
+warnings.filterwarnings('ignore')
+
 from .data_collector import StockData
 
 logger = logging.getLogger(__name__)
@@ -583,112 +583,106 @@ class ChartAnalyzer:
         
         return summary
     
-    def create_technical_chart(self, stock_data: List[StockData], 
-                             analysis_result: Dict[str, Any]) -> go.Figure:
+    def create_technical_chart(self, 
+                             stock_data: List[StockData],
+                             analysis_result: Dict[str, Any]) -> plt.Figure:
         """기술적 분석 차트 생성"""
         try:
-            df = self._prepare_dataframe(stock_data)
-            indicators = analysis_result['technical_indicators']
+            if not stock_data:
+                logger.warning("차트 생성을 위한 주식 데이터가 없습니다")
+                return plt.figure()
             
-            # 서브플롯 생성
-            fig = make_subplots(
-                rows=4, cols=1,
-                shared_xaxes=True,
-                vertical_spacing=0.03,
-                subplot_titles=['Price & Moving Averages', 'MACD', 'RSI', 'Volume'],
-                row_width=[0.2, 0.2, 0.2, 0.4]
-            )
+            # 기본 차트 생성 (matplotlib 사용)
+            fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 8))
             
-            # 가격 차트
-            fig.add_trace(
-                go.Candlestick(
-                    x=df.index,
-                    open=df['open'],
-                    high=df['high'],
-                    low=df['low'],
-                    close=df['close'],
-                    name='Price'
-                ),
-                row=1, col=1
-            )
+            # 주가 차트
+            dates = [i for i in range(len(stock_data))]
+            prices = [stock.price for stock in stock_data]
             
-            # 이동평균선
-            if 'sma_20' in indicators:
-                fig.add_trace(
-                    go.Scatter(x=df.index, y=indicators['sma_20'], 
-                             name='SMA 20', line=dict(color='orange')),
-                    row=1, col=1
-                )
+            ax1.plot(dates, prices, label='주가', linewidth=2)
+            ax1.set_title('주가 차트')
+            ax1.set_ylabel('가격')
+            ax1.legend()
+            ax1.grid(True)
             
-            if 'sma_50' in indicators:
-                fig.add_trace(
-                    go.Scatter(x=df.index, y=indicators['sma_50'], 
-                             name='SMA 50', line=dict(color='blue')),
-                    row=1, col=1
-                )
+            # 거래량 차트
+            volumes = [stock.volume for stock in stock_data]
+            ax2.bar(dates, volumes, alpha=0.7, label='거래량')
+            ax2.set_title('거래량')
+            ax2.set_xlabel('시간')
+            ax2.set_ylabel('거래량')
+            ax2.legend()
+            ax2.grid(True)
             
-            # 볼린저 밴드
-            if 'bb_upper' in indicators and 'bb_lower' in indicators:
-                fig.add_trace(
-                    go.Scatter(x=df.index, y=indicators['bb_upper'], 
-                             name='BB Upper', line=dict(color='gray', dash='dash')),
-                    row=1, col=1
-                )
-                fig.add_trace(
-                    go.Scatter(x=df.index, y=indicators['bb_lower'], 
-                             name='BB Lower', line=dict(color='gray', dash='dash')),
-                    row=1, col=1
-                )
-            
-            # MACD
-            if 'macd' in indicators and 'macd_signal' in indicators:
-                fig.add_trace(
-                    go.Scatter(x=df.index, y=indicators['macd'], 
-                             name='MACD', line=dict(color='blue')),
-                    row=2, col=1
-                )
-                fig.add_trace(
-                    go.Scatter(x=df.index, y=indicators['macd_signal'], 
-                             name='Signal', line=dict(color='red')),
-                    row=2, col=1
-                )
-                
-                if 'macd_histogram' in indicators:
-                    fig.add_trace(
-                        go.Bar(x=df.index, y=indicators['macd_histogram'], 
-                             name='Histogram', marker_color='gray'),
-                        row=2, col=1
-                    )
-            
-            # RSI
-            if 'rsi' in indicators:
-                fig.add_trace(
-                    go.Scatter(x=df.index, y=indicators['rsi'], 
-                             name='RSI', line=dict(color='purple')),
-                    row=3, col=1
-                )
-                # RSI 기준선
-                fig.add_hline(y=70, line_dash="dash", line_color="red", row=3, col=1)
-                fig.add_hline(y=30, line_dash="dash", line_color="green", row=3, col=1)
-                fig.add_hline(y=50, line_dash="dot", line_color="gray", row=3, col=1)
-            
-            # 거래량
-            fig.add_trace(
-                go.Bar(x=df.index, y=df['volume'], 
-                     name='Volume', marker_color='lightblue'),
-                row=4, col=1
-            )
-            
-            # 레이아웃 설정
-            fig.update_layout(
-                title=f'{stock_data[0].symbol} 기술적 분석',
-                xaxis_rangeslider_visible=False,
-                height=800,
-                showlegend=True
-            )
-            
+            plt.tight_layout()
             return fig
             
         except Exception as e:
             logger.error(f"기술적 분석 차트 생성 실패: {e}")
-            return go.Figure() 
+            return plt.figure()
+
+class TechnicalAnalyzer:
+    """기술적 분석 통합 클래스"""
+    
+    def __init__(self):
+        self.chart_analyzer = ChartAnalyzer()
+        self.logger = logging.getLogger(__name__)
+    
+    async def analyze_all_markets(self, market_data: Dict[str, List[StockData]]) -> Dict[str, Any]:
+        """모든 시장 데이터에 대한 기술적 분석 수행"""
+        results = {}
+        
+        try:
+            for market_name, stocks in market_data.items():
+                self.logger.info(f"🔍 {market_name} 기술적 분석 시작")
+                market_results = {}
+                
+                for stock in stocks[:10]:  # 상위 10개 종목만 분석
+                    try:
+                        # 개별 종목 기술적 분석
+                        analysis = self.chart_analyzer.analyze_stock_technical([stock])
+                        market_results[stock.symbol] = analysis
+                        
+                    except Exception as e:
+                        self.logger.error(f"{stock.symbol} 기술적 분석 실패: {e}")
+                        continue
+                
+                results[market_name] = market_results
+                self.logger.info(f"✅ {market_name} 기술적 분석 완료: {len(market_results)}개 종목")
+            
+        except Exception as e:
+            self.logger.error(f"기술적 분석 실패: {e}")
+            raise
+        
+        return results
+    
+    def create_market_chart(self, market_data: Dict[str, List[StockData]]) -> plt.Figure:
+        """시장별 종합 차트 생성"""
+        try:
+            fig, axes = plt.subplots(len(market_data), 1, figsize=(12, 4 * len(market_data)))
+            
+            if len(market_data) == 1:
+                axes = [axes]
+            
+            for i, (market_name, stocks) in enumerate(market_data.items()):
+                ax = axes[i]
+                
+                # 시장 대표 종목들의 평균 가격 변화
+                if stocks:
+                    avg_prices = []
+                    for j in range(min(30, len(stocks))):  # 최대 30개 데이터 포인트
+                        if j < len(stocks):
+                            avg_prices.append(stocks[j].price)
+                    
+                    ax.plot(range(len(avg_prices)), avg_prices, label=market_name, linewidth=2)
+                    ax.set_title(f'{market_name} 대표 종목 가격 추이')
+                    ax.set_ylabel('평균 가격')
+                    ax.legend()
+                    ax.grid(True)
+            
+            plt.tight_layout()
+            return fig
+            
+        except Exception as e:
+            self.logger.error(f"시장 차트 생성 실패: {e}")
+            return plt.figure() 

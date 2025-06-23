@@ -4,7 +4,7 @@
 """
 
 import logging
-from typing import List, Dict, Optional, Tuple
+from typing import List, Dict, Optional, Tuple, Any
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 import pandas as pd
@@ -488,4 +488,67 @@ class StrategyManager:
         combined_results.sort(key=lambda x: x['average_score'], reverse=True)
         
         logger.info(f"전략 종합 분석 완료: {len(combined_results)}개 종목")
-        return combined_results 
+        return combined_results
+    
+    async def analyze_all_strategies(self, market_data: Dict[str, List[StockData]]) -> Dict[str, Any]:
+        """모든 시장 데이터에 대해 전체 전략 분석 수행"""
+        try:
+            all_results = {}
+            
+            for market_name, stocks in market_data.items():
+                logger.info(f"🔍 {market_name} 전략 분석 시작")
+                
+                # 각 전략별 분석
+                market_results = self.apply_all_strategies(stocks)
+                all_results[market_name] = market_results
+                
+                logger.info(f"✅ {market_name} 전략 분석 완료")
+            
+            return all_results
+            
+        except Exception as e:
+            logger.error(f"전략 분석 실패: {e}")
+            raise
+    
+    async def analyze_strategies(self, market_data: Dict[str, List[StockData]], 
+                               selected_strategies: List[str]) -> Dict[str, Any]:
+        """선택된 전략들만 분석 수행 (GUI용)"""
+        try:
+            all_results = {}
+            
+            # 선택된 전략만 필터링
+            selected_strategy_objects = {}
+            strategy_name_map = {
+                "워런 버핏": "buffett",
+                "피터 린치": "lynch", 
+                "벤저민 그레이엄": "graham"
+            }
+            
+            for strategy_name in selected_strategies:
+                if strategy_name in strategy_name_map:
+                    key = strategy_name_map[strategy_name]
+                    if key in self.strategies:
+                        selected_strategy_objects[key] = self.strategies[key]
+            
+            for market_name, stocks in market_data.items():
+                logger.info(f"🔍 {market_name} 선택된 전략 분석 시작")
+                
+                market_results = {}
+                for strategy_key, strategy in selected_strategy_objects.items():
+                    try:
+                        logger.info(f"{strategy.name} 전략 적용 시작")
+                        scores = strategy.apply_strategy(stocks)
+                        market_results[strategy_key] = scores
+                        logger.info(f"{strategy.name} 전략 완료: {len(scores)}개 종목 평가")
+                    except Exception as e:
+                        logger.error(f"{strategy.name} 전략 적용 실패: {e}")
+                        market_results[strategy_key] = []
+                
+                all_results[market_name] = market_results
+                logger.info(f"✅ {market_name} 선택된 전략 분석 완료")
+            
+            return all_results
+            
+        except Exception as e:
+            logger.error(f"선택된 전략 분석 실패: {e}")
+            raise 

@@ -105,111 +105,224 @@ class GeminiAnalyzer:
     def _prepare_analysis_data(self, 
                              strategy_results: Dict[str, List[StrategyScore]], 
                              market_data: Dict[str, List[StockData]]) -> Dict[str, Any]:
-        """분석용 데이터 준비"""
-        
-        # 전략별 상위 후보 추출 (각 전략별 Top 10)
-        top_candidates = {}
-        all_symbols = set()
-        
-        for strategy_name, scores in strategy_results.items():
-            top_10 = scores[:10]
-            top_candidates[strategy_name] = top_10
-            all_symbols.update([score.symbol for score in top_10])
-        
-        # 종목별 상세 데이터 수집
-        stock_details = {}
-        for market, stocks in market_data.items():
-            for stock in stocks:
-                if stock.symbol in all_symbols:
-                    stock_details[stock.symbol] = {
-                        'market': market,
-                        'basic_data': stock,
-                        'technical_indicators': {
-                            'rsi': stock.rsi,
-                            'macd': stock.macd,
-                            'macd_signal': stock.macd_signal,
-                            'bollinger_upper': stock.bollinger_upper,
-                            'bollinger_lower': stock.bollinger_lower,
-                            'moving_avg_20': stock.moving_avg_20,
-                            'moving_avg_60': stock.moving_avg_60
-                        }
+        """분석 데이터 준비 - 고품질 데이터셋 활용"""
+        try:
+            logger.info("🧠 Gemini AI 분석용 고품질 데이터 준비 중...")
+            
+            # DataCollector의 고품질 데이터셋 활용
+            from .data_collector import DataCollector
+            data_collector = DataCollector()
+            
+            # 고품질 데이터셋 생성
+            gemini_dataset = data_collector.prepare_gemini_dataset(market_data)
+            
+            # 전략 결과 통합
+            strategy_candidates = {}
+            all_symbols_with_scores = {}
+            
+            for strategy_name, scores in strategy_results.items():
+                strategy_candidates[strategy_name] = []
+                for score in scores[:20]:  # 각 전략별 상위 20개
+                    candidate_info = {
+                        'symbol': score.symbol,
+                        'name': score.name,
+                        'total_score': score.total_score,
+                        'individual_scores': score.individual_scores,
+                        'analysis_reason': score.analysis_reason
                     }
-        
-        return {
-            'strategy_candidates': top_candidates,
-            'stock_details': stock_details,
-            'analysis_timestamp': datetime.now(),
-            'total_candidates': len(all_symbols)
-        }
+                    strategy_candidates[strategy_name].append(candidate_info)
+                    
+                    # 심볼별 전략 점수 수집
+                    if score.symbol not in all_symbols_with_scores:
+                        all_symbols_with_scores[score.symbol] = {}
+                    all_symbols_with_scores[score.symbol][strategy_name] = score.total_score
+            
+            # 고급 분석 데이터 구성
+            analysis_data = {
+                # 기존 전략 결과
+                'strategy_candidates': strategy_results,
+                'strategy_summary': strategy_candidates,
+                
+                # 고품질 데이터셋 (Gemini AI 최적화)
+                'gemini_dataset': gemini_dataset,
+                
+                # 종합 분석용 데이터
+                'comprehensive_analysis': {
+                    'total_stocks_analyzed': gemini_dataset.get('total_stocks', 0),
+                    'markets_covered': gemini_dataset.get('markets', []),
+                    'data_quality_score': gemini_dataset.get('data_quality_summary', {}).get('avg_quality_score', 0),
+                    'market_statistics': gemini_dataset.get('market_statistics', {}),
+                    'technical_patterns': gemini_dataset.get('technical_patterns', {}),
+                    'top_performers': gemini_dataset.get('top_performers', {}),
+                    'sector_analysis': gemini_dataset.get('sector_analysis', {})
+                },
+                
+                # 투자 전략 매핑
+                'strategy_mapping': {
+                    'buffett_candidates': [s for s in strategy_candidates.get('buffett', [])],
+                    'lynch_candidates': [s for s in strategy_candidates.get('lynch', [])],
+                    'graham_candidates': [s for s in strategy_candidates.get('graham', [])]
+                },
+                
+                # 종목별 종합 점수
+                'symbol_comprehensive_scores': all_symbols_with_scores,
+                
+                # 분석 메타데이터
+                'analysis_metadata': {
+                    'timestamp': datetime.now().isoformat(),
+                    'data_freshness': 'real-time',
+                    'quality_threshold': 70.0,
+                    'analysis_scope': 'kospi200_nasdaq100_sp500',
+                    'optimization_target': 'gemini_ai_analysis'
+                }
+            }
+            
+            logger.info(f"✅ 고품질 분석 데이터 준비 완료: {len(all_symbols_with_scores)}개 종목, 평균 품질 점수 {gemini_dataset.get('data_quality_summary', {}).get('avg_quality_score', 0):.1f}")
+            return analysis_data
+            
+        except Exception as e:
+            logger.error(f"분석 데이터 준비 실패: {e}")
+            # 백업 데이터 준비
+            return {
+                'strategy_candidates': strategy_results,
+                'market_data_summary': self._create_market_summary(market_data),
+                'error': str(e)
+            }
     
     def _create_analysis_prompt(self, analysis_data: Dict[str, Any]) -> str:
-        """Gemini AI 분석 프롬프트 생성"""
+        """Gemini AI 분석 프롬프트 생성 - 고품질 데이터 활용"""
+        
+        # 고품질 데이터셋 추출
+        gemini_dataset = analysis_data.get('gemini_dataset', {})
+        comprehensive_analysis = analysis_data.get('comprehensive_analysis', {})
+        strategy_mapping = analysis_data.get('strategy_mapping', {})
         
         prompt = f"""
-        당신은 세계적인 투자 전문가입니다. 다음 데이터를 바탕으로 최고의 Top5 종목을 선정해주세요.
+🚀 **Ultra HTS v5.0 - Gemini AI 고급 종목 분석 및 Top5 선정**
 
-        ## 분석 대상
-        - 코스피200, 나스닥100, S&P500 전체 종목
-        - 총 {analysis_data['total_candidates']}개 후보 종목
-        - 분석 시점: {analysis_data['analysis_timestamp'].strftime('%Y-%m-%d %H:%M')}
+당신은 세계 최고 수준의 AI 투자 분석가입니다. 아래 고품질 데이터를 바탕으로 최적의 Top5 종목을 선정해주세요.
 
-        ## 투자 전략별 후보군
-        """
-        
-        # 각 전략별 후보 정보 추가
-        for strategy_name, candidates in analysis_data['strategy_candidates'].items():
-            prompt += f"\n### {strategy_name} 전략 Top 10:\n"
-            for i, candidate in enumerate(candidates[:5], 1):  # 상위 5개만 표시
-                stock_detail = analysis_data['stock_details'].get(candidate.symbol, {})
-                basic_data = stock_detail.get('basic_data')
-                
-                if basic_data:
-                    prompt += f"{i}. {candidate.symbol} ({candidate.name})\n"
-                    prompt += f"   - 점수: {candidate.total_score:.1f}점\n"
-                    prompt += f"   - 현재가: ${basic_data.price:.2f}\n"
-                    prompt += f"   - 시가총액: ${basic_data.market_cap/1e9:.1f}B (if available)\n"
-                    prompt += f"   - PER: {basic_data.pe_ratio:.1f} (if available)\n"
-                    prompt += f"   - RSI: {basic_data.rsi:.1f} (if available)\n"
-                    prompt += f"   - 선정 이유: {candidate.reasoning[:200]}...\n\n"
-        
-        prompt += """
-        ## 요청사항
-        위 후보군을 종합적으로 분석하여 다음 기준으로 Top5 종목을 선정해주세요:
+## 📊 **고품질 데이터셋 정보**
+- **분석 대상**: {comprehensive_analysis.get('total_stocks_analyzed', 0)}개 종목
+- **커버 시장**: {', '.join(comprehensive_analysis.get('markets_covered', []))}
+- **데이터 품질 점수**: {comprehensive_analysis.get('data_quality_score', 0):.1f}/100
+- **분석 시점**: {analysis_data.get('analysis_metadata', {}).get('timestamp', 'N/A')}
 
-        1. **다각도 분석**: 각 투자 전략의 장단점을 고려
-        2. **기술적 분석**: RSI, MACD, 볼린저밴드 등 기술적 지표 해석
-        3. **리스크 평가**: 각 종목의 위험 요소 분석
-        4. **포트폴리오 균형**: 시장별, 섹터별 분산 고려
-        5. **현재 시장 상황**: 최근 시장 트렌드와 경제 상황 반영
+## 🎯 **투자 대가 전략 결과**
 
-        ## 응답 형식 (JSON)
-        다음 JSON 형식으로 정확히 응답해주세요:
+### 워런 버핏 전략 (가치투자)
+{self._format_strategy_candidates(strategy_mapping.get('buffett_candidates', []))}
 
-        {
-          "top5_selections": [
-            {
-              "rank": 1,
-              "symbol": "AAPL",
-              "name": "Apple Inc.",
-              "final_score": 95.5,
-              "selection_reason": "강력한 기술적 지표와 워런 버핏 전략에서 높은 점수...",
-              "technical_analysis": "RSI 65로 적정 수준, MACD 골든크로스 형성...",
-              "risk_assessment": "높은 유동성으로 리스크 낮음, 단 기술주 변동성 주의...",
-              "gemini_reasoning": "종합적으로 판단할 때 가장 안정적이면서도 성장 가능성이 높은 종목..."
-            }
-            // ... 5개 종목
-          ],
-          "analysis_summary": "현재 시장은 기술주 중심의 회복세를 보이고 있으며...",
-          "market_outlook": "향후 3-6개월 시장 전망...",
-          "risk_warnings": ["금리 인상 리스크", "지정학적 위험"],
-          "alternative_candidates": ["MSFT", "GOOGL", "005930.KS"],
-          "confidence_score": 85.5
-        }
+### 피터 린치 전략 (성장투자)  
+{self._format_strategy_candidates(strategy_mapping.get('lynch_candidates', []))}
 
-        중요: 반드시 유효한 JSON 형식으로만 응답하고, 추가 설명은 JSON 내부에 포함해주세요.
+### 벤저민 그레이엄 전략 (가치투자)
+{self._format_strategy_candidates(strategy_mapping.get('graham_candidates', []))}
+
+## 📈 **시장 통계 및 기술적 패턴**
+
+### 시장별 현황
+{self._format_market_statistics(comprehensive_analysis.get('market_statistics', {}))}
+
+### 기술적 패턴 분석
+- **강세 신호**: {comprehensive_analysis.get('technical_patterns', {}).get('bullish_signals', 0)}개 종목
+- **약세 신호**: {comprehensive_analysis.get('technical_patterns', {}).get('bearish_signals', 0)}개 종목
+- **강한 모멘텀**: {', '.join(comprehensive_analysis.get('technical_patterns', {}).get('strong_momentum', [])[:5])}
+- **과매도 기회**: {', '.join(comprehensive_analysis.get('technical_patterns', {}).get('oversold_opportunities', [])[:5])}
+
+### 상위 성과 종목
+{self._format_top_performers(comprehensive_analysis.get('top_performers', {}))}
+
+## 🎯 **분석 지침**
+
+### 선정 기준 (우선순위)
+1. **기술적 분석 우선**: RSI, MACD, 볼린저밴드, 스토캐스틱 등 기술적 지표 종합 평가
+2. **모멘텀 분석**: 단기/중기 가격 모멘텀 및 거래량 패턴
+3. **리스크 관리**: 변동성 대비 수익률, 베타 계수 고려
+4. **전략 다각화**: 워런 버핏, 피터 린치, 벤저민 그레이엄 전략 균형 반영
+5. **시장 상황 고려**: 현재 시장 환경에 최적화된 종목 선정
+
+### 필수 고려사항
+- 재무정보 제외, 순수 기술적 분석 기반 선정
+- 각 선정 종목의 구체적 기술적 근거 제시
+- 리스크 요인 및 대안 후보 제시
+- 포트폴리오 다각화 고려 (시장/섹터 분산)
+
+## 📋 **요구 응답 형식**
+
+반드시 아래 JSON 형식으로만 응답하세요:
+
+```json
+{{
+  "top5_selections": [
+    {{
+      "symbol": "AAPL",
+      "name": "Apple Inc.",
+      "rank": 1,
+      "final_score": 92.5,
+      "selection_reason": "강력한 기술적 지표와 모멘텀 우수",
+      "technical_analysis": "RSI 65.2 (적정), MACD 상승 크로스오버, 볼린저밴드 상단 돌파",
+      "risk_assessment": "베타 1.2, 변동성 중간 수준, 단기 조정 가능성",
+      "gemini_reasoning": "현재 시장 환경에서 기술적 우위와 모멘텀을 동시에 보유한 최적 종목"
+    }},
+    // ... 나머지 4개 종목
+  ],
+  "analysis_summary": "현재 시장은 기술적 분석 관점에서 선별적 강세를 보이고 있으며, 모멘텀과 기술적 지표가 우수한 종목들이 부각되고 있습니다...",
+  "market_outlook": "향후 3-6개월 시장 전망: 기술적 분석 기반으로 볼 때...",
+  "risk_warnings": ["금리 변동성", "지정학적 리스크", "기술적 조정 가능성"],
+  "alternative_candidates": ["MSFT", "GOOGL", "005930.KS", "NVDA", "TSLA"],
+  "confidence_score": 87.5
+}}
+```
+
+## 🔥 **핵심 미션**
+고품질 데이터와 투자 대가들의 전략을 바탕으로, 현재 시장에서 최고의 성과를 낼 수 있는 Top5 종목을 선정하고, 그 이유를 명확히 제시해주세요. 당신의 분석이 투자자들의 성공을 좌우합니다!
         """
         
         return prompt
+    
+    def _format_strategy_candidates(self, candidates: List[Dict]) -> str:
+        """전략별 후보 종목 포맷팅"""
+        if not candidates:
+            return "- 해당 전략 후보 없음"
+        
+        formatted = []
+        for i, candidate in enumerate(candidates[:5], 1):  # 상위 5개만
+            formatted.append(f"- {i}. {candidate['symbol']} ({candidate['name']}) - 점수: {candidate['total_score']:.1f}")
+        
+        return "\n".join(formatted)
+    
+    def _format_market_statistics(self, market_stats: Dict) -> str:
+        """시장 통계 포맷팅"""
+        if not market_stats:
+            return "- 시장 통계 정보 없음"
+        
+        formatted = []
+        for market, stats in market_stats.items():
+            formatted.append(f"- **{market.upper()}**: {stats.get('total_stocks', 0)}개 종목, 평균 RSI: {stats.get('avg_rsi', 0):.1f}")
+        
+        return "\n".join(formatted)
+    
+    def _format_top_performers(self, top_performers: Dict) -> str:
+        """상위 성과 종목 포맷팅"""
+        if not top_performers:
+            return "- 상위 성과 종목 정보 없음"
+        
+        formatted = []
+        
+        # 수익률 상위 종목
+        top_returns = top_performers.get('top_20_returns', [])
+        if top_returns:
+            symbols = [stock['symbol'] for stock in top_returns]
+            formatted.append(f"- **수익률 상위**: {', '.join(symbols)}")
+        
+        # RSI 적정 종목
+        good_rsi = top_performers.get('good_rsi_stocks', [])
+        if good_rsi:
+            symbols = [stock['symbol'] for stock in good_rsi[:5]]
+            formatted.append(f"- **RSI 적정 구간**: {', '.join(symbols)}")
+        
+        return "\n".join(formatted) if formatted else "- 상위 성과 종목 정보 없음"
     
     async def _call_gemini_api(self, prompt: str) -> str:
         """Gemini API 호출"""
