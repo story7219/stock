@@ -1,36 +1,37 @@
 @echo off
 chcp 65001 > nul
-title 🚀 주식 분석 시스템 with Enhanced Token Manager
+title 🚀 Ultra Stock Analysis System v5.0
 
-echo ==========================================
-echo 🚀 주식 분석 시스템 시작
-echo ==========================================
 echo.
-echo 📊 시스템 기능:
-echo   ✅ 매일 오전 7시 자동 토큰 발행
-echo   ✅ 코드 품질 자동 검사
-echo   ✅ 코스피 200 전체 종목 분석
-echo   ✅ 실시간 모니터링
-echo   ✅ 텔레그램 알림
-echo.
-echo 🔧 시작 중...
+echo ===============================================
+echo  🚀 Ultra Stock Analysis System v5.0
+echo  코스피200·나스닥100·S&P500 AI 분석 시스템
+echo ===============================================
 echo.
 
-REM 가상환경 활성화 (있다면)
-if exist "venv\Scripts\activate.bat" (
-    echo 📦 가상환경 활성화 중...
-    call venv\Scripts\activate.bat
+REM 가상환경 확인 및 활성화
+if exist ".venv\Scripts\activate.bat" (
+    echo 🔧 가상환경 활성화 중...
+    call .venv\Scripts\activate.bat
+    echo ✅ 가상환경 활성화 완료
+) else (
+    echo ⚠️ 가상환경이 없습니다. 전역 Python을 사용합니다.
 )
 
-REM 의존성 설치
-echo 📦 의존성 확인 및 설치 중...
-pip install -r requirements.txt --quiet
-
-REM 메인 시스템 실행
-echo ✅ 시스템 실행 중...
 echo.
-python main.py
+echo 🎨 GUI 애플리케이션을 시작합니다...
+echo.
+
+REM Python 스크립트 실행
+python start.py
+
+REM 오류 발생 시 대기
+if errorlevel 1 (
+    echo.
+    echo ❌ 실행 중 오류가 발생했습니다.
+    pause
+)
 
 echo.
-echo 👋 시스템이 종료되었습니다.
+echo 👋 프로그램이 종료되었습니다.
 pause 
