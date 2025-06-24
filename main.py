@@ -5,6 +5,12 @@
 - 세계 최고 수준의 AI 투자 분석가 시스템
 - 고품질 데이터 + AI 추론으로 Top5 종목 자동 선정
 - 고급 결측치 보정 및 데이터 정제 자동화
+
+🎯 AI 요청 가이드:
+- QUICK_GUIDE.md: AI 작업 요청 빠른 가이드
+- AI_CODE_MAP.md: 코드 위치 즉시 찾기 맵
+- EASY_REQUESTS.md: 쉬운 요청 템플릿 모음
+- README.md: 전체 시스템 구조 안내
 """
 import os
 import sys
