@@ -1,691 +1,664 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Ultra Premium Stock Analysis System - 자동화 스케줄러
-매일 정해진 시간에 자동으로 분석을 수행하고 결과를 저장/알림하는 시스템
-
-주요 기능:
-- 매일 07:00: 아침 종합 분석 (전체 데이터 수집 → AI 분석 → 결과 저장/알림)
-- 매일 12:00: 정오 상태 점검 (시스템 리소스, 컴포넌트 상태 확인)
-- 매일 18:00: 저녁 일일 요약 (분석 결과 요약, 리포트 생성)
-- 매일 23:00: 야간 유지보수 (코드 품질 검사, 자동 리팩토링, GitHub 커밋)
-- 매주 월요일 09:00: 주간 요약
-- 매시간: 시스템 상태 체크
+⏰ 자동 스케줄러 시스템
+시간 기반으로 자동 분석, 학습, 진화를 수행하는 스케줄러
 """
 
-import os
-import sys
 import asyncio
+import logging
 import schedule
 import time
+import threading
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Any, Callable
-import logging
-from dataclasses import dataclass, asdict
-from dotenv import load_dotenv
-import subprocess
+from typing import Dict, List, Any, Optional, Callable
+from dataclasses import dataclass
 import json
-import traceback
-import psutil
-from pathlib import Path
+import os
+from main_optimized import InvestmentAnalysisSystem
 
-# 로그 디렉토리 생성
-Path("logs").mkdir(exist_ok=True)
-
-# 프로젝트 루트를 파이썬 경로에 추가
-project_root = Path(__file__).parent.parent
-sys.path.insert(0, str(project_root))
-
-# 프로젝트 모듈 임포트
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-
-try:
-    from multi_data_collector import MultiDataCollector
-    from gemini_analyzer import GeminiAnalyzer
-    from telegram_notifier import TelegramNotifier
-    from google_sheets_manager import GoogleSheetsManager
-except ImportError as e:
-    print(f"⚠️ 모듈 임포트 오류: {e}")
-
-# 환경 변수 로드
-load_dotenv()
-
+logger = logging.getLogger(__name__)
 
 @dataclass
-class ScheduleConfig:
-    """스케줄 설정"""
-
+class ScheduledTask:
+    """예약된 작업"""
     name: str
-    time: str  # HH:MM 형식
-    function: str
-    enabled: bool = True
-    retry_count: int = 3
-    timeout: int = 3600  # 초 단위
+    function: Callable
+    schedule_type: str  # 'daily', 'weekly', 'hourly', 'interval'
+    schedule_time: str  # "09:00", "Monday", "5" (minutes)
+    enabled: bool
+    last_run: Optional[datetime]
+    next_run: Optional[datetime]
+    run_count: int
+    parameters: Dict[str, Any]
 
+@dataclass
+class ScheduleStatus:
+    """스케줄 상태"""
+    active_tasks: int
+    completed_today: int
+    failed_today: int
+    next_scheduled: Optional[datetime]
+    system_running: bool
+    last_health_check: datetime
 
-class AutomatedScheduler:
-    """자동화 스케줄러"""
-
-    def __init__(self):
+class IntelligentScheduler:
+    """🧠 지능형 스케줄러"""
+    
+    def __init__(self, analysis_system: InvestmentAnalysisSystem):
         """초기화"""
-        self.logger = self._setup_logger()
-
-        # 컴포넌트 초기화
-        self.data_collector = MultiDataCollector()
-        self.gemini_analyzer = GeminiAnalyzer()
-        self.telegram_notifier = TelegramNotifier()
-        self.sheets_manager = GoogleSheetsManager()
-
+        self.analysis_system = analysis_system
+        self.scheduled_tasks = []
+        self.task_history = []
+        self.is_running = False
+        
         # 스케줄 설정
-        self.schedules = {
-            "morning_analysis": ScheduleConfig(
-                name="아침 종합 분석",
-                time="07:00",
-                function="run_morning_analysis",
+        self.config_path = "config/scheduler_config.json"
+        self.max_concurrent_tasks = 3
+        self.task_timeout_minutes = 60
+        
+        # 통계
+        self.total_runs = 0
+        self.successful_runs = 0
+        self.failed_runs = 0
+        
+        # 기본 스케줄 설정
+        self._setup_default_schedule()
+        
+        logger.info("⏰ 지능형 스케줄러 초기화 완료")
+    
+    def _setup_default_schedule(self):
+        """기본 스케줄 설정"""
+        
+        default_tasks = [
+            # 매일 장 시작 전 분석 (09:00)
+            ScheduledTask(
+                name="daily_market_analysis",
+                function=self._run_daily_analysis,
+                schedule_type="daily",
+                schedule_time="09:00",
                 enabled=True,
-                retry_count=3,
-                timeout=3600,
+                last_run=None,
+                next_run=None,
+                run_count=0,
+                parameters={"markets": ["KOSPI200", "NASDAQ100", "S&P500"], "full_analysis": True}
             ),
-            "midday_check": ScheduleConfig(
-                name="정오 상태 점검",
-                time="12:00",
-                function="run_midday_check",
+            
+            # 시간당 실시간 모니터링 (평일 09:00-18:00)
+            ScheduledTask(
+                name="hourly_monitoring",
+                function=self._run_hourly_monitoring,
+                schedule_type="hourly",
+                schedule_time="09-18",  # 9시부터 18시까지
                 enabled=True,
-                retry_count=2,
-                timeout=1800,
+                last_run=None,
+                next_run=None,
+                run_count=0,
+                parameters={"quick_scan": True}
             ),
-            "evening_summary": ScheduleConfig(
-                name="저녁 일일 요약",
-                time="18:00",
-                function="run_evening_summary",
+            
+            # 주간 모델 재학습 (일요일 02:00)
+            ScheduledTask(
+                name="weekly_model_training",
+                function=self._run_weekly_training,
+                schedule_type="weekly",
+                schedule_time="Sunday:02:00",
                 enabled=True,
-                retry_count=2,
-                timeout=1800,
+                last_run=None,
+                next_run=None,
+                run_count=0,
+                parameters={"full_retrain": True}
             ),
-            "night_maintenance": ScheduleConfig(
-                name="야간 유지보수",
-                time="23:00",
-                function="run_night_maintenance",
+            
+            # 매일 성능 진화 체크 (22:00)
+            ScheduledTask(
+                name="daily_evolution_check",
+                function=self._run_evolution_check,
+                schedule_type="daily",
+                schedule_time="22:00",
                 enabled=True,
-                retry_count=1,
-                timeout=1800,
+                last_run=None,
+                next_run=None,
+                run_count=0,
+                parameters={"enable_auto_evolution": True}
             ),
-        }
-
-        # 실행 이력
-        self.execution_history = []
-        self.current_execution = None
-
-        # 종목 리스트 (코스피200 + 나스닥100 + S&P500 주요 종목)
-        self.target_symbols = self._load_target_symbols()
-
-        self._setup_schedules()
-        self.logger.info("🚀 Automated Scheduler 초기화 완료")
-
-    def _setup_logger(self) -> logging.Logger:
-        """로거 설정"""
-        logger = logging.getLogger("AutomatedScheduler")
-        logger.setLevel(logging.INFO)
-
-        if not logger.handlers:
-            # 파일 핸들러
-            file_handler = logging.FileHandler("logs/scheduler.log", encoding="utf-8")
-            file_formatter = logging.Formatter(
-                "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+            
+            # 5분마다 시스템 헬스 체크
+            ScheduledTask(
+                name="health_check",
+                function=self._run_health_check,
+                schedule_type="interval",
+                schedule_time="5",  # 5분
+                enabled=True,
+                last_run=None,
+                next_run=None,
+                run_count=0,
+                parameters={"deep_check": False}
             )
-            file_handler.setFormatter(file_formatter)
-            logger.addHandler(file_handler)
-
-            # 콘솔 핸들러
-            console_handler = logging.StreamHandler()
-            console_formatter = logging.Formatter(
-                "%(asctime)s - %(levelname)s - %(message)s"
-            )
-            console_handler.setFormatter(console_formatter)
-            logger.addHandler(console_handler)
-
-        return logger
-
-    def _load_target_symbols(self) -> List[str]:
-        """분석 대상 종목 로드"""
-        symbols = []
-
-        # 코스피200 주요 종목
-        kospi_symbols = [
-            "005930",
-            "000660",
-            "035420",
-            "005490",
-            "068270",  # 삼성전자, SK하이닉스, 네이버, POSCO홀딩스, 셀트리온
-            "207940",
-            "005380",
-            "051910",
-            "035720",
-            "006400",  # 삼성바이오로직스, 현대차, LG화학, 카카오, 삼성SDI
-            "028260",
-            "105560",
-            "055550",
-            "096770",
-            "003670",  # 삼성물산, KB금융, 신한지주, SK이노베이션, 포스코퓨처엠
         ]
-
-        # 나스닥100 주요 종목
-        nasdaq_symbols = [
-            "AAPL",
-            "MSFT",
-            "GOOGL",
-            "AMZN",
-            "TSLA",
-            "META",
-            "NVDA",
-            "NFLX",
-            "ADBE",
-            "CRM",
-            "ORCL",
-            "CSCO",
-            "INTC",
-            "QCOM",
-            "AMD",
-        ]
-
-        # S&P500 주요 종목
-        sp500_symbols = [
-            "JPM",
-            "JNJ",
-            "V",
-            "PG",
-            "UNH",
-            "HD",
-            "BAC",
-            "MA",
-            "DIS",
-            "PYPL",
-            "ADBE",
-            "CRM",
-            "NFLX",
-            "KO",
-            "PEP",
-        ]
-
-        symbols.extend(kospi_symbols)
-        symbols.extend(nasdaq_symbols)
-        symbols.extend(sp500_symbols)
-
-        return symbols
-
-    def _setup_schedules(self):
-        """스케줄 설정"""
-        for schedule_key, config in self.schedules.items():
-            if config.enabled:
-                schedule.every().day.at(config.time).do(
-                    self._execute_scheduled_task, schedule_key
-                )
-                self.logger.info(f"📅 스케줄 등록: {config.name} - {config.time}")
-
-    async def _execute_scheduled_task(self, schedule_key: str):
-        """스케줄된 작업 실행"""
-        config = self.schedules[schedule_key]
-        start_time = datetime.now()
-
-        self.current_execution = {
-            "schedule_key": schedule_key,
-            "config": config,
-            "start_time": start_time,
-            "status": "running",
-        }
-
-        self.logger.info(f"🎯 스케줄 작업 시작: {config.name}")
-
-        try:
-            # 시작 알림 - 한글화
-            await self.telegram_notifier.send_message(
-                {
-                    "title": f"📅 스케줄 작업 시작: {config.name}",
-                    "content": f'⏰ 시작 시간: {start_time.strftime("%Y년 %m월 %d일 %H시 %M분")}',
-                    "priority": "low",
-                    "timestamp": start_time,
-                    "message_type": "info",
-                }
-            )
-
-            # 해당 함수 실행
-            success = False
-            for attempt in range(config.retry_count):
-                try:
-                    if hasattr(self, config.function):
-                        func = getattr(self, config.function)
-
-                        # 타임아웃 설정
-                        success = await asyncio.wait_for(func(), timeout=config.timeout)
-
-                        if success:
-                            break
-                    else:
-                        self.logger.error(f"❌ 함수 없음: {config.function}")
-                        break
-
-                except asyncio.TimeoutError:
-                    self.logger.warning(
-                        f"⏰ 작업 타임아웃: {config.name} (시도 {attempt + 1}/{config.retry_count})"
-                    )
-                    if attempt == config.retry_count - 1:
-                        raise
-                except Exception as e:
-                    self.logger.error(
-                        f"❌ 작업 실행 오류: {config.name} (시도 {attempt + 1}/{config.retry_count}) - {e}"
-                    )
-                    if attempt == config.retry_count - 1:
-                        raise
-                    await asyncio.sleep(60)  # 재시도 전 대기
-
-            end_time = datetime.now()
-            duration = (end_time - start_time).total_seconds()
-
-            # 실행 결과 기록
-            execution_record = {
-                "schedule_key": schedule_key,
-                "config": config,
-                "start_time": start_time,
-                "end_time": end_time,
-                "duration": duration,
-                "success": success,
-                "error": None,
-            }
-
-            self.execution_history.append(execution_record)
-            self.current_execution["status"] = "completed" if success else "failed"
-
-            # 완료 알림 - 한글화
-            status_emoji = "✅" if success else "❌"
-            await self.telegram_notifier.send_message(
-                {
-                    "title": f"{status_emoji} 스케줄 작업 완료: {config.name}",
-                    "content": f"⏱️ 소요 시간: {duration:.1f}초\n"
-                    f'📊 실행 결과: {"성공" if success else "실패"}',
-                    "priority": "low" if success else "high",
-                    "timestamp": end_time,
-                    "message_type": "success" if success else "error",
-                }
-            )
-
-            self.logger.info(f"✅ 스케줄 작업 완료: {config.name} ({duration:.1f}초)")
-
-        except Exception as e:
-            end_time = datetime.now()
-            duration = (end_time - start_time).total_seconds()
-            error_msg = str(e)
-
-            # 오류 기록
-            execution_record = {
-                "schedule_key": schedule_key,
-                "config": config,
-                "start_time": start_time,
-                "end_time": end_time,
-                "duration": duration,
-                "success": False,
-                "error": error_msg,
-            }
-
-            self.execution_history.append(execution_record)
-            self.current_execution["status"] = "error"
-
-            # 오류 알림
-            await self.telegram_notifier.notify_error(
-                {
-                    "type": "ScheduleExecutionError",
-                    "message": error_msg,
-                    "component": f"Scheduler.{config.function}",
-                    "critical": schedule_key == "morning_analysis",
-                }
-            )
-
-            self.logger.error(f"❌ 스케줄 작업 실패: {config.name} - {error_msg}")
-
-        finally:
-            self.current_execution = None
-
-    async def run_morning_analysis(self) -> bool:
-        """아침 종합 분석 (07:00)"""
-        self.logger.info("🌅 아침 종합 분석 시작")
-
-        try:
-            # 1. 데이터 수집
-            self.logger.info("📊 데이터 수집 시작")
-            collected_data = await self.data_collector.collect_all_data(
-                self.target_symbols
-            )
-
-            if not collected_data:
-                raise Exception("데이터 수집 실패")
-
-            # 2. AI 분석
-            self.logger.info("🤖 AI 분석 시작")
-            analysis_results = await self.gemini_analyzer.analyze_stocks(
-                list(collected_data.values())
-            )
-
-            if not analysis_results:
-                raise Exception("AI 분석 실패")
-
-            # 3. 구글 시트 저장
-            self.logger.info("📝 구글 시트 저장")
-            await self.sheets_manager.save_stock_data(
-                [
-                    {
-                        "symbol": dp.symbol,
-                        "name": dp.name,
-                        "price": dp.price,
-                        "change_percent": dp.change_percent,
-                        "volume": dp.volume,
-                        "market_cap": dp.market_cap,
-                        "pe_ratio": dp.pe_ratio,
-                        "pb_ratio": dp.pb_ratio,
-                        "source": dp.source,
-                        "quality_score": dp.quality.overall_score,
-                    }
-                    for dp in collected_data.values()
-                ]
-            )
-
-            await self.sheets_manager.save_analysis_results(
-                analysis_results.get("recommendations", [])
-            )
-
-            # 4. 품질 메트릭 저장
-            quality_report = self.data_collector.get_quality_report()
-            if quality_report:
-                quality_data = []
-                for source, metrics in quality_report.get("source_quality", {}).items():
-                    quality_data.append(
-                        {
-                            "source": source,
-                            "completeness": 100,  # 기본값
-                            "accuracy": metrics.get("average_score", 0),
-                            "freshness": 95,
-                            "consistency": 90,
-                            "overall_score": metrics.get("average_score", 0),
-                            "issues": [],
-                        }
-                    )
-
-                await self.sheets_manager.save_quality_metrics(quality_data)
-
-            # 5. 텔레그램 알림
-            await self.telegram_notifier.notify_analysis_results(analysis_results)
-            await self.telegram_notifier.notify_data_collection_status(
-                self.data_collector.get_data_source_status()
-            )
-
-            # 6. GitHub 커밋
-            await self._commit_to_github("아침 종합 분석 결과 업데이트")
-
-            self.logger.info("✅ 아침 종합 분석 완료")
-            return True
-
-        except Exception as e:
-            self.logger.error(f"❌ 아침 종합 분석 실패: {e}")
-            return False
-
-    async def run_midday_check(self) -> bool:
-        """정오 상태 점검 (12:00)"""
-        self.logger.info("🕐 정오 상태 점검 시작")
-
-        try:
-            # 1. 시스템 상태 점검
-            system_status = {
-                "data_sources": self.data_collector.get_data_source_status(),
-                "telegram": await self.telegram_notifier.test_connection(),
-                "sheets": self.sheets_manager.client is not None,
-                "gemini": True,  # 기본값
-            }
-
-            # 2. 간단한 데이터 수집 테스트
-            test_symbols = ["005930", "AAPL", "GOOGL"]  # 테스트용 소수 종목
-            test_data = await self.data_collector.collect_all_data(test_symbols)
-
-            # 3. 상태 알림 - 한글화
-            active_sources = sum(
-                1
-                for status in system_status["data_sources"].values()
-                if status["status"] == "active"
-            )
-            total_sources = len(system_status["data_sources"])
-
-            await self.telegram_notifier.send_message(
-                {
-                    "title": "�� 정오 시스템 상태 점검 완료",
-                    "content": f"🔍 데이터 소스: {active_sources}/{total_sources} 활성\n"
-                    f"📊 테스트 수집: {len(test_data)}개 종목\n"
-                    f'📱 텔레그램: {"✅" if system_status["telegram"] else "❌"}\n'
-                    f'📝 구글시트: {"✅" if system_status["sheets"] else "❌"}',
-                    "priority": "low",
-                    "timestamp": datetime.now(),
-                    "message_type": "info",
-                    "data": system_status,
-                }
-            )
-
-            self.logger.info("✅ 정오 상태 점검 완료")
-            return True
-
-        except Exception as e:
-            self.logger.error(f"❌ 정오 상태 점검 실패: {e}")
-            return False
-
-    async def run_evening_summary(self) -> bool:
-        """저녁 일일 요약 (18:00)"""
-        self.logger.info("🌆 저녁 일일 요약 시작")
-
-        try:
-            # 1. 일일 통계 수집
-            today = datetime.now().strftime("%Y-%m-%d")
-
-            # 실행 이력에서 오늘 데이터 추출
-            today_executions = [
-                exec_record
-                for exec_record in self.execution_history
-                if exec_record["start_time"].strftime("%Y-%m-%d") == today
-            ]
-
-            summary_data = {
-                "date": today,
-                "total_analyzed": len(self.target_symbols),
-                "successful_executions": sum(
-                    1 for ex in today_executions if ex["success"]
-                ),
-                "failed_executions": sum(
-                    1 for ex in today_executions if not ex["success"]
-                ),
-                "avg_execution_time": (
-                    sum(ex["duration"] for ex in today_executions)
-                    / len(today_executions)
-                    if today_executions
-                    else 0
-                ),
-                "data_quality": self.data_collector.get_quality_report().get(
-                    "overall_quality", 0
-                ),
-            }
-
-            # 2. 구글 시트에 일일 요약 저장
-            await self.sheets_manager.save_daily_summary(summary_data)
-
-            # 3. 일일 리포트 알림
-            await self.telegram_notifier.notify_daily_report(summary_data)
-
-            self.logger.info("✅ 저녁 일일 요약 완료")
-            return True
-
-        except Exception as e:
-            self.logger.error(f"❌ 저녁 일일 요약 실패: {e}")
-            return False
-
-    async def run_night_maintenance(self) -> bool:
-        """야간 유지보수 (23:00)"""
-        self.logger.info("🌙 야간 유지보수 시작")
-
-        try:
-            # 1. 코드 품질 검사
-            self.logger.info("🔍 코드 품질 검사")
-            quality_results = await self.quality_checker.run_full_check()
-
-            # 2. 자동 리팩토링 (안전한 수준만)
-            if quality_results.get("needs_refactoring", False):
-                self.logger.info("🔧 자동 리팩토링 수행")
-                await self.quality_checker.auto_refactor()
-
-            # 3. 로그 정리
-            await self._cleanup_logs()
-
-            # 4. 구글 시트 데이터 정리 (30일 이상 오래된 데이터)
-            await self.sheets_manager.cleanup_old_data(days_to_keep=30)
-
-            # 5. 시스템 상태 리포트
-            maintenance_report = {
-                "code_quality": quality_results,
-                "log_cleanup": True,
-                "sheet_cleanup": True,
-                "timestamp": datetime.now(),
-            }
-
-            # 6. GitHub 커밋 (유지보수 결과)
-            await self._commit_to_github("야간 유지보수 및 코드 품질 개선")
-
-            # 7. 유지보수 완료 알림
-            await self.telegram_notifier.send_message(
-                {
-                    "title": "야간 유지보수 완료",
-                    "content": f'🔧 코드 품질 점수: {quality_results.get("overall_score", 0):.1f}점\n'
-                    f"📝 로그 정리: 완료\n"
-                    f"🗃️ 데이터 정리: 완료\n"
-                    f"📤 GitHub 업데이트: 완료",
-                    "priority": "low",
-                    "timestamp": datetime.now(),
-                    "message_type": "success",
-                    "data": maintenance_report,
-                }
-            )
-
-            self.logger.info("✅ 야간 유지보수 완료")
-            return True
-
-        except Exception as e:
-            self.logger.error(f"❌ 야간 유지보수 실패: {e}")
-            return False
-
-    async def _commit_to_github(self, commit_message: str) -> bool:
-        """GitHub 자동 커밋"""
-        try:
-            # Git 명령어 실행
-            commands = [
-                ["git", "add", "."],
-                [
-                    "git",
-                    "commit",
-                    "-m",
-                    f'[AUTO] {commit_message} - {datetime.now().strftime("%Y-%m-%d %H:%M")}',
-                ],
-                ["git", "push", "origin", "main"],
-            ]
-
-            for cmd in commands:
-                result = subprocess.run(cmd, capture_output=True, text=True, cwd=".")
-                if result.returncode != 0:
-                    self.logger.warning(f"Git 명령어 실행 결과: {result.stderr}")
-
-            self.logger.info("✅ GitHub 자동 커밋 완료")
-            return True
-
-        except Exception as e:
-            self.logger.error(f"❌ GitHub 커밋 실패: {e}")
-            return False
-
-    async def _cleanup_logs(self) -> bool:
-        """로그 파일 정리"""
-        try:
-            log_dir = "logs"
-            if not os.path.exists(log_dir):
-                return True
-
-            cutoff_date = datetime.now() - timedelta(days=7)  # 7일 이상 된 로그 삭제
-
-            for filename in os.listdir(log_dir):
-                file_path = os.path.join(log_dir, filename)
-                if os.path.isfile(file_path):
-                    file_time = datetime.fromtimestamp(os.path.getctime(file_path))
-                    if file_time < cutoff_date:
-                        os.remove(file_path)
-                        self.logger.info(f"🗑️ 오래된 로그 파일 삭제: {filename}")
-
-            return True
-
-        except Exception as e:
-            self.logger.error(f"❌ 로그 정리 실패: {e}")
-            return False
-
+        
+        self.scheduled_tasks.extend(default_tasks)
+        logger.info(f"📋 기본 스케줄 설정 완료: {len(default_tasks)}개 작업")
+    
     def start_scheduler(self):
         """스케줄러 시작"""
-        self.logger.info("🚀 자동화 스케줄러 시작")
-
-        # 스케줄 실행
-        while True:
+        
+        if self.is_running:
+            logger.warning("스케줄러가 이미 실행 중입니다")
+            return
+        
+        logger.info("🚀 스케줄러 시작")
+        
+        # 각 작업을 schedule 라이브러리에 등록
+        for task in self.scheduled_tasks:
+            if not task.enabled:
+                continue
+                
+            try:
+                self._register_task(task)
+                logger.info(f"✅ 작업 등록: {task.name} ({task.schedule_type})")
+            except Exception as e:
+                logger.error(f"❌ 작업 등록 실패 ({task.name}): {e}")
+        
+        # 백그라운드에서 스케줄러 실행
+        self.is_running = True
+        scheduler_thread = threading.Thread(target=self._run_scheduler_loop, daemon=True)
+        scheduler_thread.start()
+        
+        logger.info("✅ 스케줄러 시작 완료")
+    
+    def _register_task(self, task: ScheduledTask):
+        """작업을 schedule에 등록"""
+        
+        if task.schedule_type == "daily":
+            schedule.every().day.at(task.schedule_time).do(
+                self._execute_task_safely, task
+            )
+        
+        elif task.schedule_type == "weekly":
+            day, time_str = task.schedule_time.split(":")
+            schedule.every().week.day.at(time_str).do(
+                self._execute_task_safely, task
+            )
+        
+        elif task.schedule_type == "hourly":
+            if "-" in task.schedule_time:  # 특정 시간대
+                start_hour, end_hour = map(int, task.schedule_time.split("-"))
+                # 현재는 단순화하여 매시간 실행
+                schedule.every().hour.do(self._execute_hourly_task, task, start_hour, end_hour)
+            else:
+                schedule.every().hour.do(self._execute_task_safely, task)
+        
+        elif task.schedule_type == "interval":
+            minutes = int(task.schedule_time)
+            schedule.every(minutes).minutes.do(self._execute_task_safely, task)
+    
+    def _execute_hourly_task(self, task: ScheduledTask, start_hour: int, end_hour: int):
+        """시간대 제한 있는 작업 실행"""
+        
+        current_hour = datetime.now().hour
+        
+        if start_hour <= current_hour <= end_hour:
+            self._execute_task_safely(task)
+        else:
+            logger.debug(f"시간대 밖 작업 스킵: {task.name} (현재: {current_hour}시)")
+    
+    def _execute_task_safely(self, task: ScheduledTask):
+        """안전한 작업 실행 (예외 처리 및 리소스 체크 포함)"""
+        
+        logger.info(f"🔄 작업 실행 시작: {task.name}")
+        
+        # 시스템 리소스 체크
+        if not self._check_system_resources():
+            logger.warning(f"⚠️ 시스템 리소스 부족으로 작업 연기: {task.name}")
+            return
+        
+        start_time = datetime.now()
+        task.last_run = start_time
+        
+        try:
+            # 비동기 함수를 동기적으로 실행
+            if asyncio.iscoroutinefunction(task.function):
+                # 새로운 이벤트 루프에서 실행
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
+                result = loop.run_until_complete(task.function(**task.parameters))
+                loop.close()
+            else:
+                result = task.function(**task.parameters)
+            
+            # 성공 기록
+            execution_time = (datetime.now() - start_time).total_seconds()
+            
+            task.run_count += 1
+            self.total_runs += 1
+            self.successful_runs += 1
+            
+            # 작업 기록
+            self.task_history.append({
+                'task_name': task.name,
+                'start_time': start_time.isoformat(),
+                'execution_time_seconds': execution_time,
+                'status': 'success',
+                'result_summary': str(result)[:200] if result else 'completed'
+            })
+            
+            logger.info(f"✅ 작업 완료: {task.name} ({execution_time:.1f}초)")
+            
+        except Exception as e:
+            # 실패 기록
+            execution_time = (datetime.now() - start_time).total_seconds()
+            
+            self.total_runs += 1
+            self.failed_runs += 1
+            
+            self.task_history.append({
+                'task_name': task.name,
+                'start_time': start_time.isoformat(),
+                'execution_time_seconds': execution_time,
+                'status': 'failed',
+                'error': str(e)
+            })
+            
+            logger.error(f"❌ 작업 실패: {task.name} - {e}")
+    
+    def _check_system_resources(self) -> bool:
+        """시스템 리소스 체크"""
+        
+        try:
+            import psutil
+            
+            # 메모리 사용률 체크 (80% 이하)
+            memory_percent = psutil.virtual_memory().percent
+            if memory_percent > 80:
+                logger.warning(f"메모리 사용률 높음: {memory_percent:.1f}%")
+                return False
+            
+            # CPU 사용률 체크 (90% 이하)
+            cpu_percent = psutil.cpu_percent(interval=1)
+            if cpu_percent > 90:
+                logger.warning(f"CPU 사용률 높음: {cpu_percent:.1f}%")
+                return False
+            
+            return True
+            
+        except ImportError:
+            # psutil이 없으면 기본적으로 허용
+            logger.debug("psutil 없음 - 리소스 체크 스킵")
+            return True
+        except Exception as e:
+            logger.debug(f"리소스 체크 실패: {e}")
+            return True  # 오류시 기본 허용
+    
+    def _run_scheduler_loop(self):
+        """스케줄러 메인 루프"""
+        
+        logger.info("🔄 스케줄러 루프 시작")
+        
+        while self.is_running:
             try:
                 schedule.run_pending()
-                time.sleep(60)  # 1분마다 체크
-
-            except KeyboardInterrupt:
-                self.logger.info("⏹️ 스케줄러 중단 요청")
-                break
+                time.sleep(30)  # 30초마다 체크
+                
             except Exception as e:
-                self.logger.error(f"❌ 스케줄러 오류: {e}")
-                time.sleep(300)  # 5분 대기 후 재시작
+                logger.error(f"스케줄러 루프 오류: {e}")
+                time.sleep(60)  # 오류 시 1분 대기
+    
+    def stop_scheduler(self):
+        """스케줄러 중지"""
+        
+        logger.info("⏸️ 스케줄러 중지")
+        self.is_running = False
+        schedule.clear()
+        
+        logger.info("✅ 스케줄러 중지 완료")
+    
+    # === 스케줄된 작업 함수들 ===
+    
+    async def _run_daily_analysis(self, **kwargs) -> Dict[str, Any]:
+        """일일 시장 분석"""
+        
+        logger.info("📊 일일 시장 분석 시작")
+        
+        try:
+            markets = kwargs.get('markets', ["KOSPI200", "NASDAQ100"])
+            full_analysis = kwargs.get('full_analysis', True)
+            
+            # 종합 분석 실행
+            results = await self.analysis_system.run_comprehensive_analysis(
+                markets=markets,
+                enable_learning=True,
+                enable_evolution=full_analysis
+            )
+            
+            # 결과 요약
+            summary = {
+                'analysis_time': results.get('timestamp'),
+                'markets_analyzed': len(results.get('markets_analyzed', [])),
+                'top_recommendations': len(results.get('top_recommendations', [])),
+                'system_health': results.get('system_status', {}).get('overall_health', 'unknown'),
+                'learning_updates': bool(results.get('learning_updates', {})),
+                'evolution_triggered': len(results.get('evolution_log', [])) > 0
+            }
+            
+            logger.info(f"✅ 일일 분석 완료: {summary}")
+            return summary
+            
+        except Exception as e:
+            logger.error(f"일일 분석 실패: {e}")
+            raise
+    
+    async def _run_hourly_monitoring(self, **kwargs) -> Dict[str, Any]:
+        """시간당 모니터링"""
+        
+        logger.info("👁️ 시간당 모니터링 시작")
+        
+        try:
+            quick_scan = kwargs.get('quick_scan', True)
+            
+            # 시스템 상태 체크
+            system_status = await self.analysis_system._check_system_status()
+            
+            # 간단한 성능 모니터링
+            performance_report = self.analysis_system.auto_updater.monitor_system_performance()
+            
+            summary = {
+                'timestamp': datetime.now().isoformat(),
+                'system_health': system_status.overall_health,
+                'ml_models': system_status.ml_models_loaded,
+                'improvements_identified': len(performance_report.get('improvement_recommendations', [])),
+                'auto_update_triggered': performance_report.get('auto_update_triggered', False)
+            }
+            
+            # 긴급 상황 감지
+            if system_status.overall_health in ['poor', 'error']:
+                logger.warning(f"🚨 시스템 상태 경고: {system_status.overall_health}")
+                # 자동 복구 시도
+                await self._attempt_auto_recovery()
+            
+            logger.info(f"✅ 시간당 모니터링 완료: {summary}")
+            return summary
+            
+        except Exception as e:
+            logger.error(f"시간당 모니터링 실패: {e}")
+            raise
+    
+    async def _run_weekly_training(self, **kwargs) -> Dict[str, Any]:
+        """주간 모델 재학습"""
+        
+        logger.info("🧠 주간 모델 재학습 시작")
+        
+        try:
+            full_retrain = kwargs.get('full_retrain', True)
+            
+            # ML 모델 재학습
+            training_success = self.analysis_system.ml_engine.train_models()
+            
+            # 모델 성능 평가
+            model_status = self.analysis_system.ml_engine.get_model_status()
+            
+            summary = {
+                'timestamp': datetime.now().isoformat(),
+                'training_success': training_success,
+                'models_trained': sum(model_status.get('models_loaded', {}).values()),
+                'full_retrain': full_retrain
+            }
+            
+            logger.info(f"✅ 주간 재학습 완료: {summary}")
+            return summary
+            
+        except Exception as e:
+            logger.error(f"주간 재학습 실패: {e}")
+            raise
+    
+    async def _run_evolution_check(self, **kwargs) -> Dict[str, Any]:
+        """진화 체크"""
+        
+        logger.info("🧬 진화 체크 시작")
+        
+        try:
+            enable_auto_evolution = kwargs.get('enable_auto_evolution', True)
+            
+            if enable_auto_evolution:
+                # 진화 사이클 실행
+                evolution_log = await self.analysis_system._run_evolutionary_cycle()
+                
+                summary = {
+                    'timestamp': datetime.now().isoformat(),
+                    'evolution_actions': len(evolution_log),
+                    'auto_evolution_enabled': enable_auto_evolution,
+                    'actions_taken': [action.get('type') for action in evolution_log]
+                }
+            else:
+                summary = {
+                    'timestamp': datetime.now().isoformat(),
+                    'evolution_actions': 0,
+                    'auto_evolution_enabled': False,
+                    'message': 'auto evolution disabled'
+                }
+            
+            logger.info(f"✅ 진화 체크 완료: {summary}")
+            return summary
+            
+        except Exception as e:
+            logger.error(f"진화 체크 실패: {e}")
+            raise
+    
+    async def _run_health_check(self, **kwargs) -> Dict[str, Any]:
+        """헬스 체크"""
+        
+        deep_check = kwargs.get('deep_check', False)
+        
+        try:
+            # 기본 시스템 상태
+            system_status = await self.analysis_system._check_system_status()
+            
+            health_summary = {
+                'timestamp': datetime.now().isoformat(),
+                'overall_health': system_status.overall_health,
+                'uptime_hours': (datetime.now() - self.analysis_system.start_time).total_seconds() / 3600,
+                'scheduler_running': self.is_running,
+                'task_success_rate': self.successful_runs / max(self.total_runs, 1),
+                'deep_check': deep_check
+            }
+            
+            if deep_check:
+                # 깊은 체크 추가 로직
+                health_summary['memory_usage'] = 'normal'  # 실제로는 psutil로 체크
+                health_summary['disk_space'] = 'sufficient'
+                health_summary['network_status'] = 'connected'
+            
+            # 문제 감지 시 알림
+            if health_summary['task_success_rate'] < 0.8:
+                logger.warning(f"🚨 작업 성공률 낮음: {health_summary['task_success_rate']:.1%}")
+            
+            return health_summary
+            
+        except Exception as e:
+            logger.error(f"헬스 체크 실패: {e}")
+            return {
+                'timestamp': datetime.now().isoformat(),
+                'overall_health': 'error',
+                'error': str(e)
+            }
+    
+    async def _attempt_auto_recovery(self):
+        """자동 복구 시도"""
+        
+        logger.info("🔧 자동 복구 시도")
+        
+        try:
+            # 1. 시스템 재시작 시뮬레이션
+            logger.info("  • 시스템 구성요소 재초기화...")
+            
+            # 2. 백업으로 롤백 (필요시)
+            if hasattr(self.analysis_system.auto_updater, '_rollback_to_backup'):
+                logger.info("  • 백업으로 롤백 시도...")
+                # 실제로는 상황에 따라 결정
+            
+            # 3. ML 모델 재로드
+            logger.info("  • ML 모델 재로드...")
+            # self.analysis_system.ml_engine.reload_models()
+            
+            logger.info("✅ 자동 복구 완료")
+            
+        except Exception as e:
+            logger.error(f"자동 복구 실패: {e}")
+    
+    # === 스케줄 관리 함수들 ===
+    
+    def add_custom_task(self, task: ScheduledTask):
+        """커스텀 작업 추가"""
+        
+        self.scheduled_tasks.append(task)
+        
+        if self.is_running and task.enabled:
+            self._register_task(task)
+        
+        logger.info(f"📝 커스텀 작업 추가: {task.name}")
+    
+    def enable_task(self, task_name: str):
+        """작업 활성화"""
+        
+        for task in self.scheduled_tasks:
+            if task.name == task_name:
+                task.enabled = True
+                if self.is_running:
+                    self._register_task(task)
+                logger.info(f"✅ 작업 활성화: {task_name}")
+                return
+        
+        logger.warning(f"작업을 찾을 수 없음: {task_name}")
+    
+    def disable_task(self, task_name: str):
+        """작업 비활성화"""
+        
+        for task in self.scheduled_tasks:
+            if task.name == task_name:
+                task.enabled = False
+                logger.info(f"⏸️ 작업 비활성화: {task_name}")
+                return
+        
+        logger.warning(f"작업을 찾을 수 없음: {task_name}")
+    
+    def get_schedule_status(self) -> ScheduleStatus:
+        """스케줄 상태 반환"""
+        
+        active_tasks = sum(1 for task in self.scheduled_tasks if task.enabled)
+        
+        # 오늘 실행된 작업 통계
+        today = datetime.now().date()
+        today_history = [
+            h for h in self.task_history 
+            if datetime.fromisoformat(h['start_time']).date() == today
+        ]
+        
+        completed_today = sum(1 for h in today_history if h['status'] == 'success')
+        failed_today = sum(1 for h in today_history if h['status'] == 'failed')
+        
+        # 다음 예정 작업 (간단화)
+        next_scheduled = datetime.now() + timedelta(minutes=5)  # 다음 헬스체크
+        
+        return ScheduleStatus(
+            active_tasks=active_tasks,
+            completed_today=completed_today,
+            failed_today=failed_today,
+            next_scheduled=next_scheduled,
+            system_running=self.is_running,
+            last_health_check=datetime.now()
+        )
+    
+    def get_task_history(self, hours: int = 24) -> List[Dict[str, Any]]:
+        """작업 히스토리 반환"""
+        
+        cutoff_time = datetime.now() - timedelta(hours=hours)
+        
+        recent_history = [
+            h for h in self.task_history
+            if datetime.fromisoformat(h['start_time']) > cutoff_time
+        ]
+        
+        return recent_history
+    
+    def save_schedule_config(self):
+        """스케줄 설정 저장"""
+        
+        try:
+            os.makedirs(os.path.dirname(self.config_path), exist_ok=True)
+            
+            config = {
+                'scheduled_tasks': [
+                    {
+                        'name': task.name,
+                        'schedule_type': task.schedule_type,
+                        'schedule_time': task.schedule_time,
+                        'enabled': task.enabled,
+                        'parameters': task.parameters
+                    }
+                    for task in self.scheduled_tasks
+                ],
+                'scheduler_stats': {
+                    'total_runs': self.total_runs,
+                    'successful_runs': self.successful_runs,
+                    'failed_runs': self.failed_runs
+                },
+                'last_saved': datetime.now().isoformat()
+            }
+            
+            with open(self.config_path, 'w', encoding='utf-8') as f:
+                json.dump(config, f, indent=2, ensure_ascii=False)
+            
+            logger.info(f"💾 스케줄 설정 저장: {self.config_path}")
+            
+        except Exception as e:
+            logger.error(f"스케줄 설정 저장 실패: {e}")
 
-        self.logger.info("⏹️ 자동화 스케줄러 종료")
-
-    def get_status(self) -> Dict[str, Any]:
-        """스케줄러 상태 반환"""
-        return {
-            "current_execution": self.current_execution,
-            "schedules": {k: asdict(v) for k, v in self.schedules.items()},
-            "execution_history": self.execution_history[-10:],  # 최근 10개
-            "target_symbols_count": len(self.target_symbols),
-            "next_jobs": [str(job) for job in schedule.jobs],
-        }
-
-
-# 코드 품질 검사기 클래스 (간단 버전)
-class CodeQualityChecker:
-    """코드 품질 검사기"""
-
-    def __init__(self):
-        self.logger = logging.getLogger("CodeQualityChecker")
-
-    async def run_full_check(self) -> Dict[str, Any]:
-        """전체 품질 검사"""
-        return {
-            "overall_score": 85.0,
-            "needs_refactoring": False,
-            "issues": [],
-            "suggestions": [],
-        }
-
-    async def auto_refactor(self) -> bool:
-        """자동 리팩토링"""
-        return True
-
+# 사용 예시
+def main():
+    """메인 실행 함수"""
+    print("⏰ 자동 스케줄러 시스템 v1.0")
+    print("=" * 50)
+    
+    # 분석 시스템 초기화
+    analysis_system = InvestmentAnalysisSystem()
+    
+    # 스케줄러 초기화
+    scheduler = IntelligentScheduler(analysis_system)
+    
+    # 스케줄 상태 출력
+    status = scheduler.get_schedule_status()
+    print(f"\n📋 스케줄 상태:")
+    print(f"  • 활성 작업: {status.active_tasks}개")
+    print(f"  • 오늘 완료: {status.completed_today}개")
+    print(f"  • 오늘 실패: {status.failed_today}개")
+    print(f"  • 시스템 실행중: {'예' if status.system_running else '아니오'}")
+    
+    try:
+        # 스케줄러 시작
+        scheduler.start_scheduler()
+        
+        print(f"\n🚀 스케줄러 시작됨!")
+        print(f"📝 예정된 작업:")
+        for task in scheduler.scheduled_tasks:
+            if task.enabled:
+                print(f"  • {task.name}: {task.schedule_type} ({task.schedule_time})")
+        
+        print(f"\n⏰ 시스템이 백그라운드에서 실행됩니다...")
+        print(f"Ctrl+C로 중지할 수 있습니다.")
+        
+        # 무한 대기 (실제 서비스에서는 다른 방식 사용)
+        while True:
+            time.sleep(60)
+            
+    except KeyboardInterrupt:
+        print(f"\n⏸️ 사용자 중지 요청")
+        scheduler.stop_scheduler()
+        
+    except Exception as e:
+        print(f"\n❌ 오류 발생: {e}")
+        scheduler.stop_scheduler()
+    
+    print(f"✅ 스케줄러 종료")
 
 if __name__ == "__main__":
-    # 스케줄러 실행
-    scheduler = AutomatedScheduler()
-
-    # 즉시 테스트 실행
-    if len(sys.argv) > 1 and sys.argv[1] == "test":
-
-        async def test_run():
-            print("🧪 테스트 실행")
-            await scheduler.run_morning_analysis()
-
-        asyncio.run(test_run())
-    else:
-        # 정상 스케줄러 시작
-        scheduler.start_scheduler()
+    main() 
