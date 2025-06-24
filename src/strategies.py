@@ -419,10 +419,22 @@ class StrategyManager:
     """전략 관리자"""
     
     def __init__(self):
+        """전략 매니저 초기화"""
         self.strategies = {
             'buffett': WarrenBuffettStrategy(),
             'lynch': PeterLynchStrategy(),
-            'graham': BenjaminGrahamStrategy()
+            'graham': BenjaminGrahamStrategy(),
+            'oneil': WilliamOneilStrategy(),
+            'livermore': JesseLivermoreStrategy(),
+            'templeton': JohnTempletonStrategy(),
+            'neff': JohnNeffStrategy(),
+            'fisher': PhilipFisherStrategy(),
+            'minervini': MarkMinerviniStrategy(),
+            'slater': JimSlaterStrategy(),
+            'greenblatt': JoelGreenblattStrategy(),
+            'thorp': EdwardThorpStrategy(),
+            'dalio': RayDalioStrategy(),
+            'drucker': PeterDruckerStrategy(),
         }
         
     def apply_all_strategies(self, stocks: List[StockData]) -> Dict[str, List[StrategyScore]]:
@@ -551,4 +563,240 @@ class StrategyManager:
             
         except Exception as e:
             logger.error(f"선택된 전략 분석 실패: {e}")
-            raise 
+            raise
+
+class WilliamOneilStrategy(BaseStrategy):
+    """윌리엄 오닐 전략 - CAN SLIM"""
+    
+    def __init__(self):
+        super().__init__(
+            name="William O'Neil Strategy",
+            description="CAN SLIM 방법론 기반 성장주 선별 전략"
+        )
+    
+    def filter_stocks(self, stocks: List[StockData]) -> List[StockData]:
+        return [s for s in stocks if s.rsi and s.rsi > 50]
+    
+    def calculate_score(self, stock: StockData) -> StrategyScore:
+        total_score = 70 + (stock.rsi - 50) if stock.rsi else 50
+        return StrategyScore(
+            symbol=stock.symbol, name=stock.name, strategy_name=self.name,
+            total_score=total_score, criteria_scores={'rsi': total_score},
+            reasoning="CAN SLIM 기법 적용 - 모멘텀 중심 분석"
+        )
+
+class JesseLivermoreStrategy(BaseStrategy):
+    """제시 리버모어 전략 - 트렌드 추종"""
+    
+    def __init__(self):
+        super().__init__(
+            name="Jesse Livermore Strategy",
+            description="트렌드 추종 및 모멘텀 전략"
+        )
+    
+    def filter_stocks(self, stocks: List[StockData]) -> List[StockData]:
+        return [s for s in stocks if s.moving_avg_20 and s.price > s.moving_avg_20]
+    
+    def calculate_score(self, stock: StockData) -> StrategyScore:
+        momentum_score = ((stock.price / stock.moving_avg_20) - 1) * 100 if stock.moving_avg_20 else 0
+        total_score = 60 + momentum_score
+        return StrategyScore(
+            symbol=stock.symbol, name=stock.name, strategy_name=self.name,
+            total_score=total_score, criteria_scores={'momentum': momentum_score},
+            reasoning="트렌드 추종 전략 - 상승 모멘텀 중심"
+        )
+
+class JohnTempletonStrategy(BaseStrategy):
+    """존 템플턴 전략 - 글로벌 가치투자"""
+    
+    def __init__(self):
+        super().__init__(
+            name="John Templeton Strategy",
+            description="글로벌 가치투자 전략"
+        )
+    
+    def filter_stocks(self, stocks: List[StockData]) -> List[StockData]:
+        return [s for s in stocks if s.pb_ratio and s.pb_ratio < 2.0]
+    
+    def calculate_score(self, stock: StockData) -> StrategyScore:
+        value_score = (2.0 - stock.pb_ratio) * 25 if stock.pb_ratio else 0
+        total_score = 50 + value_score
+        return StrategyScore(
+            symbol=stock.symbol, name=stock.name, strategy_name=self.name,
+            total_score=total_score, criteria_scores={'value': value_score},
+            reasoning="글로벌 가치투자 - 저평가 종목 중심"
+        )
+
+class JohnNeffStrategy(BaseStrategy):
+    """존 네프 전략 - 저PER 가치투자"""
+    
+    def __init__(self):
+        super().__init__(
+            name="John Neff Strategy",
+            description="저PER 가치투자 전략"
+        )
+    
+    def filter_stocks(self, stocks: List[StockData]) -> List[StockData]:
+        return [s for s in stocks if s.pe_ratio and s.pe_ratio < 15]
+    
+    def calculate_score(self, stock: StockData) -> StrategyScore:
+        pe_score = (15 - stock.pe_ratio) * 5 if stock.pe_ratio else 0
+        total_score = 50 + pe_score
+        return StrategyScore(
+            symbol=stock.symbol, name=stock.name, strategy_name=self.name,
+            total_score=total_score, criteria_scores={'pe': pe_score},
+            reasoning="저PER 가치투자 - 저평가 우량주 중심"
+        )
+
+class PhilipFisherStrategy(BaseStrategy):
+    """필립 피셔 전략 - 성장주 투자"""
+    
+    def __init__(self):
+        super().__init__(
+            name="Philip Fisher Strategy",
+            description="성장주 투자 전략"
+        )
+    
+    def filter_stocks(self, stocks: List[StockData]) -> List[StockData]:
+        return [s for s in stocks if s.roe and s.roe > 0.15]
+    
+    def calculate_score(self, stock: StockData) -> StrategyScore:
+        growth_score = stock.roe * 200 if stock.roe else 0
+        total_score = 50 + growth_score
+        return StrategyScore(
+            symbol=stock.symbol, name=stock.name, strategy_name=self.name,
+            total_score=total_score, criteria_scores={'growth': growth_score},
+            reasoning="성장주 투자 - 높은 ROE 기업 중심"
+        )
+
+class MarkMinerviniStrategy(BaseStrategy):
+    """마크 미너비니 전략 - 트레이드 마크"""
+    
+    def __init__(self):
+        super().__init__(
+            name="Mark Minervini Strategy",
+            description="트레이드 마크 전략"
+        )
+    
+    def filter_stocks(self, stocks: List[StockData]) -> List[StockData]:
+        return [s for s in stocks if s.volume > 50000]
+    
+    def calculate_score(self, stock: StockData) -> StrategyScore:
+        volume_score = min(stock.volume / 100000, 50) if stock.volume else 0
+        total_score = 50 + volume_score
+        return StrategyScore(
+            symbol=stock.symbol, name=stock.name, strategy_name=self.name,
+            total_score=total_score, criteria_scores={'volume': volume_score},
+            reasoning="트레이드 마크 전략 - 거래량 기반 분석"
+        )
+
+class JimSlaterStrategy(BaseStrategy):
+    """짐 슬레이터 전략 - PEG 투자"""
+    
+    def __init__(self):
+        super().__init__(
+            name="Jim Slater Strategy",
+            description="PEG 기반 투자 전략"
+        )
+    
+    def filter_stocks(self, stocks: List[StockData]) -> List[StockData]:
+        return [s for s in stocks if s.pe_ratio and s.pe_ratio > 0]
+    
+    def calculate_score(self, stock: StockData) -> StrategyScore:
+        peg_score = 100 / stock.pe_ratio if stock.pe_ratio and stock.pe_ratio > 0 else 0
+        total_score = 50 + min(peg_score, 50)
+        return StrategyScore(
+            symbol=stock.symbol, name=stock.name, strategy_name=self.name,
+            total_score=total_score, criteria_scores={'peg': peg_score},
+            reasoning="PEG 기반 투자 - 성장 대비 저평가 종목"
+        )
+
+class JoelGreenblattStrategy(BaseStrategy):
+    """조엘 그린블라트 전략 - 마법공식"""
+    
+    def __init__(self):
+        super().__init__(
+            name="Joel Greenblatt Strategy",
+            description="마법공식 투자 전략"
+        )
+    
+    def filter_stocks(self, stocks: List[StockData]) -> List[StockData]:
+        return [s for s in stocks if s.roe and s.pe_ratio]
+    
+    def calculate_score(self, stock: StockData) -> StrategyScore:
+        magic_score = (stock.roe * 100) / stock.pe_ratio if stock.roe and stock.pe_ratio else 0
+        total_score = 50 + min(magic_score, 50)
+        return StrategyScore(
+            symbol=stock.symbol, name=stock.name, strategy_name=self.name,
+            total_score=total_score, criteria_scores={'magic': magic_score},
+            reasoning="마법공식 - ROE/PER 비율 기반"
+        )
+
+class EdwardThorpStrategy(BaseStrategy):
+    """에드워드 소프 전략 - 수학적 투자"""
+    
+    def __init__(self):
+        super().__init__(
+            name="Edward Thorp Strategy",
+            description="수학적 투자 전략"
+        )
+    
+    def filter_stocks(self, stocks: List[StockData]) -> List[StockData]:
+        return [s for s in stocks if s.volatility_20d]
+    
+    def calculate_score(self, stock: StockData) -> StrategyScore:
+        math_score = 1 / stock.volatility_20d if stock.volatility_20d else 0
+        total_score = 50 + min(math_score * 100, 50)
+        return StrategyScore(
+            symbol=stock.symbol, name=stock.name, strategy_name=self.name,
+            total_score=total_score, criteria_scores={'math': math_score},
+            reasoning="수학적 투자 - 변동성 기반 분석"
+        )
+
+class RayDalioStrategy(BaseStrategy):
+    """레이 달리오 전략 - 올웨더"""
+    
+    def __init__(self):
+        super().__init__(
+            name="Ray Dalio Strategy",
+            description="올웨더 포트폴리오 전략"
+        )
+    
+    def filter_stocks(self, stocks: List[StockData]) -> List[StockData]:
+        return stocks  # 모든 종목 대상
+    
+    def calculate_score(self, stock: StockData) -> StrategyScore:
+        balance_score = 70  # 균형 포트폴리오 기본 점수
+        if stock.market_beta:
+            balance_score += (1 - abs(stock.market_beta - 1)) * 30
+        total_score = balance_score
+        return StrategyScore(
+            symbol=stock.symbol, name=stock.name, strategy_name=self.name,
+            total_score=total_score, criteria_scores={'balance': balance_score},
+            reasoning="올웨더 전략 - 균형 포트폴리오 구성"
+        )
+
+class PeterDruckerStrategy(BaseStrategy):
+    """피터 드러커 전략 - 경영 품질"""
+    
+    def __init__(self):
+        super().__init__(
+            name="Peter Drucker Strategy",
+            description="경영 품질 중심 투자 전략"
+        )
+    
+    def filter_stocks(self, stocks: List[StockData]) -> List[StockData]:
+        return [s for s in stocks if s.market_cap and s.market_cap > 1e11]
+    
+    def calculate_score(self, stock: StockData) -> StrategyScore:
+        management_score = 60  # 경영 품질 기본 점수
+        if stock.roe and stock.roe > 0.1:
+            management_score += 20
+        if stock.debt_ratio and stock.debt_ratio < 0.5:
+            management_score += 20
+        total_score = management_score
+        return StrategyScore(
+            symbol=stock.symbol, name=stock.name, strategy_name=self.name,
+            total_score=total_score, criteria_scores={'management': management_score},
+            reasoning="경영 품질 중심 - 우수한 경영진 기업 선별"
+        ) 

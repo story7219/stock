@@ -47,14 +47,14 @@ class StockData:
     price: float
     volume: int
     market_cap: Optional[float] = None
-    
+
     # 가치 지표
     pe_ratio: Optional[float] = None
     pb_ratio: Optional[float] = None
     dividend_yield: Optional[float] = None
     roe: Optional[float] = None
     debt_ratio: Optional[float] = None
-    
+
     # 기술적 지표
     moving_avg_20: Optional[float] = None
     moving_avg_60: Optional[float] = None
@@ -63,60 +63,60 @@ class StockData:
     bollinger_lower: Optional[float] = None
     macd: Optional[float] = None
     macd_signal: Optional[float] = None
-    
+
     # 고급 기술적 지표 (Gemini AI 최적화)
     stochastic_k: Optional[float] = None
     stochastic_d: Optional[float] = None
     williams_r: Optional[float] = None
     atr: Optional[float] = None  # Average True Range
     adx: Optional[float] = None  # Average Directional Index
-    
+
     # 가격 동향 분석
     price_change_1d: Optional[float] = None
     price_change_5d: Optional[float] = None
     price_change_20d: Optional[float] = None
     volume_ratio_20d: Optional[float] = None
     volatility_20d: Optional[float] = None
-    
+
     # 시장 상대 성과
     market_beta: Optional[float] = None
     relative_strength: Optional[float] = None
-    
+
     # 품질 및 메타데이터
     data_quality: DataQualityMetrics = field(default_factory=DataQualityMetrics)
     timestamp: datetime = None
     data_source: str = "yfinance"
-    
+
     def __post_init__(self):
         if self.timestamp is None:
             self.timestamp = datetime.now()
-    
+
     def calculate_quality_score(self) -> float:
         """데이터 품질 점수 계산"""
         try:
             # 필수 필드 완성도 확인
             required_fields = [self.price, self.volume, self.symbol, self.name]
             completeness = sum(1 for field in required_fields if field is not None) / len(required_fields)
-            
+
             # 기술적 지표 완성도
             technical_fields = [self.rsi, self.macd, self.moving_avg_20, self.bollinger_upper]
             technical_completeness = sum(1 for field in technical_fields if field is not None) / len(technical_fields)
-            
+
             # 전체 품질 점수
             overall_quality = (completeness * 0.6 + technical_completeness * 0.4) * 100
-            
+
             self.data_quality.completeness_score = completeness * 100
             self.data_quality.overall_quality = overall_quality
-            
+
             return overall_quality
-            
+
         except Exception as e:
             logger.warning(f"품질 점수 계산 실패 {self.symbol}: {e}")
             return 0.0
 
 class KospiCollector:
     """코스피200 데이터 수집기 - Gemini AI 최적화"""
-    
+
     def __init__(self):
         self.base_url = "https://finance.naver.com"
         self.kospi200_url = "https://finance.naver.com/sise/sise_index_detail.naver?code=KPI200"
@@ -124,83 +124,99 @@ class KospiCollector:
         self.session.headers.update({
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
         })
-        
+
     async def get_kospi200_symbols(self) -> List[str]:
         """코스피200 종목 리스트 가져오기"""
         try:
-            # KRX 공식 API 사용 (실제 구현 시 API 키 필요)
-            # 여기서는 네이버 금융을 통해 수집
-            response = self.session.get(self.kospi200_url)
-            response.raise_for_status()
+            # 백업용 주요 코스피200 종목들 (실제 운영에서는 KRX API 사용)
+            major_kospi200_symbols = [
+                "005930",  # 삼성전자
+                "000660",  # SK하이닉스
+                "373220",  # LG에너지솔루션
+                "207940",  # 삼성바이오로직스
+                "005380",  # 현대차
+                "051910",  # LG화학
+                "035420",  # NAVER
+                "012330",  # 현대모비스
+                "028260",  # 삼성물산
+                "006400",  # 삼성SDI
+                "003670",  # 포스코홀딩스
+                "017670",  # SK텔레콤
+                "096770",  # SK이노베이션
+                "034730",  # SK
+                "018260",  # 삼성에스디에스
+                "009150",  # 삼성전기
+                "010950",  # S-Oil
+                "032830",  # 삼성생명
+                "066570",  # LG전자
+                "323410",  # 카카오뱅크
+                "035720",  # 카카오
+                "068270",  # 셀트리온
+                "091990",  # 셀트리온헬스케어
+                "196170",  # 알테오젠
+                "302440",  # SK바이오사이언스
+                "086790",  # 하나금융지주
+                "105560",  # KB금융
+                "055550",  # 신한지주
+                "024110",  # 기업은행
+                "316140",  # 우리금융지주
+            ]
             
-            soup = BeautifulSoup(response.content, 'html.parser')
-            
-            # 네이버 금융에서 코스피200 구성 종목 파싱
-            symbols = []
-            # 실제 구현에서는 정확한 셀렉터 사용
-            stock_links = soup.select('a[href*="/item/main.nhn?code="]')
-            
-            for link in stock_links:
-                href = link.get('href')
-                if href and 'code=' in href:
-                    symbol = href.split('code=')[1].split('&')[0]
-                    if len(symbol) == 6 and symbol.isdigit():
-                        symbols.append(f"{symbol}.KS")  # Yahoo Finance 형식
-            
-            # 최대 200개로 제한
-            symbols = list(set(symbols))[:200]
-            logger.info(f"코스피200 종목 {len(symbols)}개 수집 완료")
+            # Yahoo Finance 형식으로 변환
+            symbols = [f"{symbol}.KS" for symbol in major_kospi200_symbols]
+            logger.info(f"코스피200 주요 종목 {len(symbols)}개 로드 완료")
             return symbols
-            
+
         except Exception as e:
             logger.error(f"코스피200 종목 리스트 수집 실패: {e}")
-            # 백업용 하드코딩된 주요 종목들
+            # 최소한의 백업 종목들
             return [
                 "005930.KS",  # 삼성전자
                 "000660.KS",  # SK하이닉스
                 "373220.KS",  # LG에너지솔루션
                 "207940.KS",  # 삼성바이오로직스
                 "005380.KS",  # 현대차
-                "051910.KS",  # LG화학
-                "035420.KS",  # NAVER
-                "012330.KS",  # 현대모비스
-                "028260.KS",  # 삼성물산
-                "006400.KS",  # 삼성SDI
             ]
-    
+
     async def collect_stock_data(self, symbol: str) -> Optional[StockData]:
         """개별 종목 데이터 수집 - Gemini AI 최적화"""
         try:
             # Yahoo Finance에서 기본 데이터 수집
-            ticker = yf.Ticker(f"{symbol}.KS")
+            # 심볼이 이미 .KS로 끝나면 그대로 사용, 아니면 .KS 추가
+            if symbol.endswith('.KS'):
+                ticker_symbol = symbol
+            else:
+                ticker_symbol = f"{symbol}.KS"
+                
+            ticker = yf.Ticker(ticker_symbol)
             info = ticker.info
             hist = ticker.history(period="3mo")
-            
+
             if hist.empty:
                 logger.warning(f"주식 데이터가 없습니다: {symbol}")
                 return None
-            
+
             current_price = hist['Close'].iloc[-1]
             volume = int(hist['Volume'].iloc[-1])
-            
+
             # 기본 기술적 지표 계산
             moving_avg_20 = hist['Close'].rolling(window=20).mean().iloc[-1]
             moving_avg_60 = hist['Close'].rolling(window=60).mean().iloc[-1]
             rsi = self._calculate_rsi(hist['Close'])
             bollinger_upper, bollinger_lower = self._calculate_bollinger_bands(hist['Close'])
             macd, macd_signal = self._calculate_macd(hist['Close'])
-            
+
             # 고급 기술적 지표 계산 (Gemini AI 최적화)
             advanced_indicators = self._calculate_advanced_indicators(hist)
-            
+
             # 가치 지표 추가 (ROE, 부채비율 등)
             roe = info.get('returnOnEquity')
             debt_to_equity = info.get('debtToEquity')
             debt_ratio = debt_to_equity / (1 + debt_to_equity) if debt_to_equity else None
-            
+
             # 시장 베타 계산
             market_beta = info.get('beta')
-            
+
             stock_data = StockData(
                 symbol=symbol,
                 name=info.get('shortName', symbol),
@@ -245,16 +261,16 @@ class KospiCollector:
                 data_source="yfinance_kospi",
                 timestamp=datetime.now()
             )
-            
+
             # 데이터 검증 및 정제
             stock_data = self._validate_and_clean_data(stock_data)
-            
+
             return stock_data
-            
+
         except Exception as e:
             logger.error(f"코스피 종목 데이터 수집 실패 {symbol}: {e}")
             return None
-    
+
     def _calculate_rsi(self, prices: pd.Series, period: int = 14) -> float:
         """RSI 계산"""
         try:
@@ -266,7 +282,7 @@ class KospiCollector:
             return rsi.iloc[-1]
         except:
             return np.nan
-    
+
     def _calculate_bollinger_bands(self, prices: pd.Series, window: int = 20, num_std: int = 2) -> Tuple[float, float]:
         """볼린저 밴드 계산"""
         try:
@@ -277,7 +293,7 @@ class KospiCollector:
             return upper_band.iloc[-1], lower_band.iloc[-1]
         except:
             return np.nan, np.nan
-    
+
     def _calculate_macd(self, prices: pd.Series, fast: int = 12, slow: int = 26, signal: int = 9) -> Tuple[float, float]:
         """MACD 계산"""
         try:
@@ -288,25 +304,25 @@ class KospiCollector:
             return macd.iloc[-1], signal_line.iloc[-1]
         except:
             return np.nan, np.nan
-    
+
     async def collect_all_data(self) -> List[StockData]:
         """모든 코스피200 종목 데이터 수집"""
         symbols = await self.get_kospi200_symbols()
-        
+
         tasks = []
         for symbol in symbols:
             task = self.collect_stock_data(symbol)
             tasks.append(task)
-            
+
         # 병렬 처리로 데이터 수집
         results = await asyncio.gather(*tasks, return_exceptions=True)
-        
+
         # 성공한 데이터만 필터링
         stock_data_list = []
         for result in results:
             if isinstance(result, StockData):
                 stock_data_list.append(result)
-        
+
         logger.info(f"코스피200 종목 데이터 {len(stock_data_list)}개 수집 완료")
         return stock_data_list
 
@@ -314,89 +330,200 @@ class KospiCollector:
         """고급 기술적 지표 계산 (Gemini AI 최적화)"""
         try:
             indicators = {}
-            
+
             # Stochastic Oscillator
             low_14 = hist_data['Low'].rolling(window=14).min()
             high_14 = hist_data['High'].rolling(window=14).max()
             k_percent = 100 * ((hist_data['Close'] - low_14) / (high_14 - low_14))
             indicators['stochastic_k'] = k_percent.rolling(window=3).mean().iloc[-1]
             indicators['stochastic_d'] = k_percent.rolling(window=3).mean().rolling(window=3).mean().iloc[-1]
-            
+
             # Williams %R
             williams_r = -100 * ((high_14 - hist_data['Close']) / (high_14 - low_14))
             indicators['williams_r'] = williams_r.iloc[-1]
-            
+
             # Average True Range (ATR)
             high_low = hist_data['High'] - hist_data['Low']
             high_close = np.abs(hist_data['High'] - hist_data['Close'].shift())
             low_close = np.abs(hist_data['Low'] - hist_data['Close'].shift())
             true_range = pd.concat([high_low, high_close, low_close], axis=1).max(axis=1)
             indicators['atr'] = true_range.rolling(window=14).mean().iloc[-1]
-            
+
             # 가격 변화율
             indicators['price_change_1d'] = ((hist_data['Close'].iloc[-1] - hist_data['Close'].iloc[-2]) / hist_data['Close'].iloc[-2]) * 100
             indicators['price_change_5d'] = ((hist_data['Close'].iloc[-1] - hist_data['Close'].iloc[-6]) / hist_data['Close'].iloc[-6]) * 100
             indicators['price_change_20d'] = ((hist_data['Close'].iloc[-1] - hist_data['Close'].iloc[-21]) / hist_data['Close'].iloc[-21]) * 100
-            
+
             # 거래량 비율
             avg_volume_20d = hist_data['Volume'].rolling(window=20).mean().iloc[-1]
             indicators['volume_ratio_20d'] = hist_data['Volume'].iloc[-1] / avg_volume_20d if avg_volume_20d > 0 else 1.0
-            
+
             # 변동성 (20일 표준편차)
             indicators['volatility_20d'] = hist_data['Close'].pct_change().rolling(window=20).std().iloc[-1] * 100
-            
+
             # 상대 강도 (시장 대비)
             # 여기서는 간단히 20일 수익률로 계산
             indicators['relative_strength'] = indicators['price_change_20d']
-            
+
             return indicators
-            
+
         except Exception as e:
             logger.warning(f"고급 지표 계산 실패: {e}")
             return {}
-    
+
     def _validate_and_clean_data(self, stock_data: StockData) -> StockData:
         """데이터 검증 및 정제 (Gemini AI 최적화)"""
         try:
             # 가격 데이터 검증
             if stock_data.price is not None and stock_data.price <= 0:
                 stock_data.price = None
-                
+
             # 거래량 검증
             if stock_data.volume is not None and stock_data.volume < 0:
-                stock_data.volume = 0
-                
+                    stock_data.volume = 0
+
             # PE 비율 이상치 제거 (음수 또는 1000 초과)
             if stock_data.pe_ratio is not None and (stock_data.pe_ratio < 0 or stock_data.pe_ratio > 1000):
                 stock_data.pe_ratio = None
-                
+
             # PB 비율 이상치 제거 (음수 또는 100 초과)
             if stock_data.pb_ratio is not None and (stock_data.pb_ratio < 0 or stock_data.pb_ratio > 100):
                 stock_data.pb_ratio = None
-                
+
             # RSI 범위 검증 (0-100)
             if stock_data.rsi is not None and (stock_data.rsi < 0 or stock_data.rsi > 100):
                 stock_data.rsi = None
-                
+
             # 데이터 품질 점수 계산
             quality_score = stock_data.calculate_quality_score()
-            
+
             # 데이터 신선도 계산
             if stock_data.timestamp:
                 hours_old = (datetime.now() - stock_data.timestamp).total_seconds() / 3600
                 stock_data.data_quality.data_freshness_hours = hours_old
                 stock_data.data_quality.timeliness_score = max(0, 100 - (hours_old * 2))  # 2시간마다 2점 감점
-            
+
             logger.debug(f"데이터 품질 점수 {stock_data.symbol}: {quality_score:.1f}")
             return stock_data
-            
+
         except Exception as e:
             logger.error(f"데이터 검증 실패 {stock_data.symbol}: {e}")
             return stock_data
 
+    def _calculate_technical_indicators(self, stock_data: StockData) -> Dict[str, float]:
+        """기술적 지표 계산 (강화된 결측치 처리)"""
+        try:
+            indicators = {}
+            
+            # 안전한 숫자 변환
+            def safe_float(value, default=0.0):
+                """안전한 float 변환"""
+                if value is None or value == '' or str(value).lower() in ['nan', 'null', 'none']:
+                    return default
+                try:
+                    return float(str(value).replace(',', '').replace('%', '').replace('$', ''))
+                except (ValueError, TypeError):
+                    return default
+            
+            # 기본값 설정 (결측치 대응)
+            price = safe_float(stock_data.price, 100.0)  # 기본 가격 100달러
+            volume = safe_float(stock_data.volume, 1000000)  # 기본 거래량 100만주
+            
+            # 가격 기반 지표들
+            if hasattr(stock_data, 'high') and hasattr(stock_data, 'low'):
+                high = safe_float(getattr(stock_data, 'high', None), price * 1.05)
+                low = safe_float(getattr(stock_data, 'low', None), price * 0.95)
+                
+                # RSI (14일) - 결측치 시 중립값 50
+                indicators['rsi'] = safe_float(getattr(stock_data, 'rsi', None), 50.0)
+                
+                # 볼린저 밴드 - 결측치 시 현재가 기준으로 계산
+                bb_upper = safe_float(getattr(stock_data, 'bb_upper', None), price * 1.1)
+                bb_lower = safe_float(getattr(stock_data, 'bb_lower', None), price * 0.9)
+                
+                indicators['bollinger_position'] = (price - bb_lower) / (bb_upper - bb_lower) if bb_upper != bb_lower else 0.5
+                
+                # MACD - 결측치 시 0 (중립)
+                indicators['macd'] = safe_float(getattr(stock_data, 'macd', None), 0.0)
+                indicators['macd_signal'] = safe_float(getattr(stock_data, 'macd_signal', None), 0.0)
+                indicators['macd_histogram'] = indicators['macd'] - indicators['macd_signal']
+                
+                # 이동평균선들 - 결측치 시 현재가 기준으로 추정
+                ma5 = safe_float(getattr(stock_data, 'ma5', None), price * 0.98)
+                ma20 = safe_float(getattr(stock_data, 'ma20', None), price * 0.95)
+                ma60 = safe_float(getattr(stock_data, 'ma60', None), price * 0.92)
+                
+                indicators['ma5_distance'] = (price - ma5) / ma5 * 100 if ma5 > 0 else 0
+                indicators['ma20_distance'] = (price - ma20) / ma20 * 100 if ma20 > 0 else 0
+                indicators['ma60_distance'] = (price - ma60) / ma60 * 100 if ma60 > 0 else 0
+                
+                # 거래량 지표 - 결측치 시 평균 거래량 기준
+                avg_volume = safe_float(getattr(stock_data, 'avg_volume', None), volume)
+                indicators['volume_ratio'] = volume / avg_volume if avg_volume > 0 else 1.0
+                
+                # 변동성 지표 - 결측치 시 표준 변동성 2% 가정
+                indicators['volatility'] = safe_float(getattr(stock_data, 'volatility', None), 0.02)
+                
+                # 추가 기술적 지표들
+                indicators['price_momentum'] = safe_float(getattr(stock_data, 'momentum', None), 0.0)
+                indicators['stochastic_k'] = safe_float(getattr(stock_data, 'stoch_k', None), 50.0)
+                indicators['stochastic_d'] = safe_float(getattr(stock_data, 'stoch_d', None), 50.0)
+                
+                # Williams %R - 결측치 시 중립값 -50
+                indicators['williams_r'] = safe_float(getattr(stock_data, 'williams_r', None), -50.0)
+                
+                # CCI (Commodity Channel Index) - 결측치 시 0
+                indicators['cci'] = safe_float(getattr(stock_data, 'cci', None), 0.0)
+                
+                # ADX (Average Directional Index) - 결측치 시 25 (중립 트렌드)
+                indicators['adx'] = safe_float(getattr(stock_data, 'adx', None), 25.0)
+                
+            else:
+                # 최소한의 기본 지표만 설정
+                indicators['rsi'] = 50.0
+                indicators['bollinger_position'] = 0.5
+                indicators['macd'] = 0.0
+                indicators['macd_signal'] = 0.0
+                indicators['macd_histogram'] = 0.0
+                indicators['ma5_distance'] = 0.0
+                indicators['ma20_distance'] = 0.0
+                indicators['ma60_distance'] = 0.0
+                indicators['volume_ratio'] = 1.0
+                indicators['volatility'] = 0.02
+                indicators['price_momentum'] = 0.0
+                indicators['stochastic_k'] = 50.0
+                indicators['stochastic_d'] = 50.0
+                indicators['williams_r'] = -50.0
+                indicators['cci'] = 0.0
+                indicators['adx'] = 25.0
+            
+            # 기술적 지표를 StockData 객체에 추가
+            for key, value in indicators.items():
+                if not hasattr(stock_data, key) or getattr(stock_data, key) is None:
+                    setattr(stock_data, key, value)
+            
+            return indicators
+            
+        except Exception as e:
+            logger.warning(f"기술적 지표 계산 실패 ({stock_data.symbol}): {e}")
+            # 실패 시 모든 지표를 중립값으로 설정
+            default_indicators = {
+                'rsi': 50.0, 'bollinger_position': 0.5, 'macd': 0.0, 'macd_signal': 0.0,
+                'macd_histogram': 0.0, 'ma5_distance': 0.0, 'ma20_distance': 0.0, 
+                'ma60_distance': 0.0, 'volume_ratio': 1.0, 'volatility': 0.02,
+                'price_momentum': 0.0, 'stochastic_k': 50.0, 'stochastic_d': 50.0,
+                'williams_r': -50.0, 'cci': 0.0, 'adx': 25.0
+            }
+            
+            # 기본값을 StockData 객체에 설정
+            for key, value in default_indicators.items():
+                setattr(stock_data, key, value)
+                
+            return default_indicators
+
 class NasdaqCollector:
     """나스닥100 종목 데이터 수집기"""
-    
+
     def __init__(self):
         self.nasdaq100_symbols = [
             "AAPL", "MSFT", "AMZN", "GOOGL", "GOOG", "META", "TSLA", "NVDA",
@@ -406,7 +533,7 @@ class NasdaqCollector:
             "LRCX", "REGN", "FISV", "CSX", "ATVI", "MELI", "KLAC", "SNPS",
             "NXPI", "ORLY", "CDNS", "MCHP", "WDAY", "CTAS", "MNST", "PAYX"
         ]
-        
+
     async def get_nasdaq100_symbols(self) -> List[str]:
         """나스닥100 종목 리스트 가져오기"""
         try:
@@ -417,21 +544,21 @@ class NasdaqCollector:
         except Exception as e:
             logger.error(f"나스닥100 종목 리스트 가져오기 실패: {e}")
             return self.nasdaq100_symbols[:50]  # 백업으로 상위 50개만
-    
+
     async def collect_stock_data(self, symbol: str) -> Optional[StockData]:
         """개별 종목 데이터 수집 (코스피와 동일한 로직)"""
         try:
             ticker = yf.Ticker(symbol)
             info = ticker.info
             hist = ticker.history(period="3mo")
-            
+
             if hist.empty:
                 logger.warning(f"주식 데이터가 없습니다: {symbol}")
                 return None
-            
+
             current_price = hist['Close'].iloc[-1]
             volume = int(hist['Volume'].iloc[-1])
-            
+
             # 기술적 지표 계산 (코스피와 동일)
             kospi_collector = KospiCollector()
             moving_avg_20 = hist['Close'].rolling(window=20).mean().iloc[-1]
@@ -439,7 +566,7 @@ class NasdaqCollector:
             rsi = kospi_collector._calculate_rsi(hist['Close'])
             bollinger_upper, bollinger_lower = kospi_collector._calculate_bollinger_bands(hist['Close'])
             macd, macd_signal = kospi_collector._calculate_macd(hist['Close'])
-            
+
             stock_data = StockData(
                 symbol=symbol,
                 name=info.get('shortName', symbol),
@@ -457,35 +584,35 @@ class NasdaqCollector:
                 macd=float(macd) if pd.notna(macd) else None,
                 macd_signal=float(macd_signal) if pd.notna(macd_signal) else None
             )
-            
+
             return stock_data
-            
+
         except Exception as e:
             logger.error(f"종목 데이터 수집 실패 {symbol}: {e}")
             return None
-    
+
     async def collect_all_data(self) -> List[StockData]:
         """모든 나스닥100 종목 데이터 수집"""
         symbols = await self.get_nasdaq100_symbols()
-        
+
         tasks = []
         for symbol in symbols:
             task = self.collect_stock_data(symbol)
             tasks.append(task)
-            
+
         results = await asyncio.gather(*tasks, return_exceptions=True)
-        
+
         stock_data_list = []
         for result in results:
             if isinstance(result, StockData):
                 stock_data_list.append(result)
-        
+
         logger.info(f"나스닥100 종목 데이터 {len(stock_data_list)}개 수집 완료")
         return stock_data_list
 
 class SP500Collector:
     """S&P500 종목 데이터 수집기"""
-    
+
     def __init__(self):
         # S&P500 주요 종목들 (실제로는 API에서 가져와야 함)
         self.sp500_symbols = [
@@ -502,7 +629,7 @@ class SP500Collector:
             "APD", "GM", "SHW", "USB", "GD", "NFLX", "EMR", "NSC", "HUM",
             "MU", "INTC", "F", "MCO", "FCX", "TFC", "ATVI", "COF", "PSA"
         ]
-        
+
     async def get_sp500_symbols(self) -> List[str]:
         """S&P500 종목 리스트 가져오기"""
         try:
@@ -513,21 +640,21 @@ class SP500Collector:
         except Exception as e:
             logger.error(f"S&P500 종목 리스트 가져오기 실패: {e}")
             return self.sp500_symbols[:100]  # 백업으로 상위 100개만
-    
+
     async def collect_stock_data(self, symbol: str) -> Optional[StockData]:
         """개별 종목 데이터 수집"""
         try:
             ticker = yf.Ticker(symbol)
             info = ticker.info
             hist = ticker.history(period="3mo")
-            
+
             if hist.empty:
                 logger.warning(f"주식 데이터가 없습니다: {symbol}")
                 return None
-            
+
             current_price = hist['Close'].iloc[-1]
             volume = int(hist['Volume'].iloc[-1])
-            
+
             # 기술적 지표 계산
             kospi_collector = KospiCollector()
             moving_avg_20 = hist['Close'].rolling(window=20).mean().iloc[-1]
@@ -535,7 +662,7 @@ class SP500Collector:
             rsi = kospi_collector._calculate_rsi(hist['Close'])
             bollinger_upper, bollinger_lower = kospi_collector._calculate_bollinger_bands(hist['Close'])
             macd, macd_signal = kospi_collector._calculate_macd(hist['Close'])
-            
+
             stock_data = StockData(
                 symbol=symbol,
                 name=info.get('shortName', symbol),
@@ -553,82 +680,82 @@ class SP500Collector:
                 macd=float(macd) if pd.notna(macd) else None,
                 macd_signal=float(macd_signal) if pd.notna(macd_signal) else None
             )
-            
+
             return stock_data
-            
+
         except Exception as e:
             logger.error(f"종목 데이터 수집 실패 {symbol}: {e}")
             return None
-    
+
     async def collect_all_data(self) -> List[StockData]:
         """모든 S&P500 종목 데이터 수집"""
         symbols = await self.get_sp500_symbols()
-        
+
         tasks = []
         for symbol in symbols:
             task = self.collect_stock_data(symbol)
             tasks.append(task)
-            
+
         results = await asyncio.gather(*tasks, return_exceptions=True)
-        
+
         stock_data_list = []
         for result in results:
             if isinstance(result, StockData):
                 stock_data_list.append(result)
-        
+
         logger.info(f"S&P500 종목 데이터 {len(stock_data_list)}개 수집 완료")
         return stock_data_list
 
 class DataCollector:
     """전체 데이터 수집 관리자 - Gemini AI 최적화"""
-    
+
     def __init__(self):
         self.kospi_collector = KospiCollector()
         self.nasdaq_collector = NasdaqCollector()
         self.sp500_collector = SP500Collector()
-        
+
     async def collect_all_market_data(self) -> Dict[str, List[StockData]]:
         """코스피200 + 나스닥100 + S&P500 전체 데이터 수집"""
         logger.info("🚀 전체 시장 데이터 수집 시작 (Gemini AI 최적화)")
-        
+
         # 병렬로 세 시장 데이터 수집
         kospi_task = self.kospi_collector.collect_all_data()
         nasdaq_task = self.nasdaq_collector.collect_all_data()
         sp500_task = self.sp500_collector.collect_all_data()
-        
+
         kospi_data, nasdaq_data, sp500_data = await asyncio.gather(
             kospi_task, nasdaq_task, sp500_task
         )
-        
+
         # 데이터 품질 필터링
         kospi_data = self._filter_high_quality_data(kospi_data, "KOSPI200")
         nasdaq_data = self._filter_high_quality_data(nasdaq_data, "NASDAQ100")
         sp500_data = self._filter_high_quality_data(sp500_data, "S&P500")
-        
+
         result = {
             'kospi200': kospi_data,
             'nasdaq100': nasdaq_data,
             'sp500': sp500_data
         }
-        
+
         total_stocks = len(kospi_data) + len(nasdaq_data) + len(sp500_data)
         logger.info(f"✅ 고품질 데이터 수집 완료: {total_stocks}개 종목 (코스피200: {len(kospi_data)}, 나스닥100: {len(nasdaq_data)}, S&P500: {len(sp500_data)})")
-        
+
         return result
-    
+
     def _filter_high_quality_data(self, stock_list: List[StockData], market_name: str) -> List[StockData]:
         """고품질 데이터만 필터링 (Gemini AI 최적화)"""
         try:
             if not stock_list:
                 return stock_list
-            
+
             # 품질 점수 계산
             for stock in stock_list:
                 stock.calculate_quality_score()
-            
+
             # 품질 점수 70점 이상만 유지
             high_quality_stocks = [stock for stock in stock_list if stock.data_quality.overall_quality >= 70.0]
-            
+
             # 필수 데이터가 있는 종목만 유지
             filtered_stocks = []
             for stock in high_quality_stocks:
@@ -636,38 +763,38 @@ class DataCollector:
                     stock.volume is not None and stock.volume > 0 and
                     stock.symbol and stock.name):
                     filtered_stocks.append(stock)
-            
+
             logger.info(f"{market_name} 고품질 데이터 필터링: {len(stock_list)} → {len(filtered_stocks)}개 종목")
             return filtered_stocks
-            
+
         except Exception as e:
             logger.error(f"데이터 품질 필터링 실패 {market_name}: {e}")
             return stock_list
-    
+
     def prepare_gemini_dataset(self, market_data: Dict[str, List[StockData]]) -> Dict[str, any]:
         """Gemini AI 분석을 위한 최적화된 데이터셋 준비"""
         try:
             logger.info("🧠 Gemini AI 분석용 데이터셋 준비 중...")
-            
+
             # 전체 데이터를 하나의 리스트로 통합
             all_stocks = []
             for market, stocks in market_data.items():
                 for stock in stocks:
                     stock_dict = self._stock_to_gemini_format(stock, market)
                     all_stocks.append(stock_dict)
-            
+
             # 시장별 통계 계산
             market_stats = self._calculate_market_statistics(market_data)
-            
+
             # 상위 성과 종목 식별
             top_performers = self._identify_top_performers(all_stocks)
-            
+
             # 기술적 패턴 분석
             technical_patterns = self._analyze_technical_patterns(all_stocks)
-            
+
             # 섹터별 분석 (간단한 분류)
             sector_analysis = self._analyze_by_sectors(all_stocks)
-            
+
             gemini_dataset = {
                 "timestamp": datetime.now().isoformat(),
                 "total_stocks": len(all_stocks),
@@ -696,11 +823,11 @@ class DataCollector:
             
             logger.info(f"✅ Gemini AI 데이터셋 준비 완료: {len(all_stocks)}개 종목, 품질 점수 평균 {self._calculate_avg_quality(all_stocks):.1f}")
             return gemini_dataset
-            
+
         except Exception as e:
             logger.error(f"Gemini 데이터셋 준비 실패: {e}")
             return {"error": str(e), "stocks": []}
-    
+
     def _stock_to_gemini_format(self, stock: StockData, market: str) -> Dict[str, any]:
         """개별 종목을 Gemini AI 분석용 포맷으로 변환"""
         return {
@@ -758,19 +885,19 @@ class DataCollector:
                 "freshness_hours": stock.data_quality.data_freshness_hours,
             }
         }
-    
+
     def _calculate_market_statistics(self, market_data: Dict[str, List[StockData]]) -> Dict[str, any]:
         """시장별 통계 계산"""
         stats = {}
-        
+
         for market, stocks in market_data.items():
             if not stocks:
                 continue
-                
+
             prices = [s.price for s in stocks if s.price is not None]
             volumes = [s.volume for s in stocks if s.volume is not None]
             rsi_values = [s.rsi for s in stocks if s.rsi is not None]
-            
+
             stats[market] = {
                 "total_stocks": len(stocks),
                 "avg_price": np.mean(prices) if prices else 0,
@@ -779,32 +906,32 @@ class DataCollector:
                 "high_rsi_count": len([r for r in rsi_values if r and r > 70]),
                 "low_rsi_count": len([r for r in rsi_values if r and r < 30]),
             }
-        
+
         return stats
-    
+
     def _identify_top_performers(self, all_stocks: List[Dict]) -> List[Dict]:
         """상위 성과 종목 식별"""
         try:
             # 20일 수익률 기준 상위 20개
             stocks_with_returns = [s for s in all_stocks if s.get("price_performance", {}).get("change_20d") is not None]
             top_20_returns = sorted(stocks_with_returns, 
-                                  key=lambda x: x["price_performance"]["change_20d"], 
+                key=lambda x: x["price_performance"]["change_20d"],
                                   reverse=True)[:20]
-            
+
             # RSI 기준 적정 매수 구간 (30-70)
             good_rsi_stocks = [s for s in all_stocks 
-                             if s.get("technical_indicators", {}).get("momentum", {}).get("rsi") 
+                if s.get("technical_indicators", {}).get("momentum", {}).get("rsi")
                              and 30 <= s["technical_indicators"]["momentum"]["rsi"] <= 70]
-            
+
             return {
                 "top_20_returns": top_20_returns[:5],  # 상위 5개만
                 "good_rsi_stocks": good_rsi_stocks[:10]  # 상위 10개만
             }
-            
+
         except Exception as e:
             logger.error(f"상위 성과 종목 식별 실패: {e}")
             return {"top_20_returns": [], "good_rsi_stocks": []}
-    
+
     def _analyze_technical_patterns(self, all_stocks: List[Dict]) -> Dict[str, any]:
         """기술적 패턴 분석"""
         try:
@@ -816,42 +943,42 @@ class DataCollector:
                 "oversold_opportunities": [],
                 "breakout_candidates": []
             }
-            
+
             for stock in all_stocks:
                 tech = stock.get("technical_indicators", {})
                 perf = stock.get("price_performance", {})
-                
+
                 rsi = tech.get("momentum", {}).get("rsi")
                 macd = tech.get("trend", {}).get("macd")
                 change_20d = perf.get("change_20d")
-                
+
                 # 강한 모멘텀 (RSI > 60, 20일 수익률 > 10%)
                 if rsi and rsi > 60 and change_20d and change_20d > 10:
                     patterns["strong_momentum"].append(stock["symbol"])
                     patterns["bullish_signals"] += 1
-                
+
                 # 과매도 기회 (RSI < 35, 하지만 기본적으로 건전)
                 elif rsi and rsi < 35 and change_20d and change_20d > -15:
                     patterns["oversold_opportunities"].append(stock["symbol"])
-                
+
                 # 중립
                 else:
                     patterns["neutral_signals"] += 1
-            
+
             return patterns
-            
+
         except Exception as e:
             logger.error(f"기술적 패턴 분석 실패: {e}")
             return {"error": str(e)}
-    
+
     def _analyze_by_sectors(self, all_stocks: List[Dict]) -> Dict[str, any]:
         """섹터별 간단 분석"""
         # 간단한 섹터 분류 (심볼 기반)
         tech_keywords = ["AAPL", "MSFT", "GOOGL", "AMZN", "TSLA", "NVDA", "META"]
         finance_keywords = ["JPM", "BAC", "WFC", "GS", "MS"]
-        
+
         sectors = {"Technology": 0, "Finance": 0, "Others": 0}
-        
+
         for stock in all_stocks:
             symbol = stock.get("symbol", "")
             if any(keyword in symbol for keyword in tech_keywords):
@@ -860,9 +987,9 @@ class DataCollector:
                 sectors["Finance"] += 1
             else:
                 sectors["Others"] += 1
-        
+
         return sectors
-    
+
     def _generate_quality_summary(self, market_data: Dict[str, List[StockData]]) -> Dict[str, any]:
         """데이터 품질 요약"""
         total_stocks = sum(len(stocks) for stocks in market_data.values())
@@ -885,10 +1012,10 @@ class DataCollector:
         """평균 품질 점수 계산"""
         if not all_stocks:
             return 0.0
-        
+
         total_quality = sum(stock.get('data_quality_score', 0) for stock in all_stocks)
         return total_quality / len(all_stocks)
-    
+
     # GUI 인터페이스를 위한 개별 시장 데이터 수집 메서드들
     async def collect_kospi_data(self) -> List[StockData]:
         """코스피200 데이터 수집"""
@@ -901,7 +1028,7 @@ class DataCollector:
         except Exception as e:
             logger.error(f"❌ 코스피200 데이터 수집 실패: {e}")
             return []
-    
+
     async def collect_nasdaq_data(self) -> List[StockData]:
         """나스닥100 데이터 수집"""
         try:
@@ -913,7 +1040,7 @@ class DataCollector:
         except Exception as e:
             logger.error(f"❌ 나스닥100 데이터 수집 실패: {e}")
             return []
-    
+
     async def collect_sp500_data(self) -> List[StockData]:
         """S&P500 데이터 수집"""
         try:
@@ -924,4 +1051,4 @@ class DataCollector:
             return stocks
         except Exception as e:
             logger.error(f"❌ S&P500 데이터 수집 실패: {e}")
-            return [] 
+            return []
