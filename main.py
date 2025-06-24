@@ -26,7 +26,11 @@ STRATEGY_LIST = [
     "조엘 그린블라트", "에드워드 소프", "레이 달리오", "피터 드러커"
 ]
 
-MARKET_LIST = ["한국주식(코스피200)", "미국주식(나스닥100/S&P500)"]
+MARKET_LIST = [
+    "한국주식(코스피200)", 
+    "미국주식(나스닥100)", 
+    "미국주식(S&P500)"
+]
 
 def print_progress(step, total_steps, message, progress_percent=None):
     """진행 상황 출력"""
@@ -126,14 +130,17 @@ async def main():
             print("📈 코스피200 종목 데이터 수집 중...")
             stocks = await collector.collect_kospi_data()
             market_data = {"kospi200": stocks}
+        elif "나스닥100" in selected_market:
+            print("📈 나스닥100 종목 데이터 수집 중...")
+            stocks = await collector.collect_nasdaq_data()
+            market_data = {"nasdaq100": stocks}
+        elif "S&P500" in selected_market:
+            print("📈 S&P500 종목 데이터 수집 중...")
+            stocks = await collector.collect_sp500_data()
+            market_data = {"sp500": stocks}
         else:
-            print("📈 나스닥100 + S&P500 종목 데이터 수집 중...")
-            print("  - 나스닥100 데이터 수집 중...")
-            nasdaq = await collector.collect_nasdaq_data()
-            print("  - S&P500 데이터 수집 중...")
-            sp500 = await collector.collect_sp500_data()
-            stocks = nasdaq + sp500
-            market_data = {"nasdaq100": nasdaq, "sp500": sp500}
+            print("❌ 알 수 없는 시장입니다.")
+            return
         
         print(f"✅ 원본 데이터 수집 완료: {len(stocks)}개 종목")
         if stocks:
@@ -162,13 +169,10 @@ async def main():
         # 정제된 데이터로 market_data 업데이트
         if "한국" in selected_market:
             market_data = {"kospi200": cleaned_stocks}
-        else:
-            # 정제된 데이터를 nasdaq과 sp500으로 다시 분리 (간단히 반반 나누기)
-            mid_point = len(cleaned_stocks) // 2
-            market_data = {
-                "nasdaq100": cleaned_stocks[:mid_point],
-                "sp500": cleaned_stocks[mid_point:]
-            }
+        elif "나스닥100" in selected_market:
+            market_data = {"nasdaq100": cleaned_stocks}
+        elif "S&P500" in selected_market:
+            market_data = {"sp500": cleaned_stocks}
         
         stocks = cleaned_stocks  # 이후 처리를 위해 정제된 데이터 사용
         
