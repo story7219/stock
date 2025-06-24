@@ -11,13 +11,14 @@ import sys
 import asyncio
 from typing import List, Dict, Any
 from dotenv import load_dotenv
+
 from src.strategies import StrategyManager
 from src.data_collector import DataCollector
 from src.data_cleaner import AdvancedDataCleaner
 from src.gemini_analyzer import GeminiAnalyzer, GeminiAnalysisResult
 
 # 환경 변수 로드
-load_dotenv('config.env')
+load_dotenv('.env')
 
 # 14개 투자 대가 전략명
 STRATEGY_LIST = [
@@ -31,6 +32,24 @@ MARKET_LIST = [
     "미국주식(나스닥100)", 
     "미국주식(S&P500)"
 ]
+
+def validate_system_setup() -> bool:
+    """시스템 설정 검증"""
+    print("🔍" + "=" * 60 + "🔍")
+    print("🚀 Ultra Premium HTS v5.0 - 시스템 초기화")
+    print("🔍" + "=" * 60 + "🔍")
+    
+    print("📋 필수 설정 검증 실행...")
+    
+    gemini_api_key = os.getenv('GEMINI_API_KEY')
+    if not gemini_api_key or gemini_api_key == 'your_gemini_api_key_here':
+        print("❌ Gemini API 키가 설정되지 않았습니다!")
+        print("📋 .env 파일에서 GEMINI_API_KEY를 실제 키로 변경해주세요.")
+        print("🔗 API 키 발급: https://aistudio.google.com/app/apikey")
+        return False
+    
+    print("✅ 필수 설정 검증 완료!")
+    return True
 
 def print_progress(step, total_steps, message, progress_percent=None):
     """진행 상황 출력"""
@@ -49,25 +68,20 @@ def print_ai_banner():
     print("🤖" + "=" * 58 + "🤖")
 
 async def main():
+    # 시스템 설정 검증 (최우선)
+    if not validate_system_setup():
+        print("\n🛑 시스템 설정이 완료되지 않아 실행을 중단합니다.")
+        print("💡 위의 가이드를 따라 설정을 완료한 후 다시 실행해주세요.")
+        return
+    
     total_steps = 10  # 단계 수 증가 (데이터 정제 단계 추가)
     
     print_ai_banner()
     
-    # Gemini API 키 확인
+    # 검증된 Gemini API 키 사용
     gemini_api_key = os.getenv('GEMINI_API_KEY')
-    if not gemini_api_key or gemini_api_key == 'your_gemini_api_key_here':
-        print("❌ Gemini API 키가 설정되지 않았습니다!")
-        print("📋 config.env 파일에서 GEMINI_API_KEY를 실제 키로 변경해주세요.")
-        print("🔗 API 키 발급: https://aistudio.google.com/app/apikey")
-        
-        # 데모 모드로 실행할지 물어보기
-        demo_mode = input("\n🎮 데모 모드(규칙 기반)로 실행하시겠습니까? (y/n): ").lower() == 'y'
-        if not demo_mode:
-            return
-        use_ai = False
-    else:
-        use_ai = True
-        print("✅ Gemini AI 연동 확인됨 - 실제 AI 분석 모드로 실행합니다!")
+    use_ai = True
+    print("✅ Gemini AI 연동 확인됨 - 실제 AI 분석 모드로 실행합니다!")
     
     print_progress(1, total_steps, "투자 전략 선택 중...", 10)
     print("\n📊 투자 대가 전략 리스트:")
@@ -112,13 +126,9 @@ async def main():
         strategy_manager = StrategyManager()
         print("✅ StrategyManager 초기화 완료")
         
-        # Gemini AI 분석기 초기화 (AI 모드일 때만)
-        if use_ai:
-            gemini_analyzer = GeminiAnalyzer(api_key=gemini_api_key)
-            print("🤖 Gemini AI 분석기 초기화 완료")
-        else:
-            gemini_analyzer = None
-            print("📊 규칙 기반 분석 모드")
+        # Gemini AI 분석기 초기화 (검증된 API 키 사용)
+        gemini_analyzer = GeminiAnalyzer(api_key=gemini_api_key)
+        print("🤖 Gemini AI 분석기 초기화 완료 (인증 검증됨)")
             
     except Exception as e:
         print(f"❌ 시스템 초기화 실패: {e}")
