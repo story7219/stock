@@ -1,375 +1,595 @@
+#!/usr/bin/env python3
 """
-고급 AI 코드 리뷰어
-다중 AI 모델을 활용한 종합적 코드 분석
+🤖 고급 AI 코드 리뷰어
+Gemini AI를 활용한 투자 시스템 전용 고급 코드 리뷰 도구
 """
 
 import os
 import sys
 import json
 import ast
-import subprocess
-from typing import List, Dict, Any
+import logging
 from pathlib import Path
+from typing import Dict, List, Any, Optional
+from datetime import datetime
+import re
+import asyncio
+import aiohttp
 
-# AI 모델 imports
-try:
-    import google.generativeai as genai
-    GEMINI_AVAILABLE = True
-except ImportError:
-    GEMINI_AVAILABLE = False
-
-try:
-    import openai
-    OPENAI_AVAILABLE = True
-except ImportError:
-    OPENAI_AVAILABLE = False
+# 로깅 설정
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
 class AdvancedAIReviewer:
     """고급 AI 코드 리뷰어"""
     
-    def __init__(self):
-        self.setup_ai_models()
+    def __init__(self, project_root: str = "."):
+        self.project_root = Path(project_root)
+        self.gemini_api_key = os.getenv('GEMINI_API_KEY')
         self.review_results = []
+        self.analysis_stats = {
+            'files_reviewed': 0,
+            'issues_found': 0,
+            'suggestions_made': 0,
+            'security_issues': 0,
+            'performance_issues': 0,
+            'investment_logic_issues': 0
+        }
         
-    def setup_ai_models(self):
-        """AI 모델 설정"""
-        if GEMINI_AVAILABLE and os.getenv('GEMINI_API_KEY'):
-            genai.configure(api_key=os.getenv('GEMINI_API_KEY'))
-            self.gemini_model = genai.GenerativeModel('gemini-1.5-pro')
-            print("✅ Gemini AI 모델 설정 완료")
-        else:
-            self.gemini_model = None
-            print("⚠️ Gemini AI 사용 불가")
-            
-        if OPENAI_AVAILABLE and os.getenv('OPENAI_API_KEY'):
-            openai.api_key = os.getenv('OPENAI_API_KEY')
-            self.openai_available = True
-            print("✅ OpenAI 모델 설정 완료")
-        else:
-            self.openai_available = False
-            print("⚠️ OpenAI 사용 불가")
+        # 투자 시스템 특화 패턴
+        self.investment_patterns = {
+            'strategy_methods': [
+                'analyze_market', 'calculate_score', 'filter_stocks',
+                'evaluate_risk', 'generate_signals', 'backtest'
+            ],
+            'risk_keywords': [
+                'stop_loss', 'risk_management', 'position_size',
+                'volatility', 'drawdown', 'var', 'sharpe_ratio'
+            ],
+            'data_sources': [
+                'yahoo_finance', 'alpha_vantage', 'quandl',
+                'bloomberg', 'reuters', 'fred'
+            ]
+        }
+        
+        logger.info(f"🤖 고급 AI 리뷰어 초기화 (프로젝트: {self.project_root})")
     
-    def get_changed_files(self) -> List[str]:
-        """변경된 파일 목록 가져오기"""
+    async def analyze_code_with_ai(self, file_path: Path, code_content: str) -> Dict[str, Any]:
+        """AI를 활용한 코드 분석"""
+        if not self.gemini_api_key:
+            logger.warning("⚠️ GEMINI_API_KEY 환경 변수가 설정되지 않음")
+            return self._fallback_analysis(file_path, code_content)
+        
         try:
-            # Git을 통해 변경된 파일 목록 가져오기
-            result = subprocess.run(
-                ['git', 'diff', '--name-only', 'HEAD~1', 'HEAD'],
-                capture_output=True,
-                text=True
-            )
+            # Gemini AI 분석 요청
+            analysis_prompt = self._create_analysis_prompt(file_path, code_content)
+            ai_response = await self._call_gemini_api(analysis_prompt)
             
-            if result.returncode == 0:
-                files = [f.strip() for f in result.stdout.split('\n') if f.strip().endswith('.py')]
-                return files[:10]  # 최대 10개 파일만 분석
+            if ai_response:
+                return self._parse_ai_response(file_path, ai_response)
             else:
-                print("⚠️ Git diff 실행 실패, 전체 Python 파일 분석")
-                return list(Path('.').rglob('*.py'))[:10]
+                return self._fallback_analysis(file_path, code_content)
                 
         except Exception as e:
-            print(f"❌ 파일 목록 가져오기 실패: {e}")
-            return []
+            logger.error(f"❌ AI 분석 오류 {file_path}: {e}")
+            return self._fallback_analysis(file_path, code_content)
     
-    def analyze_file_structure(self, file_path: str) -> Dict[str, Any]:
-        """파일 구조 상세 분석"""
-        try:
-            with open(file_path, 'r', encoding='utf-8') as f:
-                content = f.read()
-            
-            tree = ast.parse(content)
-            
-            analysis = {
-                'file_path': file_path,
-                'lines_of_code': len(content.split('\n')),
-                'classes': [],
-                'functions': [],
-                'imports': [],
-                'complexity_issues': [],
-                'code_smells': [],
-                'best_practices': []
-            }
-            
-            # AST 분석
-            for node in ast.walk(tree):
-                if isinstance(node, ast.ClassDef):
-                    methods = [n.name for n in node.body if isinstance(n, ast.FunctionDef)]
-                    analysis['classes'].append({
-                        'name': node.name,
-                        'methods': methods,
-                        'method_count': len(methods),
-                        'line_start': node.lineno,
-                        'docstring': ast.get_docstring(node)
-                    })
-                    
-                    # 클래스 크기 체크
-                    if len(methods) > 20:
-                        analysis['code_smells'].append({
-                            'type': 'large_class',
-                            'location': f"Line {node.lineno}",
-                            'message': f"클래스 '{node.name}'에 {len(methods)}개의 메서드가 있습니다. 단일 책임 원칙을 고려하세요."
-                        })
-                
-                elif isinstance(node, ast.FunctionDef):
-                    complexity = self.calculate_cyclomatic_complexity(node)
-                    analysis['functions'].append({
-                        'name': node.name,
-                        'args_count': len(node.args.args),
-                        'line_start': node.lineno,
-                        'complexity': complexity,
-                        'docstring': ast.get_docstring(node)
-                    })
-                    
-                    # 복잡도 체크
-                    if complexity > 15:
-                        analysis['complexity_issues'].append({
-                            'function': node.name,
-                            'complexity': complexity,
-                            'line': node.lineno,
-                            'suggestion': '함수가 너무 복잡합니다. 더 작은 함수로 분리하세요.'
-                        })
-                    
-                    # 문서화 체크
-                    if not ast.get_docstring(node) and not node.name.startswith('_'):
-                        analysis['best_practices'].append({
-                            'type': 'missing_docstring',
-                            'location': f"Line {node.lineno}",
-                            'message': f"함수 '{node.name}'에 docstring이 없습니다."
-                        })
-                
-                elif isinstance(node, ast.Import):
-                    for alias in node.names:
-                        analysis['imports'].append(alias.name)
-                
-                elif isinstance(node, ast.ImportFrom):
-                    if node.module:
-                        analysis['imports'].append(node.module)
-            
-            # 추가 코드 스멜 검사
-            self.detect_code_smells(content, analysis)
-            
-            return analysis
-            
-        except Exception as e:
-            return {'error': str(e), 'file_path': file_path}
-    
-    def calculate_cyclomatic_complexity(self, node: ast.FunctionDef) -> int:
-        """순환 복잡도 계산"""
-        complexity = 1
-        
-        for child in ast.walk(node):
-            if isinstance(child, (ast.If, ast.While, ast.For, ast.AsyncFor, ast.With, ast.AsyncWith)):
-                complexity += 1
-            elif isinstance(child, ast.Try):
-                complexity += 1
-                complexity += len(child.handlers)
-            elif isinstance(child, ast.BoolOp):
-                complexity += len(child.values) - 1
-            elif isinstance(child, ast.comprehension):
-                complexity += 1
-        
-        return complexity
-    
-    def detect_code_smells(self, content: str, analysis: Dict):
-        """코드 스멜 탐지"""
-        lines = content.split('\n')
-        
-        # 긴 라인 체크
-        for i, line in enumerate(lines, 1):
-            if len(line) > 120:
-                analysis['code_smells'].append({
-                    'type': 'long_line',
-                    'location': f"Line {i}",
-                    'message': f"라인이 {len(line)}자로 너무 깁니다. (권장: 120자 이하)"
-                })
-        
-        # TODO/FIXME 주석 체크
-        for i, line in enumerate(lines, 1):
-            if 'TODO' in line or 'FIXME' in line:
-                analysis['code_smells'].append({
-                    'type': 'todo_comment',
-                    'location': f"Line {i}",
-                    'message': "TODO/FIXME 주석이 발견되었습니다. 이슈로 등록하는 것을 고려하세요."
-                })
-        
-        # 하드코딩된 값 체크 (간단한 버전)
-        import re
-        hardcoded_patterns = [
-            r'password\s*=\s*["\'][^"\']+["\']',
-            r'api_key\s*=\s*["\'][^"\']+["\']',
-            r'secret\s*=\s*["\'][^"\']+["\']'
-        ]
-        
-        for pattern in hardcoded_patterns:
-            matches = re.finditer(pattern, content, re.IGNORECASE)
-            for match in matches:
-                line_num = content[:match.start()].count('\n') + 1
-                analysis['code_smells'].append({
-                    'type': 'hardcoded_secret',
-                    'location': f"Line {line_num}",
-                    'message': "하드코딩된 비밀 정보가 발견되었습니다. 환경변수를 사용하세요."
-                })
-    
-    async def ai_review_file(self, file_analysis: Dict) -> str:
-        """AI를 통한 파일 리뷰"""
-        if not self.gemini_model:
-            return "AI 모델을 사용할 수 없습니다."
+    def _create_analysis_prompt(self, file_path: Path, code_content: str) -> str:
+        """AI 분석용 프롬프트 생성"""
+        file_type = "투자 전략" if "strategy" in str(file_path).lower() else "일반 코드"
         
         prompt = f"""
-다음은 Python 자동매매 시스템의 파일 분석 결과입니다:
+다음은 투자 시스템의 {file_type} 파일입니다. 전문적인 코드 리뷰를 수행해주세요.
 
-파일: {file_analysis['file_path']}
-코드 라인 수: {file_analysis['lines_of_code']}
-클래스 수: {len(file_analysis.get('classes', []))}
-함수 수: {len(file_analysis.get('functions', []))}
+파일: {file_path}
 
-복잡도 이슈: {len(file_analysis.get('complexity_issues', []))}개
-코드 스멜: {len(file_analysis.get('code_smells', []))}개
+코드:
+```python
+{code_content}
+```
 
-상세 분석:
-{json.dumps(file_analysis, ensure_ascii=False, indent=2)}
+다음 관점에서 분석해주세요:
 
-다음 관점에서 코드를 리뷰해주세요:
+1. **보안 검토**
+   - API 키 하드코딩 여부
+   - 인증 정보 노출 위험
+   - 입력 검증 부족
+   - SQL 인젝션 가능성
 
-1. **아키텍처 및 설계**:
-   - 단일 책임 원칙 준수
-   - 의존성 관리
-   - 모듈화 수준
+2. **성능 최적화**
+   - 비효율적인 데이터 구조 사용
+   - 불필요한 반복문
+   - 메모리 누수 가능성
+   - 비동기 처리 개선점
 
-2. **코드 품질**:
-   - 가독성 및 유지보수성
-   - 네이밍 컨벤션
-   - 코드 중복
+3. **투자 로직 검증**
+   - 전략 로직의 타당성
+   - 리스크 관리 부족
+   - 백테스팅 고려사항
+   - 데이터 품질 검증
 
-3. **성능 및 최적화**:
-   - 알고리즘 효율성
-   - 메모리 사용
-   - 비동기 처리
+4. **코드 품질**
+   - 가독성 개선점
+   - 함수 분할 필요성
+   - 예외 처리 부족
+   - 타입 힌트 누락
 
-4. **보안 및 안정성**:
-   - 에러 핸들링
-   - 입력 검증
-   - 보안 취약점
+5. **투자 시스템 특화**
+   - 시장 데이터 처리 방식
+   - 포트폴리오 관리 로직
+   - 실시간 처리 고려사항
+   - 규제 준수 여부
 
-5. **자동매매 시스템 특화**:
-   - 실시간 처리 적합성
-   - 데이터 정확성
-   - 리스크 관리
-
-구체적인 개선 방안과 코드 예시를 포함하여 마크다운 형식으로 답변해주세요.
+JSON 형식으로 응답해주세요:
+{{
+    "overall_score": 85,
+    "security_issues": [
+        {{"type": "hardcoded_secret", "line": 15, "severity": "high", "description": "API 키가 하드코딩됨", "suggestion": "환경 변수 사용"}}
+    ],
+    "performance_issues": [
+        {{"type": "inefficient_loop", "line": 25, "severity": "medium", "description": "비효율적인 반복문", "suggestion": "벡터화 연산 사용"}}
+    ],
+    "investment_logic_issues": [
+        {{"type": "missing_risk_check", "line": 35, "severity": "high", "description": "리스크 검증 누락", "suggestion": "포지션 크기 제한 추가"}}
+    ],
+    "code_quality_issues": [
+        {{"type": "missing_docstring", "line": 10, "severity": "low", "description": "함수 설명 누락", "suggestion": "docstring 추가"}}
+    ],
+    "suggestions": [
+        "비동기 처리로 성능 개선",
+        "에러 핸들링 강화",
+        "로깅 추가"
+    ]
+}}
 """
-        
-        try:
-            response = await self.gemini_model.generate_content_async(prompt)
-            return response.text
-        except Exception as e:
-            return f"AI 리뷰 생성 실패: {str(e)}"
+        return prompt
     
-    async def generate_comprehensive_review(self, file_analyses: List[Dict]) -> str:
-        """종합적인 리뷰 생성"""
-        individual_reviews = []
+    async def _call_gemini_api(self, prompt: str) -> Optional[str]:
+        """Gemini API 호출"""
+        try:
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-8b:generateContent"
+            headers = {
+                'Content-Type': 'application/json',
+                'x-goog-api-key': self.gemini_api_key
+            }
+            
+            payload = {
+                "contents": [{
+                    "parts": [{
+                        "text": prompt
+                    }]
+                }],
+                "generationConfig": {
+                    "temperature": 0.1,
+                    "topK": 40,
+                    "topP": 0.95,
+                    "maxOutputTokens": 2048,
+                }
+            }
+            
+            async with aiohttp.ClientSession() as session:
+                async with session.post(url, headers=headers, json=payload, timeout=30) as response:
+                    if response.status == 200:
+                        result = await response.json()
+                        return result['candidates'][0]['content']['parts'][0]['text']
+                    else:
+                        logger.error(f"❌ Gemini API 오류: {response.status}")
+                        return None
+                        
+        except Exception as e:
+            logger.error(f"❌ Gemini API 호출 실패: {e}")
+            return None
+    
+    def _parse_ai_response(self, file_path: Path, ai_response: str) -> Dict[str, Any]:
+        """AI 응답 파싱"""
+        try:
+            # JSON 부분 추출
+            json_match = re.search(r'\{.*\}', ai_response, re.DOTALL)
+            if json_match:
+                json_str = json_match.group()
+                ai_analysis = json.loads(json_str)
+                
+                # 파일 정보 추가
+                ai_analysis['file'] = str(file_path.relative_to(self.project_root))
+                ai_analysis['timestamp'] = datetime.now().isoformat()
+                
+                return ai_analysis
+            else:
+                logger.warning(f"⚠️ AI 응답에서 JSON을 찾을 수 없음: {file_path}")
+                return self._fallback_analysis(file_path, "")
+                
+        except json.JSONDecodeError as e:
+            logger.error(f"❌ AI 응답 JSON 파싱 오류 {file_path}: {e}")
+            return self._fallback_analysis(file_path, "")
+    
+    def _fallback_analysis(self, file_path: Path, code_content: str) -> Dict[str, Any]:
+        """AI 분석 실패 시 대체 분석"""
+        logger.info(f"🔄 대체 분석 수행: {file_path}")
         
-        for analysis in file_analyses:
-            if 'error' not in analysis:
-                review = await self.ai_review_file(analysis)
-                individual_reviews.append({
-                    'file': analysis['file_path'],
-                    'review': review
+        analysis = {
+            'file': str(file_path.relative_to(self.project_root)),
+            'timestamp': datetime.now().isoformat(),
+            'overall_score': 75,
+            'security_issues': [],
+            'performance_issues': [],
+            'investment_logic_issues': [],
+            'code_quality_issues': [],
+            'suggestions': []
+        }
+        
+        # 기본 패턴 분석
+        if code_content:
+            analysis.update(self._basic_pattern_analysis(code_content))
+        
+        return analysis
+    
+    def _basic_pattern_analysis(self, code_content: str) -> Dict[str, List[Dict[str, Any]]]:
+        """기본 패턴 분석"""
+        issues = {
+            'security_issues': [],
+            'performance_issues': [],
+            'investment_logic_issues': [],
+            'code_quality_issues': []
+        }
+        
+        lines = code_content.split('\n')
+        
+        for i, line in enumerate(lines, 1):
+            line_lower = line.lower()
+            
+            # 보안 이슈
+            if re.search(r'(api_key|secret|password)\s*=\s*["\'][^"\']{8,}["\']', line_lower):
+                issues['security_issues'].append({
+                    'type': 'hardcoded_secret',
+                    'line': i,
+                    'severity': 'high',
+                    'description': '하드코딩된 비밀정보 발견',
+                    'suggestion': '환경 변수 사용'
+                })
+            
+            # 성능 이슈
+            if 'for' in line_lower and 'range(len(' in line_lower:
+                issues['performance_issues'].append({
+                    'type': 'inefficient_loop',
+                    'line': i,
+                    'severity': 'medium',
+                    'description': '비효율적인 반복문 패턴',
+                    'suggestion': 'enumerate() 사용'
+                })
+            
+            # 투자 로직 이슈
+            if any(keyword in line_lower for keyword in ['buy', 'sell', 'trade']):
+                if 'risk' not in line_lower and 'stop' not in line_lower:
+                    issues['investment_logic_issues'].append({
+                        'type': 'missing_risk_check',
+                        'line': i,
+                        'severity': 'medium',
+                        'description': '거래 로직에 리스크 관리 부족',
+                        'suggestion': '리스크 검증 로직 추가'
+                    })
+            
+            # 코드 품질 이슈
+            if line.strip().startswith('def ') and '"""' not in code_content[code_content.find(line):code_content.find(line) + 200]:
+                issues['code_quality_issues'].append({
+                    'type': 'missing_docstring',
+                    'line': i,
+                    'severity': 'low',
+                    'description': '함수 docstring 누락',
+                    'suggestion': 'docstring 추가'
                 })
         
-        # 전체 프로젝트 종합 분석
-        total_lines = sum(a.get('lines_of_code', 0) for a in file_analyses if 'error' not in a)
-        total_complexity_issues = sum(len(a.get('complexity_issues', [])) for a in file_analyses if 'error' not in a)
-        total_code_smells = sum(len(a.get('code_smells', [])) for a in file_analyses if 'error' not in a)
+        return issues
+    
+    def analyze_investment_strategy_logic(self, file_path: Path, code_content: str) -> List[Dict[str, Any]]:
+        """투자 전략 로직 특화 분석"""
+        issues = []
         
-        comprehensive_review = f"""
-# 🧠 AI 종합 코드 리뷰
+        try:
+            tree = ast.parse(code_content)
+            
+            for node in ast.walk(tree):
+                if isinstance(node, ast.FunctionDef):
+                    # 전략 함수 분석
+                    if any(pattern in node.name.lower() for pattern in self.investment_patterns['strategy_methods']):
+                        strategy_issues = self._analyze_strategy_function(node, code_content)
+                        issues.extend(strategy_issues)
+                    
+                    # 리스크 관리 함수 확인
+                    if any(keyword in node.name.lower() for keyword in self.investment_patterns['risk_keywords']):
+                        risk_issues = self._analyze_risk_function(node, code_content)
+                        issues.extend(risk_issues)
+        
+        except Exception as e:
+            logger.warning(f"⚠️ 투자 전략 분석 오류 {file_path}: {e}")
+        
+        return issues
+    
+    def _analyze_strategy_function(self, node: ast.FunctionDef, code_content: str) -> List[Dict[str, Any]]:
+        """전략 함수 분석"""
+        issues = []
+        
+        # 백테스팅 고려사항 확인
+        func_source = ast.get_source_segment(code_content, node) or ""
+        if 'backtest' not in func_source.lower() and 'historical' not in func_source.lower():
+            issues.append({
+                'type': 'missing_backtest',
+                'line': node.lineno,
+                'severity': 'medium',
+                'description': f'전략 함수 {node.name}에 백테스팅 고려사항 부족',
+                'suggestion': '백테스팅 로직 추가 고려'
+            })
+        
+        # 데이터 검증 확인
+        if 'validate' not in func_source.lower() and 'check' not in func_source.lower():
+            issues.append({
+                'type': 'missing_validation',
+                'line': node.lineno,
+                'severity': 'medium',
+                'description': f'전략 함수 {node.name}에 데이터 검증 부족',
+                'suggestion': '입력 데이터 검증 로직 추가'
+            })
+        
+        return issues
+    
+    def _analyze_risk_function(self, node: ast.FunctionDef, code_content: str) -> List[Dict[str, Any]]:
+        """리스크 관리 함수 분석"""
+        issues = []
+        
+        func_source = ast.get_source_segment(code_content, node) or ""
+        
+        # 포지션 크기 제한 확인
+        if 'position' in func_source.lower() and 'limit' not in func_source.lower():
+            issues.append({
+                'type': 'missing_position_limit',
+                'line': node.lineno,
+                'severity': 'high',
+                'description': f'리스크 함수 {node.name}에 포지션 크기 제한 부족',
+                'suggestion': '최대 포지션 크기 제한 추가'
+            })
+        
+        # 손절 로직 확인
+        if 'stop' not in func_source.lower() and 'loss' not in func_source.lower():
+            issues.append({
+                'type': 'missing_stop_loss',
+                'line': node.lineno,
+                'severity': 'high',
+                'description': f'리스크 함수 {node.name}에 손절 로직 부족',
+                'suggestion': '손절 로직 추가'
+            })
+        
+        return issues
+    
+    async def review_file(self, file_path: Path) -> Dict[str, Any]:
+        """개별 파일 리뷰"""
+        logger.info(f"📝 파일 리뷰 중: {file_path}")
+        
+        try:
+            with open(file_path, 'r', encoding='utf-8') as f:
+                code_content = f.read()
+            
+            # AI 분석
+            ai_analysis = await self.analyze_code_with_ai(file_path, code_content)
+            
+            # 투자 전략 특화 분석
+            investment_issues = self.analyze_investment_strategy_logic(file_path, code_content)
+            ai_analysis['investment_logic_issues'].extend(investment_issues)
+            
+            # 통계 업데이트
+            self.analysis_stats['files_reviewed'] += 1
+            self.analysis_stats['issues_found'] += len(ai_analysis.get('security_issues', []))
+            self.analysis_stats['issues_found'] += len(ai_analysis.get('performance_issues', []))
+            self.analysis_stats['issues_found'] += len(ai_analysis.get('investment_logic_issues', []))
+            self.analysis_stats['issues_found'] += len(ai_analysis.get('code_quality_issues', []))
+            
+            self.analysis_stats['security_issues'] += len(ai_analysis.get('security_issues', []))
+            self.analysis_stats['performance_issues'] += len(ai_analysis.get('performance_issues', []))
+            self.analysis_stats['investment_logic_issues'] += len(ai_analysis.get('investment_logic_issues', []))
+            self.analysis_stats['suggestions_made'] += len(ai_analysis.get('suggestions', []))
+            
+            return ai_analysis
+            
+        except Exception as e:
+            logger.error(f"❌ 파일 리뷰 오류 {file_path}: {e}")
+            return {
+                'file': str(file_path.relative_to(self.project_root)),
+                'error': str(e),
+                'timestamp': datetime.now().isoformat()
+            }
+    
+    async def run_comprehensive_review(self) -> Dict[str, Any]:
+        """종합적인 코드 리뷰 실행"""
+        logger.info("🤖 고급 AI 코드 리뷰 시작")
+        
+        start_time = datetime.now()
+        
+        # Python 파일들 수집
+        python_files = list(self.project_root.rglob('*.py'))
+        logger.info(f"📁 {len(python_files)}개 Python 파일 발견")
+        
+        # 병렬 리뷰 실행
+        tasks = []
+        for py_file in python_files:
+            if py_file.is_file():
+                task = self.review_file(py_file)
+                tasks.append(task)
+        
+        # 모든 리뷰 완료 대기
+        review_results = await asyncio.gather(*tasks, return_exceptions=True)
+        
+        # 결과 정리
+        successful_reviews = []
+        failed_reviews = []
+        
+        for result in review_results:
+            if isinstance(result, Exception):
+                failed_reviews.append(str(result))
+            elif 'error' in result:
+                failed_reviews.append(result)
+            else:
+                successful_reviews.append(result)
+        
+        end_time = datetime.now()
+        duration = (end_time - start_time).total_seconds()
+        
+        # 종합 결과
+        comprehensive_result = {
+            'timestamp': start_time.isoformat(),
+            'duration_seconds': duration,
+            'stats': self.analysis_stats,
+            'successful_reviews': successful_reviews,
+            'failed_reviews': failed_reviews,
+            'summary': {
+                'total_files': len(python_files),
+                'reviewed_files': len(successful_reviews),
+                'failed_files': len(failed_reviews),
+                'total_issues': self.analysis_stats['issues_found'],
+                'average_score': self._calculate_average_score(successful_reviews)
+            },
+            'recommendations': self._generate_comprehensive_recommendations(successful_reviews)
+        }
+        
+        logger.info(f"✅ 고급 AI 리뷰 완료: {len(successful_reviews)}개 파일 리뷰, {duration:.1f}초 소요")
+        
+        return comprehensive_result
+    
+    def _calculate_average_score(self, reviews: List[Dict[str, Any]]) -> float:
+        """평균 점수 계산"""
+        if not reviews:
+            return 0.0
+        
+        total_score = sum(review.get('overall_score', 0) for review in reviews)
+        return total_score / len(reviews)
+    
+    def _generate_comprehensive_recommendations(self, reviews: List[Dict[str, Any]]) -> List[str]:
+        """종합 권장사항 생성"""
+        recommendations = []
+        
+        # 보안 이슈 집계
+        security_count = sum(len(review.get('security_issues', [])) for review in reviews)
+        if security_count > 0:
+            recommendations.append(f"🔒 {security_count}개 보안 이슈 해결 필요")
+        
+        # 성능 이슈 집계
+        performance_count = sum(len(review.get('performance_issues', [])) for review in reviews)
+        if performance_count > 0:
+            recommendations.append(f"⚡ {performance_count}개 성능 최적화 필요")
+        
+        # 투자 로직 이슈 집계
+        investment_count = sum(len(review.get('investment_logic_issues', [])) for review in reviews)
+        if investment_count > 0:
+            recommendations.append(f"💰 {investment_count}개 투자 로직 개선 필요")
+        
+        # 공통 제안사항 추출
+        all_suggestions = []
+        for review in reviews:
+            all_suggestions.extend(review.get('suggestions', []))
+        
+        # 빈도 높은 제안사항 추가
+        from collections import Counter
+        common_suggestions = Counter(all_suggestions).most_common(5)
+        for suggestion, count in common_suggestions:
+            if count > 1:
+                recommendations.append(f"💡 {suggestion} ({count}회 제안)")
+        
+        return recommendations
+    
+    def save_review_report(self, result: Dict[str, Any], output_file: str = "ai_review_report.json"):
+        """리뷰 결과 저장"""
+        output_path = self.project_root / output_file
+        
+        with open(output_path, 'w', encoding='utf-8') as f:
+            json.dump(result, f, indent=2, ensure_ascii=False, default=str)
+        
+        logger.info(f"📄 AI 리뷰 보고서 저장: {output_path}")
+        
+        # 마크다운 보고서도 생성
+        self.save_markdown_report(result, str(output_path).replace('.json', '.md'))
+    
+    def save_markdown_report(self, result: Dict[str, Any], output_file: str):
+        """마크다운 형식 보고서 저장"""
+        md_content = f"""# 🤖 고급 AI 코드 리뷰 보고서
 
-## 📊 전체 분석 요약
+**실행 시간**: {result['timestamp']}  
+**소요 시간**: {result['duration_seconds']:.1f}초  
+**평균 점수**: {result['summary']['average_score']:.1f}/100
 
-- **분석된 파일**: {len(file_analyses)}개
-- **총 코드 라인**: {total_lines:,}줄
-- **복잡도 이슈**: {total_complexity_issues}개
-- **코드 스멜**: {total_code_smells}개
+## 📊 요약
 
-## 📁 파일별 상세 리뷰
+- **총 파일**: {result['summary']['total_files']}개
+- **리뷰 완료**: {result['summary']['reviewed_files']}개
+- **리뷰 실패**: {result['summary']['failed_files']}개
+- **총 이슈**: {result['summary']['total_issues']}개
+
+### 이슈 분류
+- **보안 이슈**: {result['stats']['security_issues']}개
+- **성능 이슈**: {result['stats']['performance_issues']}개
+- **투자 로직 이슈**: {result['stats']['investment_logic_issues']}개
+- **제안사항**: {result['stats']['suggestions_made']}개
+
+## 🎯 주요 권장사항
 
 """
         
-        for review_data in individual_reviews:
-            comprehensive_review += f"""
-### 📄 {review_data['file']}
-
-{review_data['review']}
-
----
-"""
+        for rec in result['recommendations']:
+            md_content += f"- {rec}\n"
         
-        # 전체 프로젝트 권장사항
-        if self.gemini_model:
-            try:
-                project_summary_prompt = f"""
-다음은 자동매매 시스템의 전체 분석 결과입니다:
-
-- 총 {len(file_analyses)}개 파일 분석
-- 총 {total_lines:,}줄의 코드
-- {total_complexity_issues}개의 복잡도 이슈
-- {total_code_smells}개의 코드 스멜
-
-전체 프로젝트 관점에서 다음을 제안해주세요:
-
-1. **우선순위 개선 사항** (상위 3개)
-2. **아키텍처 개선 방향**
-3. **성능 최적화 포인트**
-4. **유지보수성 향상 방안**
-5. **자동매매 시스템 안정성 강화**
-
-마크다운 형식으로 답변해주세요.
-"""
-                
-                project_recommendations = await self.gemini_model.generate_content_async(project_summary_prompt)
-                comprehensive_review += f"""
-
-## 🎯 전체 프로젝트 권장사항
-
-{project_recommendations.text}
-"""
-            except Exception as e:
-                comprehensive_review += f"\n⚠️ 전체 프로젝트 분석 실패: {str(e)}\n"
+        # 상세 리뷰 결과
+        md_content += "\n## 📋 상세 리뷰 결과\n\n"
         
-        return comprehensive_review
+        for review in result['successful_reviews'][:10]:  # 상위 10개만 표시
+            md_content += f"### {review['file']}\n\n"
+            md_content += f"**점수**: {review.get('overall_score', 0)}/100\n\n"
+            
+            if review.get('security_issues'):
+                md_content += "**보안 이슈**:\n"
+                for issue in review['security_issues'][:3]:  # 상위 3개만
+                    md_content += f"- 라인 {issue['line']}: {issue['description']}\n"
+                md_content += "\n"
+            
+            if review.get('suggestions'):
+                md_content += "**제안사항**:\n"
+                for suggestion in review['suggestions'][:3]:  # 상위 3개만
+                    md_content += f"- {suggestion}\n"
+                md_content += "\n"
+        
+        with open(output_file, 'w', encoding='utf-8') as f:
+            f.write(md_content)
+        
+        logger.info(f"📄 마크다운 보고서 저장: {output_file}")
 
 async def main():
-    """메인 실행 함수"""
-    print("🧠 고급 AI 코드 리뷰 시작...")
+    """CLI 진입점"""
+    import argparse
     
-    reviewer = AdvancedAIReviewer()
+    parser = argparse.ArgumentParser(description='고급 AI 코드 리뷰어')
+    parser.add_argument('--project-root', default='.', help='프로젝트 루트 디렉토리')
+    parser.add_argument('--output', default='ai_review_report.json', help='출력 파일명')
+    parser.add_argument('--verbose', '-v', action='store_true', help='상세 로그 출력')
     
-    # 변경된 파일 분석
-    changed_files = reviewer.get_changed_files()
+    args = parser.parse_args()
     
-    if not changed_files:
-        print("❌ 분석할 파일이 없습니다.")
-        return
+    if args.verbose:
+        logging.getLogger().setLevel(logging.DEBUG)
     
-    print(f"📁 분석할 파일: {len(changed_files)}개")
+    # AI 리뷰 실행
+    reviewer = AdvancedAIReviewer(args.project_root)
+    result = await reviewer.run_comprehensive_review()
+    reviewer.save_review_report(result, args.output)
     
-    # 각 파일 분석
-    file_analyses = []
-    for file_path in changed_files:
-        print(f"🔍 분석 중: {file_path}")
-        analysis = reviewer.analyze_file_structure(file_path)
-        file_analyses.append(analysis)
+    # 결과 출력
+    print(f"\n🤖 고급 AI 코드 리뷰 완료!")
+    print(f"📊 평균 점수: {result['summary']['average_score']:.1f}/100")
+    print(f"📁 리뷰된 파일: {result['summary']['reviewed_files']}개")
+    print(f"🚨 총 이슈: {result['summary']['total_issues']}개")
     
-    # 종합 리뷰 생성
-    print("🤖 AI 리뷰 생성 중...")
-    comprehensive_review = await reviewer.generate_comprehensive_review(file_analyses)
-    
-    # 결과 저장
-    with open('ai_review_results.md', 'w', encoding='utf-8') as f:
-        f.write(comprehensive_review)
-    
-    print("✅ AI 코드 리뷰 완료!")
+    if result['summary']['average_score'] < 70:
+        print("⚠️ 코드 품질 개선이 필요합니다")
+        sys.exit(1)
+    else:
+        print("✅ 코드 품질이 양호합니다")
 
 if __name__ == "__main__":
-    import asyncio
     asyncio.run(main()) 

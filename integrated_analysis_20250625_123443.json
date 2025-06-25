@@ -1,0 +1,19 @@
+{
+  "collected_data": {},
+  "analysis_data": {
+    "analysis_results": {},
+    "top5_result": {
+      "top5_stocks": [],
+      "selection_reasoning": "오류로 인한 기본 선정: 404 models/gemini-pro is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.",
+      "gemini_analysis": null,
+      "all_candidates": []
+    },
+    "analysis_timestamp": "2025-06-25 12:34:43.704253"
+  },
+  "system_info": {
+    "collection_time": "2025-06-25 12:34:43.127925",
+    "analysis_time": "2025-06-25 12:34:43.704971",
+    "total_stocks": 0,
+    "valid_stocks": 0
+  }
+}

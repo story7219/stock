@@ -1,8 +1,26 @@
+# 📦 투자 분석 시스템 프로젝트 설정 파일 (pyproject.toml)
+# ==============================================================
+#
+# 이 파일은 Python 프로젝트의 메타데이터, 의존성, 빌드 설정을 정의합니다.
+# PEP 518/621 표준을 따라 현대적인 Python 패키지 관리를 구현합니다.
+#
+# 주요 구성 요소:
+# 1. 프로젝트 메타데이터: 이름, 버전, 설명, 저자 정보
+# 2. 의존성 관리: 필수 라이브러리 및 선택적 의존성
+# 3. 빌드 시스템: setuptools 기반 패키지 빌드
+# 4. 개발 도구 설정: black, isort, mypy 등 코드 품질 도구
+# 5. 프로젝트 URL: 저장소, 문서, 이슈 트래커 링크
+#
+# 이 파일을 통해 프로젝트의 전체 생명주기를 관리하며,
+# pip install, poetry, setuptools 등 다양한 도구와 호환됩니다.
+
 [build-system]
+# 빌드 시스템 설정 (패키지 빌드에 필요한 도구들)
 requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
+# 프로젝트 기본 정보
 name = "stock-analysis-system"
 version = "5.0.0"
 description = "코스피200·나스닥100·S&P500 투자 대가 전략 AI 분석 시스템"
@@ -14,11 +32,15 @@ authors = [
 maintainers = [
     {name = "AI Assistant", email = "ai@example.com"}
 ]
+
+# 프로젝트 키워드 (검색 및 분류용)
 keywords = [
     "stock", "analysis", "ai", "gemini", "kospi", "nasdaq", "sp500",
     "warren-buffett", "peter-lynch", "benjamin-graham",
     "technical-analysis", "investment", "finance", "trading"
 ]
+
+# PyPI 분류자 (프로젝트 카테고리 및 메타데이터)
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Financial and Insurance Industry",
@@ -34,7 +56,11 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
+
+# Python 버전 요구사항
 requires-python = ">=3.9"
+
+# 핵심 의존성 라이브러리
 dependencies = [
     # 핵심 데이터 처리
     "pandas>=2.0.0",
@@ -98,31 +124,33 @@ dependencies = [
     "typer>=0.9.0",
 ]
 
+# 선택적 의존성 (개발 환경용)
 [project.optional-dependencies]
 dev = [
-    # 코드 품질
-    "black>=23.9.0",
-    "pylint>=2.17.0",
-    "flake8>=6.1.0",
-    "mypy>=1.6.0",
-    "isort>=5.12.0",
+    # 코드 품질 도구
+    "black>=23.9.0",        # 코드 포맷터
+    "pylint>=2.17.0",       # 코드 린터
+    "flake8>=6.1.0",        # 스타일 가이드 검사기
+    "mypy>=1.6.0",          # 타입 체커
+    "isort>=5.12.0",        # import 정렬
     
-    # 테스팅
-    "pytest>=7.4.0",
-    "pytest-asyncio>=0.21.0",
-    "pytest-cov>=4.1.0",
-    "pytest-mock>=3.11.0",
-    "pytest-xdist>=3.3.0",
+    # 테스팅 도구
+    "pytest>=7.4.0",        # 테스트 프레임워크
+    "pytest-asyncio>=0.21.0", # 비동기 테스트
+    "pytest-cov>=4.1.0",    # 커버리지 측정
+    "pytest-mock>=3.11.0",  # 모킹 도구
+    "pytest-xdist>=3.3.0",  # 병렬 테스트 실행
     
     # 개발 도구
-    "jupyter>=1.0.0",
-    "notebook>=7.0.0",
-    "ipywidgets>=8.1.0",
-    "pre-commit>=3.4.0",
-    "bandit>=1.7.5",
-    "safety>=2.3.0",
+    "jupyter>=1.0.0",       # Jupyter 노트북
+    "notebook>=7.0.0",      # 노트북 인터페이스
+    "ipywidgets>=8.1.0",    # 인터랙티브 위젯
+    "pre-commit>=3.4.0",    # Git pre-commit 훅
+    "bandit>=1.7.5",        # 보안 취약점 검사
+    "safety>=2.3.0",        # 의존성 보안 검사
 ]
 
+# 프로젝트 관련 URL들
 [project.urls]
 Homepage = "https://github.com/user/stock-analysis-system"
 Documentation = "https://github.com/user/stock-analysis-system/wiki"
@@ -130,44 +158,47 @@ Repository = "https://github.com/user/stock-analysis-system.git"
 "Bug Reports" = "https://github.com/user/stock-analysis-system/issues"
 Changelog = "https://github.com/user/stock-analysis-system/blob/main/CHANGELOG.md"
 
+# CLI 스크립트 정의
 [project.scripts]
 stock-analysis = "main:main"
 
+# setuptools 패키지 설정
 [tool.setuptools.packages.find]
-include = ["src*"]
-exclude = ["tests*"]
+include = ["src*"]      # 포함할 패키지
+exclude = ["tests*"]    # 제외할 패키지
 
+# 패키지 데이터 파일 포함
 [tool.setuptools.package-data]
 "*" = ["*.txt", "*.md", "*.yml", "*.yaml", "*.json"]
 
 # Black 코드 포맷터 설정
 [tool.black]
-line-length = 88
-target-version = ['py39', 'py310', 'py311', 'py312']
-include = '\.pyi?$'
+line-length = 88                                    # 한 줄 최대 길이
+target-version = ['py39', 'py310', 'py311', 'py312'] # 대상 Python 버전
+include = '\.pyi?$'                                 # 포함할 파일 패턴
 extend-exclude = '''
 /(
-    \.eggs
-  | \.git
-  | \.hg
-  | \.mypy_cache
-  | \.tox
-  | \.venv
-  | _build
-  | buck-out
-  | build
-  | dist
-  | __pycache__
+    \.eggs      # setuptools 빌드 폴더
+  | \.git       # Git 폴더
+  | \.hg        # Mercurial 폴더
+  | \.mypy_cache # MyPy 캐시 폴더
+  | \.tox       # Tox 테스트 폴더
+  | \.venv      # 가상환경 폴더
+  | _build      # Sphinx 빌드 폴더
+  | buck-out    # Buck 빌드 폴더
+  | build       # 빌드 폴더
+  | dist        # 배포 폴더
+  | __pycache__ # Python 캐시 폴더
 )/
 '''
 
 # isort import 정렬 설정
 [tool.isort]
-profile = "black"
-multi_line_output = 3
-line_length = 88
-known_first_party = ["src"]
-known_third_party = [
+profile = "black"              # Black과 호환되는 프로필
+multi_line_output = 3          # 멀티라인 import 스타일
+line_length = 88               # 한 줄 최대 길이
+known_first_party = ["src"]    # 1st party 모듈
+known_third_party = [          # 3rd party 모듈들
     "pandas", "numpy", "aiohttp", "beautifulsoup4", "selenium",
     "yfinance", "google", "telegram", "gspread", "schedule",
     "pytest", "matplotlib", "seaborn", "plotly"
@@ -175,31 +206,32 @@ known_third_party = [
 
 # MyPy 타입 체크 설정
 [tool.mypy]
-python_version = "3.9"
-warn_return_any = true
-warn_unused_configs = true
-disallow_untyped_defs = true
-disallow_incomplete_defs = true
-check_untyped_defs = true
-disallow_untyped_decorators = true
-no_implicit_optional = true
-warn_redundant_casts = true
-warn_unused_ignores = true
-warn_no_return = true
-warn_unreachable = true
-strict_equality = true
-show_error_codes = true
+python_version = "3.9"                 # 기준 Python 버전
+warn_return_any = true                  # Any 타입 반환 경고
+warn_unused_configs = true              # 사용되지 않는 설정 경고
+disallow_untyped_defs = true           # 타입 힌트 없는 함수 금지
+disallow_incomplete_defs = true         # 불완전한 타입 정의 금지
+check_untyped_defs = true              # 타입 없는 함수도 검사
+disallow_untyped_decorators = true     # 타입 없는 데코레이터 금지
+no_implicit_optional = true            # 암시적 Optional 금지
+warn_redundant_casts = true            # 불필요한 타입 캐스트 경고
+warn_unused_ignores = true             # 사용되지 않는 ignore 경고
+warn_no_return = true                  # return 없는 함수 경고
+warn_unreachable = true                # 도달 불가능한 코드 경고
+strict_equality = true                 # 엄격한 동등성 검사
+show_error_codes = true                # 오류 코드 표시
 
+# 특정 모듈에 대한 MyPy 설정 오버라이드
 [[tool.mypy.overrides]]
 module = [
-    "yfinance.*",
-    "investpy.*",
-    "ta.*",
-    "talib.*",
-    "gspread.*",
-    "telegram.*",
-    "schedule.*",
-    "selenium.*",
+    "yfinance.*",      # Yahoo Finance 라이브러리
+    "investpy.*",      # InvestPy 라이브러리
+    "ta.*",            # 기술적 분석 라이브러리
+    "talib.*",         # TA-Lib 라이브러리
+    "gspread.*",       # Google Sheets 라이브러리
+    "telegram.*",      # 텔레그램 봇 라이브러리
+    "schedule.*",      # Schedule 라이브러리
+    "selenium.*",      # Selenium 라이브러리
 ]
 ignore_missing_imports = true
 

@@ -50,6 +50,32 @@ jobs:
           
           # 리팩토링 도구 설치
           pip install rope autoflake unify vulture
+          
+          # 고급 품질 검사 도구 추가
+          pip install pytest pytest-cov
+
+      - name: 🔍 리팩토링 전 품질 측정
+        id: pre_quality
+        run: |
+          echo "📊 리팩토링 전 품질 측정 시작..."
+          python .github/scripts/quality_check.py > pre_quality_output.txt 2>&1 || true
+          
+          if [ -f pre_quality_output.txt ]; then
+            echo "📋 리팩토링 전 품질 결과:"
+            cat pre_quality_output.txt
+            
+            # 점수 추출
+            if grep -q "전체 점수:" pre_quality_output.txt; then
+              PRE_SCORE=$(grep "전체 점수:" pre_quality_output.txt | grep -o '[0-9]\+\.[0-9]\+' | head -1)
+              echo "PRE_QUALITY_SCORE=$PRE_SCORE" >> $GITHUB_ENV
+              echo "리팩토링 전 품질 점수: $PRE_SCORE/100"
+            else
+              echo "PRE_QUALITY_SCORE=0.0" >> $GITHUB_ENV
+            fi
+          else
+            echo "⚠️ 리팩토링 전 품질 측정 실패"
+            echo "PRE_QUALITY_SCORE=0.0" >> $GITHUB_ENV
+          fi
 
       - name: 🔍 투자 전략 함수 식별
         id: identify_strategies
@@ -171,6 +197,44 @@ jobs:
         run: |
           echo "🔍 리팩토링 후 품질 검사..."
           
+          # 고급 품질 측정 추가
+          echo "📊 리팩토링 후 품질 측정 시작..."
+          python .github/scripts/quality_check.py > post_quality_output.txt 2>&1 || true
+          
+          if [ -f post_quality_output.txt ]; then
+            echo "📋 리팩토링 후 품질 결과:"
+            cat post_quality_output.txt
+            
+            # 점수 추출
+            if grep -q "전체 점수:" post_quality_output.txt; then
+              POST_SCORE=$(grep "전체 점수:" post_quality_output.txt | grep -o '[0-9]\+\.[0-9]\+' | head -1)
+              echo "POST_QUALITY_SCORE=$POST_SCORE" >> $GITHUB_ENV
+              echo "리팩토링 후 품질 점수: $POST_SCORE/100"
+              
+              # 품질 개선도 계산
+              PRE_SCORE=${PRE_QUALITY_SCORE:-0.0}
+              echo "품질 개선도: $PRE_SCORE → $POST_SCORE"
+              
+              IMPROVEMENT=$(python -c "print(round(float('$POST_SCORE') - float('$PRE_SCORE'), 2))")
+              echo "QUALITY_IMPROVEMENT=$IMPROVEMENT" >> $GITHUB_ENV
+              
+              if (( $(echo "$IMPROVEMENT > 0" | bc -l) )); then
+                echo "✅ 품질 개선됨: +$IMPROVEMENT점"
+              elif (( $(echo "$IMPROVEMENT < 0" | bc -l) )); then
+                echo "⚠️ 품질 저하됨: $IMPROVEMENT점"
+              else
+                echo "ℹ️ 품질 변화 없음"
+              fi
+            else
+              echo "POST_QUALITY_SCORE=0.0" >> $GITHUB_ENV
+              echo "QUALITY_IMPROVEMENT=0.0" >> $GITHUB_ENV
+            fi
+          else
+            echo "⚠️ 리팩토링 후 품질 측정 실패"
+            echo "POST_QUALITY_SCORE=0.0" >> $GITHUB_ENV
+            echo "QUALITY_IMPROVEMENT=0.0" >> $GITHUB_ENV
+          fi
+          
           # 구문 검사
           python -c "
           import os
@@ -245,6 +309,11 @@ jobs:
           import subprocess
           from datetime import datetime
           
+          # 환경변수에서 품질 점수 가져오기
+          pre_score = os.environ.get('PRE_QUALITY_SCORE', '0.0')
+          post_score = os.environ.get('POST_QUALITY_SCORE', '0.0')  
+          improvement = os.environ.get('QUALITY_IMPROVEMENT', '0.0')
+          
           # 리팩토링 리포트 생성
           report = f'''# 🔧 자동 리팩토링 리포트
           
@@ -252,7 +321,25 @@ jobs:
           **리팩토링 수준**: ${{ github.event.inputs.refactor_level || 'safe' }}
           **전략 보존**: ${{ github.event.inputs.preserve_strategies || 'true' }}
           
-          ## 📈 코드 품질 지표
+          ## 📈 품질 점수 비교 (고급 AI 분석)
+          
+          | 구분 | 점수 | 변화 |
+          |------|------|------|
+          | 리팩토링 전 | {pre_score}/100 | - |
+          | 리팩토링 후 | {post_score}/100 | {improvement:+.1f}점 |
+          
+          '''
+          
+          # 품질 개선 상태 표시
+          improvement_float = float(improvement)
+          if improvement_float > 0:
+              report += f'### ✅ 품질 개선 성공! (+{improvement}점)\\n\\n'
+          elif improvement_float < 0:
+              report += f'### ⚠️ 품질 저하 발생 ({improvement}점)\\n\\n'
+          else:
+              report += f'### ℹ️ 품질 변화 없음\\n\\n'
+          
+          report += '''## 📊 상세 품질 지표
           
           '''
           
@@ -278,6 +365,7 @@ jobs:
           - 📚 Import 정리: 완료  
           - 🗑️ 불필요한 코드 제거: 완료
           - 🛡️ 투자 전략 보존: {'✅ 확인됨' if '${{ github.event.inputs.preserve_strategies }}' == 'true' else '⚠️ 건너뜀'}
+          - 🔍 고급 품질 분석: 완료
           
           ## 📋 다음 단계 권장사항
           
@@ -291,6 +379,7 @@ jobs:
               f.write(report)
           
           print('📊 리팩토링 리포트 생성 완료')
+          print(f'품질 점수: {pre_score} → {post_score} ({improvement:+}점)')
           "
 
       - name: 💾 변경사항 커밋 및 푸시
@@ -324,12 +413,26 @@ jobs:
               status = '✅ 성공' if '${{ job.status }}' == 'success' else '❌ 실패'
               level = '${{ github.event.inputs.refactor_level || 'safe' }}'
               
+              # 품질 점수 정보 추가
+              pre_score = os.environ.get('PRE_QUALITY_SCORE', '0.0')
+              post_score = os.environ.get('POST_QUALITY_SCORE', '0.0')
+              improvement = os.environ.get('QUALITY_IMPROVEMENT', '0.0')
+              
+              improvement_text = ''
+              if float(improvement) > 0:
+                  improvement_text = f'📈 품질 개선: +{improvement}점'
+              elif float(improvement) < 0:
+                  improvement_text = f'📉 품질 저하: {improvement}점'
+              else:
+                  improvement_text = '📊 품질 유지'
+              
               message = f'''🔧 자동 리팩토링 완료
               
           **상태**: {status}
           **수준**: {level}
           **투자 전략**: 🛡️ 보존됨
-          **시간**: $(date '+%Y-%m-%d %H:%M')
+          **품질 점수**: {pre_score} → {post_score}
+          **개선도**: {improvement_text}
           
           📊 상세 리포트는 GitHub Actions에서 확인하세요.'''
               
@@ -356,4 +459,7 @@ jobs:
           path: |
             reports/refactor_analysis.md
             protected_strategies.txt
+            pre_quality_output.txt
+            post_quality_output.txt
+            quality_report.md
           retention-days: 30 

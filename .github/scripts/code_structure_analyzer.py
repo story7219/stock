@@ -1,377 +1,701 @@
+#!/usr/bin/env python3
 """
-AI 기반 코드 구조 분석 및 리팩토링 계획 생성
+🏗️ 코드 구조 분석기
+프로젝트의 코드 구조를 분석하고 아키텍처 품질을 평가하는 도구
 """
 
 import os
-import ast
+import sys
 import json
-import subprocess
+import ast
+import logging
 from pathlib import Path
-from typing import Dict, List, Any, Tuple
-from dataclasses import dataclass
-import google.generativeai as genai
+from typing import Dict, List, Any, Set, Tuple
+from datetime import datetime
+from collections import defaultdict, Counter
+import re
 
-@dataclass
-class ModuleAnalysis:
-    """모듈 분석 결과"""
-    file_path: str
-    lines_of_code: int
-    functions: List[str]
-    classes: List[str]
-    imports: List[str]
-    responsibilities: List[str]
-    coupling_score: float
-    cohesion_score: float
+# 로깅 설정
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
 class CodeStructureAnalyzer:
     """코드 구조 분석기"""
     
-    def __init__(self):
-        genai.configure(api_key=os.getenv('GEMINI_API_KEY'))
-        self.model = genai.GenerativeModel('gemini-1.5-pro')
-        self.modules = []
-        self.restructure_plan = {}
-    
-    def analyze_project_structure(self) -> Dict[str, Any]:
-        """프로젝트 전체 구조 분석"""
-        python_files = list(Path('.').rglob('*.py'))
-        python_files = [f for f in python_files if not str(f).startswith('.git')]
-        
-        analysis_results = {
-            'total_files': len(python_files),
-            'modules': [],
-            'structure_issues': [],
-            'recommendations': [],
-            'metrics': {}
+    def __init__(self, project_root: str = "."):
+        self.project_root = Path(project_root)
+        self.analysis_result = {
+            'timestamp': datetime.now().isoformat(),
+            'project_root': str(self.project_root),
+            'modules': {},
+            'dependencies': {},
+            'metrics': {},
+            'issues': [],
+            'recommendations': []
         }
         
-        # 각 파일 분석
-        for file_path in python_files:
-            module_analysis = self.analyze_module(str(file_path))
-            if module_analysis:
-                analysis_results['modules'].append(module_analysis.__dict__)
-                self.modules.append(module_analysis)
-        
-        # 구조적 문제 탐지
-        structure_issues = self.detect_structure_issues()
-        analysis_results['structure_issues'] = structure_issues
-        
-        # 메트릭 계산
-        metrics = self.calculate_structure_metrics()
-        analysis_results['metrics'] = metrics
-        
-        return analysis_results
+        logger.info(f"🏗️ 코드 구조 분석기 초기화 (프로젝트: {self.project_root})")
     
-    def analyze_module(self, file_path: str) -> ModuleAnalysis:
-        """개별 모듈 분석"""
+    def analyze_file_structure(self) -> Dict[str, Any]:
+        """파일 구조 분석"""
+        logger.info("📁 파일 구조 분석 중...")
+        
+        structure = {
+            'total_files': 0,
+            'python_files': 0,
+            'test_files': 0,
+            'config_files': 0,
+            'documentation_files': 0,
+            'directories': [],
+            'file_types': Counter(),
+            'largest_files': [],
+            'empty_files': []
+        }
+        
+        for file_path in self.project_root.rglob('*'):
+            if file_path.is_file():
+                structure['total_files'] += 1
+                
+                # 파일 확장자별 분류
+                suffix = file_path.suffix.lower()
+                structure['file_types'][suffix] += 1
+                
+                # 파일 크기 확인
+                file_size = file_path.stat().st_size
+                
+                if suffix == '.py':
+                    structure['python_files'] += 1
+                    
+                    # 테스트 파일 확인
+                    if 'test' in file_path.name.lower() or file_path.parent.name == 'tests':
+                        structure['test_files'] += 1
+                    
+                    # 빈 파일 확인
+                    if file_size == 0:
+                        structure['empty_files'].append(str(file_path.relative_to(self.project_root)))
+                    
+                    # 큰 파일 추적 (상위 10개)
+                    structure['largest_files'].append({
+                        'file': str(file_path.relative_to(self.project_root)),
+                        'size': file_size,
+                        'lines': self._count_lines(file_path)
+                    })
+                
+                elif suffix in ['.ini', '.conf', '.cfg', '.json', '.yaml', '.yml', '.toml']:
+                    structure['config_files'] += 1
+                
+                elif suffix in ['.md', '.rst', '.txt']:
+                    structure['documentation_files'] += 1
+            
+            elif file_path.is_dir():
+                structure['directories'].append(str(file_path.relative_to(self.project_root)))
+        
+        # 큰 파일 정렬 (상위 10개만)
+        structure['largest_files'] = sorted(
+            structure['largest_files'], 
+            key=lambda x: x['size'], 
+            reverse=True
+        )[:10]
+        
+        return structure
+    
+    def _count_lines(self, file_path: Path) -> int:
+        """파일의 라인 수 계산"""
+        try:
+            with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+                return len(f.readlines())
+        except Exception:
+            return 0
+    
+    def analyze_module_dependencies(self) -> Dict[str, Any]:
+        """모듈 의존성 분석"""
+        logger.info("🔗 모듈 의존성 분석 중...")
+        
+        dependencies = {
+            'imports': defaultdict(set),
+            'internal_dependencies': defaultdict(set),
+            'external_dependencies': set(),
+            'circular_dependencies': [],
+            'unused_imports': [],
+            'dependency_graph': {}
+        }
+        
+        # 모든 Python 파일 분석
+        for py_file in self.project_root.rglob('*.py'):
+            if py_file.is_file():
+                module_name = self._get_module_name(py_file)
+                file_imports = self._analyze_imports(py_file)
+                
+                dependencies['imports'][module_name] = file_imports['all_imports']
+                dependencies['external_dependencies'].update(file_imports['external'])
+                dependencies['internal_dependencies'][module_name] = file_imports['internal']
+                
+                # 의존성 그래프 구축
+                dependencies['dependency_graph'][module_name] = list(file_imports['internal'])
+        
+        # 순환 의존성 검사
+        dependencies['circular_dependencies'] = self._find_circular_dependencies(
+            dependencies['dependency_graph']
+        )
+        
+        return dependencies
+    
+    def _get_module_name(self, file_path: Path) -> str:
+        """파일 경로에서 모듈명 추출"""
+        relative_path = file_path.relative_to(self.project_root)
+        module_parts = list(relative_path.parts[:-1]) + [relative_path.stem]
+        return '.'.join(module_parts).replace('__init__', '')
+    
+    def _analyze_imports(self, file_path: Path) -> Dict[str, Set[str]]:
+        """파일의 import 분석"""
+        imports = {
+            'all_imports': set(),
+            'internal': set(),
+            'external': set(),
+            'unused': set()
+        }
+        
         try:
             with open(file_path, 'r', encoding='utf-8') as f:
                 content = f.read()
             
             tree = ast.parse(content)
             
-            functions = []
-            classes = []
-            imports = []
+            for node in ast.walk(tree):
+                if isinstance(node, ast.Import):
+                    for alias in node.names:
+                        import_name = alias.name
+                        imports['all_imports'].add(import_name)
+                        
+                        if self._is_internal_module(import_name):
+                            imports['internal'].add(import_name)
+                        else:
+                            imports['external'].add(import_name)
+                
+                elif isinstance(node, ast.ImportFrom):
+                    if node.module:
+                        module_name = node.module
+                        imports['all_imports'].add(module_name)
+                        
+                        if self._is_internal_module(module_name):
+                            imports['internal'].add(module_name)
+                        else:
+                            imports['external'].add(module_name)
+                        
+                        # from 절의 개별 import들도 추가
+                        for alias in node.names:
+                            full_name = f"{module_name}.{alias.name}"
+                            imports['all_imports'].add(full_name)
+        
+        except Exception as e:
+            logger.warning(f"⚠️ Import 분석 오류 {file_path}: {e}")
+        
+        return imports
+    
+    def _is_internal_module(self, module_name: str) -> bool:
+        """내부 모듈인지 확인"""
+        # 프로젝트 내부 모듈 패턴
+        internal_patterns = ['src', 'modules', 'core', 'utils', 'config']
+        
+        for pattern in internal_patterns:
+            if module_name.startswith(pattern):
+                return True
+        
+        # 상대 경로 import
+        if module_name.startswith('.'):
+            return True
+        
+        # 프로젝트 루트에 해당 모듈 파일이 있는지 확인
+        module_path = self.project_root / f"{module_name.replace('.', '/')}.py"
+        if module_path.exists():
+            return True
+        
+        return False
+    
+    def _find_circular_dependencies(self, dependency_graph: Dict[str, List[str]]) -> List[List[str]]:
+        """순환 의존성 찾기"""
+        circular_deps = []
+        visited = set()
+        rec_stack = set()
+        
+        def dfs(node: str, path: List[str]) -> bool:
+            if node in rec_stack:
+                # 순환 발견
+                cycle_start = path.index(node)
+                circular_deps.append(path[cycle_start:] + [node])
+                return True
+            
+            if node in visited:
+                return False
+            
+            visited.add(node)
+            rec_stack.add(node)
+            
+            for neighbor in dependency_graph.get(node, []):
+                if dfs(neighbor, path + [node]):
+                    return True
+            
+            rec_stack.remove(node)
+            return False
+        
+        for node in dependency_graph:
+            if node not in visited:
+                dfs(node, [])
+        
+        return circular_deps
+    
+    def analyze_code_complexity(self) -> Dict[str, Any]:
+        """코드 복잡도 분석"""
+        logger.info("🧮 코드 복잡도 분석 중...")
+        
+        complexity = {
+            'total_lines': 0,
+            'total_functions': 0,
+            'total_classes': 0,
+            'average_function_length': 0,
+            'average_class_length': 0,
+            'cyclomatic_complexity': {},
+            'complex_functions': [],
+            'large_classes': [],
+            'long_functions': []
+        }
+        
+        all_function_lengths = []
+        all_class_lengths = []
+        
+        for py_file in self.project_root.rglob('*.py'):
+            if py_file.is_file():
+                file_analysis = self._analyze_file_complexity(py_file)
+                
+                complexity['total_lines'] += file_analysis['lines']
+                complexity['total_functions'] += file_analysis['functions']
+                complexity['total_classes'] += file_analysis['classes']
+                
+                all_function_lengths.extend(file_analysis['function_lengths'])
+                all_class_lengths.extend(file_analysis['class_lengths'])
+                
+                # 복잡한 함수들 추가
+                complexity['complex_functions'].extend(file_analysis['complex_functions'])
+                complexity['large_classes'].extend(file_analysis['large_classes'])
+                complexity['long_functions'].extend(file_analysis['long_functions'])
+        
+        # 평균 계산
+        if all_function_lengths:
+            complexity['average_function_length'] = sum(all_function_lengths) / len(all_function_lengths)
+        
+        if all_class_lengths:
+            complexity['average_class_length'] = sum(all_class_lengths) / len(all_class_lengths)
+        
+        # 상위 복잡도 함수들만 유지
+        complexity['complex_functions'] = sorted(
+            complexity['complex_functions'], 
+            key=lambda x: x['complexity'], 
+            reverse=True
+        )[:20]
+        
+        complexity['large_classes'] = sorted(
+            complexity['large_classes'], 
+            key=lambda x: x['lines'], 
+            reverse=True
+        )[:10]
+        
+        complexity['long_functions'] = sorted(
+            complexity['long_functions'], 
+            key=lambda x: x['lines'], 
+            reverse=True
+        )[:10]
+        
+        return complexity
+    
+    def _analyze_file_complexity(self, file_path: Path) -> Dict[str, Any]:
+        """개별 파일 복잡도 분석"""
+        analysis = {
+            'lines': 0,
+            'functions': 0,
+            'classes': 0,
+            'function_lengths': [],
+            'class_lengths': [],
+            'complex_functions': [],
+            'large_classes': [],
+            'long_functions': []
+        }
+        
+        try:
+            with open(file_path, 'r', encoding='utf-8') as f:
+                content = f.read()
+                analysis['lines'] = len(content.split('\n'))
+            
+            tree = ast.parse(content)
             
             for node in ast.walk(tree):
                 if isinstance(node, ast.FunctionDef):
-                    functions.append(node.name)
+                    analysis['functions'] += 1
+                    func_lines = self._count_node_lines(node)
+                    analysis['function_lengths'].append(func_lines)
+                    
+                    # 긴 함수 체크 (50줄 이상)
+                    if func_lines > 50:
+                        analysis['long_functions'].append({
+                            'file': str(file_path.relative_to(self.project_root)),
+                            'name': node.name,
+                            'lines': func_lines,
+                            'start_line': node.lineno
+                        })
+                    
+                    # 순환 복잡도 계산 (간단한 버전)
+                    complexity = self._calculate_cyclomatic_complexity(node)
+                    if complexity > 10:
+                        analysis['complex_functions'].append({
+                            'file': str(file_path.relative_to(self.project_root)),
+                            'name': node.name,
+                            'complexity': complexity,
+                            'lines': func_lines,
+                            'start_line': node.lineno
+                        })
+                
                 elif isinstance(node, ast.ClassDef):
-                    classes.append(node.name)
-                elif isinstance(node, ast.Import):
-                    imports.extend([alias.name for alias in node.names])
-                elif isinstance(node, ast.ImportFrom):
-                    if node.module:
-                        imports.append(node.module)
-            
-            # 책임 분석 (키워드 기반)
-            responsibilities = self.analyze_responsibilities(content, functions, classes)
-            
-            # 결합도/응집도 계산
-            coupling_score = self.calculate_coupling(imports, len(functions) + len(classes))
-            cohesion_score = self.calculate_cohesion(functions, classes, content)
-            
-            return ModuleAnalysis(
-                file_path=file_path,
-                lines_of_code=len(content.split('\n')),
-                functions=functions,
-                classes=classes,
-                imports=imports,
-                responsibilities=responsibilities,
-                coupling_score=coupling_score,
-                cohesion_score=cohesion_score
-            )
-            
+                    analysis['classes'] += 1
+                    class_lines = self._count_node_lines(node)
+                    analysis['class_lengths'].append(class_lines)
+                    
+                    # 큰 클래스 체크 (200줄 이상)
+                    if class_lines > 200:
+                        analysis['large_classes'].append({
+                            'file': str(file_path.relative_to(self.project_root)),
+                            'name': node.name,
+                            'lines': class_lines,
+                            'start_line': node.lineno,
+                            'methods': len([n for n in node.body if isinstance(n, ast.FunctionDef)])
+                        })
+        
         except Exception as e:
-            print(f"❌ 모듈 분석 실패 ({file_path}): {e}")
-            return None
-    
-    def analyze_responsibilities(self, content: str, functions: List[str], classes: List[str]) -> List[str]:
-        """모듈의 책임 분석"""
-        responsibilities = []
+            logger.warning(f"⚠️ 파일 복잡도 분석 오류 {file_path}: {e}")
         
-        # 키워드 기반 책임 분류
-        responsibility_keywords = {
-            'trading_strategy': ['strategy', 'signal', 'indicator', 'analysis', 'fibonacci', 'scout'],
-            'data_collection': ['data', 'fetch', 'download', 'api', 'websocket', 'price'],
-            'order_execution': ['order', 'buy', 'sell', 'execute', 'trade', 'position'],
-            'portfolio_management': ['portfolio', 'balance', 'asset', 'allocation', 'risk'],
-            'logging_monitoring': ['log', 'monitor', 'alert', 'notification', 'telegram'],
-            'configuration': ['config', 'setting', 'env', 'parameter'],
-            'utility': ['util', 'helper', 'common', 'tool']
+        return analysis
+    
+    def _count_node_lines(self, node: ast.AST) -> int:
+        """AST 노드의 라인 수 계산"""
+        if hasattr(node, 'end_lineno') and hasattr(node, 'lineno'):
+            return node.end_lineno - node.lineno + 1
+        return 1
+    
+    def _calculate_cyclomatic_complexity(self, node: ast.FunctionDef) -> int:
+        """순환 복잡도 계산 (간단한 버전)"""
+        complexity = 1  # 기본 복잡도
+        
+        for child in ast.walk(node):
+            if isinstance(child, (ast.If, ast.While, ast.For, ast.AsyncFor)):
+                complexity += 1
+            elif isinstance(child, ast.ExceptHandler):
+                complexity += 1
+            elif isinstance(child, ast.With, ast.AsyncWith):
+                complexity += 1
+            elif isinstance(child, ast.BoolOp):
+                if isinstance(child.op, (ast.And, ast.Or)):
+                    complexity += len(child.values) - 1
+        
+        return complexity
+    
+    def analyze_code_quality_patterns(self) -> Dict[str, Any]:
+        """코드 품질 패턴 분석"""
+        logger.info("✨ 코드 품질 패턴 분석 중...")
+        
+        patterns = {
+            'docstring_coverage': 0,
+            'type_hint_coverage': 0,
+            'test_coverage_estimate': 0,
+            'naming_issues': [],
+            'code_smells': [],
+            'best_practices': {
+                'followed': [],
+                'violated': []
+            }
         }
         
-        content_lower = content.lower()
-        all_names = functions + classes
+        total_functions = 0
+        documented_functions = 0
+        type_hinted_functions = 0
         
-        for responsibility, keywords in responsibility_keywords.items():
-            if any(keyword in content_lower for keyword in keywords):
-                responsibilities.append(responsibility)
-            
-            # 함수/클래스 이름에서도 체크
-            if any(any(keyword in name.lower() for keyword in keywords) for name in all_names):
-                if responsibility not in responsibilities:
-                    responsibilities.append(responsibility)
+        for py_file in self.project_root.rglob('*.py'):
+            if py_file.is_file():
+                file_patterns = self._analyze_file_patterns(py_file)
+                
+                total_functions += file_patterns['total_functions']
+                documented_functions += file_patterns['documented_functions']
+                type_hinted_functions += file_patterns['type_hinted_functions']
+                
+                patterns['naming_issues'].extend(file_patterns['naming_issues'])
+                patterns['code_smells'].extend(file_patterns['code_smells'])
         
-        return responsibilities if responsibilities else ['unknown']
+        # 커버리지 계산
+        if total_functions > 0:
+            patterns['docstring_coverage'] = (documented_functions / total_functions) * 100
+            patterns['type_hint_coverage'] = (type_hinted_functions / total_functions) * 100
+        
+        # 테스트 커버리지 추정 (테스트 파일 수 기반)
+        test_files = len(list(self.project_root.rglob('*test*.py')))
+        source_files = len(list(self.project_root.rglob('*.py'))) - test_files
+        if source_files > 0:
+            patterns['test_coverage_estimate'] = min((test_files / source_files) * 100, 100)
+        
+        return patterns
     
-    def calculate_coupling(self, imports: List[str], total_entities: int) -> float:
-        """결합도 계산 (낮을수록 좋음)"""
-        if total_entities == 0:
-            return 0.0
-        
-        external_imports = len([imp for imp in imports if not imp.startswith('.')])
-        return min(1.0, external_imports / max(1, total_entities))
-    
-    def calculate_cohesion(self, functions: List[str], classes: List[str], content: str) -> float:
-        """응집도 계산 (높을수록 좋음)"""
-        if not functions and not classes:
-            return 0.0
-        
-        # 간단한 응집도 계산: 공통 키워드 비율
-        all_names = functions + classes
-        if not all_names:
-            return 0.0
-        
-        # 가장 빈번한 키워드 찾기
-        keywords = {}
-        for name in all_names:
-            words = name.lower().split('_')
-            for word in words:
-                keywords[word] = keywords.get(word, 0) + 1
-        
-        if not keywords:
-            return 0.0
-        
-        max_frequency = max(keywords.values())
-        cohesion = max_frequency / len(all_names)
-        
-        return min(1.0, cohesion)
-    
-    def detect_structure_issues(self) -> List[Dict[str, Any]]:
-        """구조적 문제 탐지"""
-        issues = []
-        
-        # 1. 거대한 파일 탐지
-        for module in self.modules:
-            if module.lines_of_code > 500:
-                issues.append({
-                    'type': 'large_file',
-                    'severity': 'high',
-                    'file': module.file_path,
-                    'description': f"파일이 {module.lines_of_code}줄로 너무 큽니다.",
-                    'suggestion': "기능별로 여러 파일로 분리하세요."
-                })
-        
-        # 2. 다중 책임 모듈 탐지
-        for module in self.modules:
-            if len(module.responsibilities) > 3:
-                issues.append({
-                    'type': 'multiple_responsibilities',
-                    'severity': 'medium',
-                    'file': module.file_path,
-                    'description': f"모듈이 {len(module.responsibilities)}개의 책임을 가집니다.",
-                    'responsibilities': module.responsibilities,
-                    'suggestion': "단일 책임 원칙에 따라 모듈을 분리하세요."
-                })
-        
-        # 3. 높은 결합도 탐지
-        for module in self.modules:
-            if module.coupling_score > 0.7:
-                issues.append({
-                    'type': 'high_coupling',
-                    'severity': 'medium',
-                    'file': module.file_path,
-                    'description': f"결합도가 {module.coupling_score:.2f}로 높습니다.",
-                    'suggestion': "의존성을 줄이고 인터페이스를 통한 느슨한 결합을 고려하세요."
-                })
-        
-        # 4. 낮은 응집도 탐지
-        for module in self.modules:
-            if module.cohesion_score < 0.3:
-                issues.append({
-                    'type': 'low_cohesion',
-                    'severity': 'medium',
-                    'file': module.file_path,
-                    'description': f"응집도가 {module.cohesion_score:.2f}로 낮습니다.",
-                    'suggestion': "관련된 기능들을 함께 그룹화하세요."
-                })
-        
-        return issues
-    
-    def calculate_structure_metrics(self) -> Dict[str, float]:
-        """구조 메트릭 계산"""
-        if not self.modules:
-            return {}
-        
-        total_loc = sum(m.lines_of_code for m in self.modules)
-        avg_coupling = sum(m.coupling_score for m in self.modules) / len(self.modules)
-        avg_cohesion = sum(m.cohesion_score for m in self.modules) / len(self.modules)
-        
-        # 책임 분산도 계산
-        all_responsibilities = []
-        for module in self.modules:
-            all_responsibilities.extend(module.responsibilities)
-        
-        unique_responsibilities = set(all_responsibilities)
-        responsibility_distribution = len(unique_responsibilities) / len(self.modules) if self.modules else 0
-        
-        return {
-            'total_lines_of_code': total_loc,
-            'average_file_size': total_loc / len(self.modules),
-            'average_coupling': avg_coupling,
-            'average_cohesion': avg_cohesion,
-            'responsibility_distribution': responsibility_distribution,
-            'modularity_score': (avg_cohesion - avg_coupling + 1) / 2  # 0-1 스케일
+    def _analyze_file_patterns(self, file_path: Path) -> Dict[str, Any]:
+        """개별 파일 패턴 분석"""
+        analysis = {
+            'total_functions': 0,
+            'documented_functions': 0,
+            'type_hinted_functions': 0,
+            'naming_issues': [],
+            'code_smells': []
         }
-    
-    async def generate_restructure_plan(self, analysis_results: Dict[str, Any]) -> Dict[str, Any]:
-        """AI를 통한 리팩토링 계획 생성"""
-        
-        prompt = f"""
-다음은 Python 자동매매 시스템의 코드 구조 분석 결과입니다:
-
-{json.dumps(analysis_results, ensure_ascii=False, indent=2)}
-
-이 분석 결과를 바탕으로 다음과 같은 역할별 모듈 구조로 리팩토링 계획을 세워주세요:
-
-## 목표 구조:
-1. **strategies/** - 매매 전략 모듈
-   - scout_strategy.py (척후병 전략)
-   - fibonacci_strategy.py (피보나치 전략)
-   - technical_analyzer.py (기술적 분석)
-
-2. **data/** - 데이터 수집 및 관리
-   - market_data_collector.py (시장 데이터 수집)
-   - websocket_manager.py (실시간 데이터)
-   - data_validator.py (데이터 검증)
-
-3. **trading/** - 주문 실행 및 포트폴리오
-   - order_executor.py (주문 실행)
-   - portfolio_manager.py (포트폴리오 관리)
-   - risk_manager.py (리스크 관리)
-
-4. **monitoring/** - 로깅 및 모니터링
-   - logger.py (로깅 시스템)
-   - telegram_notifier.py (알림)
-   - performance_monitor.py (성능 모니터링)
-
-5. **core/** - 핵심 시스템
-   - trader.py (메인 트레이더)
-   - config.py (설정 관리)
-   - exceptions.py (예외 처리)
-
-다음 형식으로 리팩토링 계획을 제시해주세요:
-
-```json
-{{
-  "restructure_needed": true/false,
-  "target_structure": {{
-    "폴더명/파일명": {{
-      "description": "파일 설명",
-      "responsibilities": ["책임1", "책임2"],
-      "source_files": ["현재_파일1.py", "현재_파일2.py"],
-      "functions_to_move": ["함수명1", "함수명2"],
-      "classes_to_move": ["클래스명1", "클래스명2"],
-      "interfaces": ["제공할_인터페이스1", "제공할_인터페이스2"]
-    }}
-  }},
-  "migration_steps": [
-    "단계별 마이그레이션 계획"
-  ],
-  "benefits": [
-    "예상되는 개선 효과"
-  ]
-}}
-```
-
-JSON 형식으로만 답변해주세요.
-"""
         
         try:
-            response = await self.model.generate_content_async(prompt)
-            plan_text = response.text.strip()
+            with open(file_path, 'r', encoding='utf-8') as f:
+                content = f.read()
             
-            # JSON 추출
-            if '```json' in plan_text:
-                json_start = plan_text.find('```json') + 7
-                json_end = plan_text.find('```', json_start)
-                plan_text = plan_text[json_start:json_end].strip()
+            tree = ast.parse(content)
             
-            return json.loads(plan_text)
-            
+            for node in ast.walk(tree):
+                if isinstance(node, ast.FunctionDef):
+                    analysis['total_functions'] += 1
+                    
+                    # Docstring 체크
+                    if ast.get_docstring(node):
+                        analysis['documented_functions'] += 1
+                    
+                    # 타입 힌트 체크
+                    if node.returns or any(arg.annotation for arg in node.args.args):
+                        analysis['type_hinted_functions'] += 1
+                    
+                    # 네이밍 규칙 체크
+                    if not self._is_valid_function_name(node.name):
+                        analysis['naming_issues'].append({
+                            'file': str(file_path.relative_to(self.project_root)),
+                            'type': 'function',
+                            'name': node.name,
+                            'line': node.lineno,
+                            'issue': '함수명이 snake_case 규칙을 따르지 않음'
+                        })
+                    
+                    # 함수 길이 체크 (코드 스멜)
+                    func_lines = self._count_node_lines(node)
+                    if func_lines > 100:
+                        analysis['code_smells'].append({
+                            'file': str(file_path.relative_to(self.project_root)),
+                            'type': 'long_function',
+                            'name': node.name,
+                            'line': node.lineno,
+                            'lines': func_lines,
+                            'description': f'함수가 너무 김 ({func_lines}줄)'
+                        })
+                
+                elif isinstance(node, ast.ClassDef):
+                    # 클래스 네이밍 규칙 체크
+                    if not self._is_valid_class_name(node.name):
+                        analysis['naming_issues'].append({
+                            'file': str(file_path.relative_to(self.project_root)),
+                            'type': 'class',
+                            'name': node.name,
+                            'line': node.lineno,
+                            'issue': '클래스명이 PascalCase 규칙을 따르지 않음'
+                        })
+        
         except Exception as e:
-            print(f"❌ 리팩토링 계획 생성 실패: {e}")
-            return {
-                "restructure_needed": False,
-                "error": str(e)
-            }
+            logger.warning(f"⚠️ 파일 패턴 분석 오류 {file_path}: {e}")
+        
+        return analysis
+    
+    def _is_valid_function_name(self, name: str) -> bool:
+        """함수명 유효성 검사 (snake_case)"""
+        return re.match(r'^[a-z_][a-z0-9_]*$', name) is not None
+    
+    def _is_valid_class_name(self, name: str) -> bool:
+        """클래스명 유효성 검사 (PascalCase)"""
+        return re.match(r'^[A-Z][a-zA-Z0-9]*$', name) is not None
+    
+    def generate_recommendations(self, analysis: Dict[str, Any]) -> List[str]:
+        """분석 결과 기반 권장사항 생성"""
+        recommendations = []
+        
+        # 파일 구조 권장사항
+        structure = analysis.get('file_structure', {})
+        if structure.get('empty_files'):
+            recommendations.append(f"📁 {len(structure['empty_files'])}개의 빈 파일을 정리하세요")
+        
+        if structure.get('python_files', 0) > 0 and structure.get('test_files', 0) == 0:
+            recommendations.append("🧪 테스트 파일이 없습니다. 단위 테스트를 추가하세요")
+        
+        # 의존성 권장사항
+        dependencies = analysis.get('dependencies', {})
+        if dependencies.get('circular_dependencies'):
+            recommendations.append(f"🔄 {len(dependencies['circular_dependencies'])}개의 순환 의존성을 해결하세요")
+        
+        # 복잡도 권장사항
+        complexity = analysis.get('complexity', {})
+        if complexity.get('complex_functions'):
+            recommendations.append(f"🧮 {len(complexity['complex_functions'])}개의 복잡한 함수를 리팩토링하세요")
+        
+        if complexity.get('large_classes'):
+            recommendations.append(f"📦 {len(complexity['large_classes'])}개의 큰 클래스를 분할하세요")
+        
+        # 품질 권장사항
+        quality = analysis.get('quality_patterns', {})
+        if quality.get('docstring_coverage', 0) < 70:
+            recommendations.append(f"📝 Docstring 커버리지가 낮습니다 ({quality.get('docstring_coverage', 0):.1f}%)")
+        
+        if quality.get('type_hint_coverage', 0) < 50:
+            recommendations.append(f"🏷️ 타입 힌트 커버리지가 낮습니다 ({quality.get('type_hint_coverage', 0):.1f}%)")
+        
+        return recommendations
+    
+    def calculate_overall_score(self, analysis: Dict[str, Any]) -> int:
+        """전체 코드 품질 점수 계산"""
+        score = 100
+        
+        # 구조 점수 (25%)
+        structure = analysis.get('file_structure', {})
+        if structure.get('empty_files'):
+            score -= len(structure['empty_files']) * 2
+        
+        # 의존성 점수 (25%)
+        dependencies = analysis.get('dependencies', {})
+        score -= len(dependencies.get('circular_dependencies', [])) * 10
+        
+        # 복잡도 점수 (25%)
+        complexity = analysis.get('complexity', {})
+        score -= len(complexity.get('complex_functions', [])) * 2
+        score -= len(complexity.get('large_classes', [])) * 5
+        
+        # 품질 점수 (25%)
+        quality = analysis.get('quality_patterns', {})
+        docstring_penalty = max(0, 70 - quality.get('docstring_coverage', 0)) * 0.3
+        type_hint_penalty = max(0, 50 - quality.get('type_hint_coverage', 0)) * 0.2
+        score -= docstring_penalty + type_hint_penalty
+        
+        return max(0, int(score))
+    
+    def run_analysis(self) -> Dict[str, Any]:
+        """전체 구조 분석 실행"""
+        logger.info("🏗️ 코드 구조 분석 시작")
+        
+        # 각 분석 실행
+        self.analysis_result['file_structure'] = self.analyze_file_structure()
+        self.analysis_result['dependencies'] = self.analyze_module_dependencies()
+        self.analysis_result['complexity'] = self.analyze_code_complexity()
+        self.analysis_result['quality_patterns'] = self.analyze_code_quality_patterns()
+        
+        # 권장사항 생성
+        self.analysis_result['recommendations'] = self.generate_recommendations(self.analysis_result)
+        
+        # 전체 점수 계산
+        self.analysis_result['overall_score'] = self.calculate_overall_score(self.analysis_result)
+        
+        logger.info(f"✅ 코드 구조 분석 완료: 점수 {self.analysis_result['overall_score']}/100")
+        
+        return self.analysis_result
+    
+    def save_report(self, output_file: str = "code_structure_report.json"):
+        """분석 결과 저장"""
+        output_path = self.project_root / output_file
+        
+        with open(output_path, 'w', encoding='utf-8') as f:
+            json.dump(self.analysis_result, f, indent=2, ensure_ascii=False, default=str)
+        
+        logger.info(f"📄 구조 분석 보고서 저장: {output_path}")
+        
+        # 마크다운 보고서도 생성
+        self.save_markdown_report(str(output_path).replace('.json', '.md'))
+    
+    def save_markdown_report(self, output_file: str):
+        """마크다운 형식 보고서 저장"""
+        result = self.analysis_result
+        
+        md_content = f"""# 🏗️ 코드 구조 분석 보고서
 
-async def main():
-    """메인 실행 함수"""
-    print("🏗️ 코드 구조 분석 시작...")
-    
-    analyzer = CodeStructureAnalyzer()
-    
-    # 프로젝트 구조 분석
-    analysis_results = analyzer.analyze_project_structure()
-    
-    # AI 리팩토링 계획 생성
-    restructure_plan = await analyzer.generate_restructure_plan(analysis_results)
-    
-    # 결과 저장
-    with open('structure_analysis_report.md', 'w', encoding='utf-8') as f:
-        f.write(f"""# 🏗️ 코드 구조 분석 리포트
+**생성 시간**: {result['timestamp']}  
+**프로젝트**: {result['project_root']}  
+**전체 점수**: {result['overall_score']}/100
 
-## 📊 전체 분석 결과
+## 📊 요약
 
-- **총 파일 수**: {analysis_results['total_files']}개
-- **구조적 이슈**: {len(analysis_results['structure_issues'])}개
-- **모듈화 점수**: {analysis_results['metrics'].get('modularity_score', 0):.2f}/1.0
+### 📁 파일 구조
+- **총 파일**: {result['file_structure']['total_files']}개
+- **Python 파일**: {result['file_structure']['python_files']}개
+- **테스트 파일**: {result['file_structure']['test_files']}개
+- **설정 파일**: {result['file_structure']['config_files']}개
 
-## 🔍 발견된 구조적 문제
+### 🔗 의존성
+- **외부 의존성**: {len(result['dependencies']['external_dependencies'])}개
+- **순환 의존성**: {len(result['dependencies']['circular_dependencies'])}개
 
-{chr(10).join([f"- **{issue['type']}** ({issue['severity']}): {issue['description']}" for issue in analysis_results['structure_issues']])}
+### 🧮 복잡도
+- **총 함수**: {result['complexity']['total_functions']}개
+- **총 클래스**: {result['complexity']['total_classes']}개
+- **평균 함수 길이**: {result['complexity']['average_function_length']:.1f}줄
 
-## 🎯 리팩토링 계획
+### ✨ 품질
+- **Docstring 커버리지**: {result['quality_patterns']['docstring_coverage']:.1f}%
+- **타입 힌트 커버리지**: {result['quality_patterns']['type_hint_coverage']:.1f}%
+- **테스트 커버리지 추정**: {result['quality_patterns']['test_coverage_estimate']:.1f}%
 
-{json.dumps(restructure_plan, ensure_ascii=False, indent=2)}
-""")
+## 🎯 주요 권장사항
+
+"""
+        
+        for rec in result['recommendations']:
+            md_content += f"- {rec}\n"
+        
+        # 상세 이슈들
+        if result['complexity']['complex_functions']:
+            md_content += "\n## 🧮 복잡한 함수들\n\n"
+            for func in result['complexity']['complex_functions'][:10]:
+                md_content += f"- **{func['file']}:{func['start_line']}** `{func['name']}()` - 복잡도: {func['complexity']}, 길이: {func['lines']}줄\n"
+        
+        if result['dependencies']['circular_dependencies']:
+            md_content += "\n## 🔄 순환 의존성\n\n"
+            for cycle in result['dependencies']['circular_dependencies']:
+                md_content += f"- {' → '.join(cycle)}\n"
+        
+        with open(output_file, 'w', encoding='utf-8') as f:
+            f.write(md_content)
+        
+        logger.info(f"📄 마크다운 보고서 저장: {output_file}")
+
+def main():
+    """CLI 진입점"""
+    import argparse
     
-    with open('restructure_plan.json', 'w', encoding='utf-8') as f:
-        json.dump(restructure_plan, f, ensure_ascii=False, indent=2)
+    parser = argparse.ArgumentParser(description='코드 구조 분석 도구')
+    parser.add_argument('--project-root', default='.', help='프로젝트 루트 디렉토리')
+    parser.add_argument('--output', default='code_structure_report.json', help='출력 파일명')
+    parser.add_argument('--verbose', '-v', action='store_true', help='상세 로그 출력')
     
-    with open('analysis_summary.json', 'w', encoding='utf-8') as f:
-        json.dump(analysis_results, f, ensure_ascii=False, indent=2)
+    args = parser.parse_args()
     
-    # 리팩토링 필요 여부 저장
-    restructure_needed = restructure_plan.get('restructure_needed', False)
-    with open('restructure_needed.txt', 'w') as f:
-        f.write(str(restructure_needed).lower())
+    if args.verbose:
+        logging.getLogger().setLevel(logging.DEBUG)
     
-    print(f"✅ 분석 완료! 리팩토링 필요: {restructure_needed}")
+    # 구조 분석 실행
+    analyzer = CodeStructureAnalyzer(args.project_root)
+    result = analyzer.run_analysis()
+    analyzer.save_report(args.output)
+    
+    # 결과 출력
+    print(f"\n🏗️ 코드 구조 분석 완료!")
+    print(f"📊 전체 점수: {result['overall_score']}/100")
+    print(f"📁 Python 파일: {result['file_structure']['python_files']}개")
+    print(f"🧮 복잡한 함수: {len(result['complexity']['complex_functions'])}개")
+    print(f"🔄 순환 의존성: {len(result['dependencies']['circular_dependencies'])}개")
+    
+    if result['overall_score'] < 70:
+        print("⚠️ 코드 구조 개선이 필요합니다")
+        sys.exit(1)
+    else:
+        print("✅ 코드 구조가 양호합니다")
 
 if __name__ == "__main__":
-    import asyncio
-    asyncio.run(main()) 
+    main() 

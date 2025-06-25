@@ -1,0 +1,48 @@
+{
+  "analysis_schedule": {
+    "weekdays": "09:30,12:00,15:30",
+    "weekends": "10:00"
+  },
+  "resource_limits": {
+    "max_cpu_percent": 85,
+    "max_memory_percent": 80,
+    "min_free_memory_gb": 2.0
+  },
+  "stocks": {
+    "kospi200_sample": [
+      "005930",
+      "000660",
+      "051910",
+      "068270",
+      "035420"
+    ],
+    "nasdaq_sample": [
+      "AAPL",
+      "MSFT",
+      "GOOGL",
+      "AMZN",
+      "TSLA",
+      "NVDA",
+      "META"
+    ],
+    "sp500_sample": [
+      "JPM",
+      "JNJ",
+      "V",
+      "WMT",
+      "PG",
+      "UNH",
+      "DIS",
+      "HD"
+    ]
+  },
+  "backup": {
+    "auto_backup": true,
+    "backup_interval_hours": 6,
+    "max_backups": 10
+  },
+  "notifications": {
+    "telegram_enabled": false,
+    "console_only": true
+  }
+}

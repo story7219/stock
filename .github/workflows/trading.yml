@@ -21,7 +21,7 @@ jobs:
           pip install -r requirements.txt
 
       - name: 🚀 척후병 전략 관리 시스템 실행
-        run: python scout_strategy_manager.py run
+        run: python .github/scripts/scout_strategy_manager.py run
         env:
           # GitHub Repository Secrets에서 환경변수를 가져옵니다.
           # 설정 방법: 리포지토리 > Settings > Secrets and variables > Actions

@@ -1,0 +1,13 @@
+{
+  "timestamp": "2025-06-25T11:07:24.263280",
+  "markets_analyzed": [
+    "NASDAQ"
+  ],
+  "top_recommendations": [],
+  "detailed_analysis": {},
+  "summary": {
+    "total_analyzed": 0,
+    "avg_score": 0,
+    "top_sectors": []
+  }
+}

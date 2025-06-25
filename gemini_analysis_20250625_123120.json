@@ -1,0 +1,780 @@
+{
+  "analysis_time": "2025-06-25 12:31:20.545839",
+  "strategies": {
+    "warren_buffett": {
+      "strategy": {
+        "name": "워런 버핏 (Warren Buffett)",
+        "focus": "우량주 장기투자",
+        "key_metrics": [
+          "ROE (자기자본이익률) > 15%",
+          "부채비율 < 50%",
+          "꾸준한 이익 성장",
+          "강력한 브랜드 파워",
+          "경쟁 우위 (해자)",
+          "합리적인 가격"
+        ],
+        "preferred_sectors": [
+          "소비재",
+          "금융",
+          "기술",
+          "헬스케어"
+        ],
+        "investment_horizon": "장기 (5년 이상)"
+      },
+      "analyzed_stocks": [
+        {
+          "symbol": "QQQ",
+          "exchange": "NASD",
+          "category": "nasdaq100",
+          "strategy": "Warren Buffett",
+          "score": 45.0,
+          "reasoning": "QQQ: 적절한 우량주 특성을 보유. 시장 지배력과 안정성 고려"
+        },
+        {
+          "symbol": "AAPL",
+          "exchange": "NASD",
+          "category": "nasdaq100",
+          "strategy": "Warren Buffett",
+          "score": 45.0,
+          "reasoning": "AAPL: 적절한 우량주 특성을 보유. 시장 지배력과 안정성 고려"
+        },
+        {
+          "symbol": "MSFT",
+          "exchange": "NASD",
+          "category": "nasdaq100",
+          "strategy": "Warren Buffett",
+          "score": 45.0,
+          "reasoning": "MSFT: 적절한 우량주 특성을 보유. 시장 지배력과 안정성 고려"
+        },
+        {
+          "symbol": "GOOGL",
+          "exchange": "NASD",
+          "category": "nasdaq100",
+          "strategy": "Warren Buffett",
+          "score": 45.0,
+          "reasoning": "GOOGL: 적절한 우량주 특성을 보유. 시장 지배력과 안정성 고려"
+        },
+        {
+          "symbol": "AMZN",
+          "exchange": "NASD",
+          "category": "nasdaq100",
+          "strategy": "Warren Buffett",
+          "score": 30.0,
+          "reasoning": "AMZN: 적절한 우량주 특성을 보유. 시장 지배력과 안정성 고려"
+        },
+        {
+          "symbol": "META",
+          "exchange": "NASD",
+          "category": "nasdaq100",
+          "strategy": "Warren Buffett",
+          "score": 30.0,
+          "reasoning": "META: 적절한 우량주 특성을 보유. 시장 지배력과 안정성 고려"
+        },
+        {
+          "symbol": "EWY",
+          "exchange": "NYSE",
+          "category": "kospi200_related",
+          "strategy": "Warren Buffett",
+          "score": 20.0,
+          "reasoning": "EWY: 버핏 전략 기준 부합도 낮음. 추가 분석 필요"
+        },
+        {
+          "symbol": "ES2412",
+          "exchange": "CME",
+          "category": "sp500_futures",
+          "strategy": "Warren Buffett",
+          "score": 0.0,
+          "reasoning": "ES2412: 버핏 전략 기준 부합도 낮음. 추가 분석 필요"
+        },
+        {
+          "symbol": "ES2503",
+          "exchange": "CME",
+          "category": "sp500_futures",
+          "strategy": "Warren Buffett",
+          "score": 0.0,
+          "reasoning": "ES2503: 버핏 전략 기준 부합도 낮음. 추가 분석 필요"
+        },
+        {
+          "symbol": "ES2506",
+          "exchange": "CME",
+          "category": "sp500_futures",
+          "strategy": "Warren Buffett",
+          "score": 0.0,
+          "reasoning": "ES2506: 버핏 전략 기준 부합도 낮음. 추가 분석 필요"
+        },
+        {
+          "symbol": "ES2509",
+          "exchange": "CME",
+          "category": "sp500_futures",
+          "strategy": "Warren Buffett",
+          "score": 0.0,
+          "reasoning": "ES2509: 버핏 전략 기준 부합도 낮음. 추가 분석 필요"
+        },
+        {
+          "symbol": "TSLA",
+          "exchange": "NASD",
+          "category": "nasdaq100",
+          "strategy": "Warren Buffett",
+          "score": 0.0,
+          "reasoning": "TSLA: 버핏 전략 기준 부합도 낮음. 추가 분석 필요"
+        },
+        {
+          "symbol": "NVDA",
+          "exchange": "NASD",
+          "category": "nasdaq100",
+          "strategy": "Warren Buffett",
+          "score": 0.0,
+          "reasoning": "NVDA: 버핏 전략 기준 부합도 낮음. 추가 분석 필요"
+        },
+        {
+          "symbol": "NFLX",
+          "exchange": "NASD",
+          "category": "nasdaq100",
+          "strategy": "Warren Buffett",
+          "score": 0.0,
+          "reasoning": "NFLX: 버핏 전략 기준 부합도 낮음. 추가 분석 필요"
+        },
+        {
+          "symbol": "ADBE",
+          "exchange": "NASD",
+          "category": "nasdaq100",
+          "strategy": "Warren Buffett",
+          "score": 0.0,
+          "reasoning": "ADBE: 버핏 전략 기준 부합도 낮음. 추가 분석 필요"
+        },
+        {
+          "symbol": "FLKR",
+          "exchange": "NYSE",
+          "category": "kospi200_related",
+          "strategy": "Warren Buffett",
+          "score": 0.0,
+          "reasoning": "FLKR: 버핏 전략 기준 부합도 낮음. 추가 분석 필요"
+        },
+        {
+          "symbol": "KRX",
+          "exchange": "NYSE",
+          "category": "kospi200_related",
+          "strategy": "Warren Buffett",
+          "score": 0.0,
+          "reasoning": "KRX: 버핏 전략 기준 부합도 낮음. 추가 분석 필요"
+        }
+      ],
+      "top_candidates": [
+        {
+          "symbol": "QQQ",
+          "exchange": "NASD",
+          "category": "nasdaq100",
+          "strategy": "Warren Buffett",
+          "score": 45.0,
+          "reasoning": "QQQ: 적절한 우량주 특성을 보유. 시장 지배력과 안정성 고려"
+        },
+        {
+          "symbol": "AAPL",
+          "exchange": "NASD",
+          "category": "nasdaq100",
+          "strategy": "Warren Buffett",
+          "score": 45.0,
+          "reasoning": "AAPL: 적절한 우량주 특성을 보유. 시장 지배력과 안정성 고려"
+        },
+        {
+          "symbol": "MSFT",
+          "exchange": "NASD",
+          "category": "nasdaq100",
+          "strategy": "Warren Buffett",
+          "score": 45.0,
+          "reasoning": "MSFT: 적절한 우량주 특성을 보유. 시장 지배력과 안정성 고려"
+        },
+        {
+          "symbol": "GOOGL",
+          "exchange": "NASD",
+          "category": "nasdaq100",
+          "strategy": "Warren Buffett",
+          "score": 45.0,
+          "reasoning": "GOOGL: 적절한 우량주 특성을 보유. 시장 지배력과 안정성 고려"
+        },
+        {
+          "symbol": "AMZN",
+          "exchange": "NASD",
+          "category": "nasdaq100",
+          "strategy": "Warren Buffett",
+          "score": 30.0,
+          "reasoning": "AMZN: 적절한 우량주 특성을 보유. 시장 지배력과 안정성 고려"
+        },
+        {
+          "symbol": "META",
+          "exchange": "NASD",
+          "category": "nasdaq100",
+          "strategy": "Warren Buffett",
+          "score": 30.0,
+          "reasoning": "META: 적절한 우량주 특성을 보유. 시장 지배력과 안정성 고려"
+        },
+        {
+          "symbol": "EWY",
+          "exchange": "NYSE",
+          "category": "kospi200_related",
+          "strategy": "Warren Buffett",
+          "score": 20.0,
+          "reasoning": "EWY: 버핏 전략 기준 부합도 낮음. 추가 분석 필요"
+        },
+        {
+          "symbol": "ES2412",
+          "exchange": "CME",
+          "category": "sp500_futures",
+          "strategy": "Warren Buffett",
+          "score": 0.0,
+          "reasoning": "ES2412: 버핏 전략 기준 부합도 낮음. 추가 분석 필요"
+        },
+        {
+          "symbol": "ES2503",
+          "exchange": "CME",
+          "category": "sp500_futures",
+          "strategy": "Warren Buffett",
+          "score": 0.0,
+          "reasoning": "ES2503: 버핏 전략 기준 부합도 낮음. 추가 분석 필요"
+        },
+        {
+          "symbol": "ES2506",
+          "exchange": "CME",
+          "category": "sp500_futures",
+          "strategy": "Warren Buffett",
+          "score": 0.0,
+          "reasoning": "ES2506: 버핏 전략 기준 부합도 낮음. 추가 분석 필요"
+        }
+      ]
+    },
+    "peter_lynch": {
+      "strategy": {
+        "name": "피터 린치 (Peter Lynch)",
+        "focus": "성장주 발굴",
+        "key_metrics": [
+          "PEG Ratio < 1.0",
+          "매출 성장률 > 20%",
+          "이익 성장률 > 25%",
+          "시장점유율 확대",
+          "혁신적인 제품/서비스",
+          "강력한 경영진"
+        ],
+        "preferred_sectors": [
+          "기술",
+          "바이오",
+          "소비재",
+          "소매"
+        ],
+        "investment_horizon": "중기 (2-5년)"
+      },
+      "analyzed_stocks": [
+        {
+          "symbol": "META",
+          "exchange": "NASD",
+          "category": "nasdaq100",
+          "strategy": "Peter Lynch",
+          "score": 80.0,
+          "reasoning": "META: 높은 성장 잠재력과 혁신성. 시장 확장 가능성이 큰 성장주"
+        },
+        {
+          "symbol": "TSLA",
+          "exchange": "NASD",
+          "category": "nasdaq100",
+          "strategy": "Peter Lynch",
+          "score": 60.0,
+          "reasoning": "TSLA: 높은 성장 잠재력과 혁신성. 시장 확장 가능성이 큰 성장주"
+        },
+        {
+          "symbol": "NVDA",
+          "exchange": "NASD",
+          "category": "nasdaq100",
+          "strategy": "Peter Lynch",
+          "score": 60.0,
+          "reasoning": "NVDA: 높은 성장 잠재력과 혁신성. 시장 확장 가능성이 큰 성장주"
+        },
+        {
+          "symbol": "GOOGL",
+          "exchange": "NASD",
+          "category": "nasdaq100",
+          "strategy": "Peter Lynch",
+          "score": 50.0,
+          "reasoning": "GOOGL: 높은 성장 잠재력과 혁신성. 시장 확장 가능성이 큰 성장주"
+        },
+        {
+          "symbol": "AMZN",
+          "exchange": "NASD",
+          "category": "nasdaq100",
+          "strategy": "Peter Lynch",
+          "score": 50.0,
+          "reasoning": "AMZN: 높은 성장 잠재력과 혁신성. 시장 확장 가능성이 큰 성장주"
+        },
+        {
+          "symbol": "NFLX",
+          "exchange": "NASD",
+          "category": "nasdaq100",
+          "strategy": "Peter Lynch",
+          "score": 35.0,
+          "reasoning": "NFLX: 적절한 성장 동력 보유. 중기 관점에서 성장 기대"
+        },
+        {
+          "symbol": "AAPL",
+          "exchange": "NASD",
+          "category": "nasdaq100",
+          "strategy": "Peter Lynch",
+          "score": 30.0,
+          "reasoning": "AAPL: 적절한 성장 동력 보유. 중기 관점에서 성장 기대"
+        },
+        {
+          "symbol": "ES2412",
+          "exchange": "CME",
+          "category": "sp500_futures",
+          "strategy": "Peter Lynch",
+          "score": 0.0,
+          "reasoning": "ES2412: 린치 전략 기준 부합도 낮음. 성장성 재검토 필요"
+        },
+        {
+          "symbol": "ES2503",
+          "exchange": "CME",
+          "category": "sp500_futures",
+          "strategy": "Peter Lynch",
+          "score": 0.0,
+          "reasoning": "ES2503: 린치 전략 기준 부합도 낮음. 성장성 재검토 필요"
+        },
+        {
+          "symbol": "ES2506",
+          "exchange": "CME",
+          "category": "sp500_futures",
+          "strategy": "Peter Lynch",
+          "score": 0.0,
+          "reasoning": "ES2506: 린치 전략 기준 부합도 낮음. 성장성 재검토 필요"
+        },
+        {
+          "symbol": "ES2509",
+          "exchange": "CME",
+          "category": "sp500_futures",
+          "strategy": "Peter Lynch",
+          "score": 0.0,
+          "reasoning": "ES2509: 린치 전략 기준 부합도 낮음. 성장성 재검토 필요"
+        },
+        {
+          "symbol": "QQQ",
+          "exchange": "NASD",
+          "category": "nasdaq100",
+          "strategy": "Peter Lynch",
+          "score": 0.0,
+          "reasoning": "QQQ: 린치 전략 기준 부합도 낮음. 성장성 재검토 필요"
+        },
+        {
+          "symbol": "MSFT",
+          "exchange": "NASD",
+          "category": "nasdaq100",
+          "strategy": "Peter Lynch",
+          "score": 0.0,
+          "reasoning": "MSFT: 린치 전략 기준 부합도 낮음. 성장성 재검토 필요"
+        },
+        {
+          "symbol": "ADBE",
+          "exchange": "NASD",
+          "category": "nasdaq100",
+          "strategy": "Peter Lynch",
+          "score": 0.0,
+          "reasoning": "ADBE: 린치 전략 기준 부합도 낮음. 성장성 재검토 필요"
+        },
+        {
+          "symbol": "EWY",
+          "exchange": "NYSE",
+          "category": "kospi200_related",
+          "strategy": "Peter Lynch",
+          "score": 0.0,
+          "reasoning": "EWY: 린치 전략 기준 부합도 낮음. 성장성 재검토 필요"
+        },
+        {
+          "symbol": "FLKR",
+          "exchange": "NYSE",
+          "category": "kospi200_related",
+          "strategy": "Peter Lynch",
+          "score": 0.0,
+          "reasoning": "FLKR: 린치 전략 기준 부합도 낮음. 성장성 재검토 필요"
+        },
+        {
+          "symbol": "KRX",
+          "exchange": "NYSE",
+          "category": "kospi200_related",
+          "strategy": "Peter Lynch",
+          "score": 0.0,
+          "reasoning": "KRX: 린치 전략 기준 부합도 낮음. 성장성 재검토 필요"
+        }
+      ],
+      "top_candidates": [
+        {
+          "symbol": "META",
+          "exchange": "NASD",
+          "category": "nasdaq100",
+          "strategy": "Peter Lynch",
+          "score": 80.0,
+          "reasoning": "META: 높은 성장 잠재력과 혁신성. 시장 확장 가능성이 큰 성장주"
+        },
+        {
+          "symbol": "TSLA",
+          "exchange": "NASD",
+          "category": "nasdaq100",
+          "strategy": "Peter Lynch",
+          "score": 60.0,
+          "reasoning": "TSLA: 높은 성장 잠재력과 혁신성. 시장 확장 가능성이 큰 성장주"
+        },
+        {
+          "symbol": "NVDA",
+          "exchange": "NASD",
+          "category": "nasdaq100",
+          "strategy": "Peter Lynch",
+          "score": 60.0,
+          "reasoning": "NVDA: 높은 성장 잠재력과 혁신성. 시장 확장 가능성이 큰 성장주"
+        },
+        {
+          "symbol": "GOOGL",
+          "exchange": "NASD",
+          "category": "nasdaq100",
+          "strategy": "Peter Lynch",
+          "score": 50.0,
+          "reasoning": "GOOGL: 높은 성장 잠재력과 혁신성. 시장 확장 가능성이 큰 성장주"
+        },
+        {
+          "symbol": "AMZN",
+          "exchange": "NASD",
+          "category": "nasdaq100",
+          "strategy": "Peter Lynch",
+          "score": 50.0,
+          "reasoning": "AMZN: 높은 성장 잠재력과 혁신성. 시장 확장 가능성이 큰 성장주"
+        },
+        {
+          "symbol": "NFLX",
+          "exchange": "NASD",
+          "category": "nasdaq100",
+          "strategy": "Peter Lynch",
+          "score": 35.0,
+          "reasoning": "NFLX: 적절한 성장 동력 보유. 중기 관점에서 성장 기대"
+        },
+        {
+          "symbol": "AAPL",
+          "exchange": "NASD",
+          "category": "nasdaq100",
+          "strategy": "Peter Lynch",
+          "score": 30.0,
+          "reasoning": "AAPL: 적절한 성장 동력 보유. 중기 관점에서 성장 기대"
+        },
+        {
+          "symbol": "ES2412",
+          "exchange": "CME",
+          "category": "sp500_futures",
+          "strategy": "Peter Lynch",
+          "score": 0.0,
+          "reasoning": "ES2412: 린치 전략 기준 부합도 낮음. 성장성 재검토 필요"
+        },
+        {
+          "symbol": "ES2503",
+          "exchange": "CME",
+          "category": "sp500_futures",
+          "strategy": "Peter Lynch",
+          "score": 0.0,
+          "reasoning": "ES2503: 린치 전략 기준 부합도 낮음. 성장성 재검토 필요"
+        },
+        {
+          "symbol": "ES2506",
+          "exchange": "CME",
+          "category": "sp500_futures",
+          "strategy": "Peter Lynch",
+          "score": 0.0,
+          "reasoning": "ES2506: 린치 전략 기준 부합도 낮음. 성장성 재검토 필요"
+        }
+      ]
+    },
+    "benjamin_graham": {
+      "strategy": {
+        "name": "벤저민 그레이엄 (Benjamin Graham)",
+        "focus": "가치주 발굴",
+        "key_metrics": [
+          "PER < 15",
+          "PBR < 1.5",
+          "부채비율 < 30%",
+          "유동비율 > 2.0",
+          "배당수익률 > 3%",
+          "안전마진 확보"
+        ],
+        "preferred_sectors": [
+          "유틸리티",
+          "금융",
+          "제조업",
+          "에너지"
+        ],
+        "investment_horizon": "장기 (3-7년)"
+      },
+      "analyzed_stocks": [
+        {
+          "symbol": "QQQ",
+          "exchange": "NASD",
+          "category": "nasdaq100",
+          "strategy": "Benjamin Graham",
+          "score": 55.0,
+          "reasoning": "QQQ: 안전마진과 가치 투자 기준 충족. 저평가된 우량 자산"
+        },
+        {
+          "symbol": "EWY",
+          "exchange": "NYSE",
+          "category": "kospi200_related",
+          "strategy": "Benjamin Graham",
+          "score": 50.0,
+          "reasoning": "EWY: 안전마진과 가치 투자 기준 충족. 저평가된 우량 자산"
+        },
+        {
+          "symbol": "FLKR",
+          "exchange": "NYSE",
+          "category": "kospi200_related",
+          "strategy": "Benjamin Graham",
+          "score": 20.0,
+          "reasoning": "FLKR: 그레이엄 전략 기준 부합도 낮음. 가치 평가 재검토 필요"
+        },
+        {
+          "symbol": "ES2412",
+          "exchange": "CME",
+          "category": "sp500_futures",
+          "strategy": "Benjamin Graham",
+          "score": 0.0,
+          "reasoning": "ES2412: 그레이엄 전략 기준 부합도 낮음. 가치 평가 재검토 필요"
+        },
+        {
+          "symbol": "ES2503",
+          "exchange": "CME",
+          "category": "sp500_futures",
+          "strategy": "Benjamin Graham",
+          "score": 0.0,
+          "reasoning": "ES2503: 그레이엄 전략 기준 부합도 낮음. 가치 평가 재검토 필요"
+        },
+        {
+          "symbol": "ES2506",
+          "exchange": "CME",
+          "category": "sp500_futures",
+          "strategy": "Benjamin Graham",
+          "score": 0.0,
+          "reasoning": "ES2506: 그레이엄 전략 기준 부합도 낮음. 가치 평가 재검토 필요"
+        },
+        {
+          "symbol": "ES2509",
+          "exchange": "CME",
+          "category": "sp500_futures",
+          "strategy": "Benjamin Graham",
+          "score": 0.0,
+          "reasoning": "ES2509: 그레이엄 전략 기준 부합도 낮음. 가치 평가 재검토 필요"
+        },
+        {
+          "symbol": "AAPL",
+          "exchange": "NASD",
+          "category": "nasdaq100",
+          "strategy": "Benjamin Graham",
+          "score": 0.0,
+          "reasoning": "AAPL: 그레이엄 전략 기준 부합도 낮음. 가치 평가 재검토 필요"
+        },
+        {
+          "symbol": "MSFT",
+          "exchange": "NASD",
+          "category": "nasdaq100",
+          "strategy": "Benjamin Graham",
+          "score": 0.0,
+          "reasoning": "MSFT: 그레이엄 전략 기준 부합도 낮음. 가치 평가 재검토 필요"
+        },
+        {
+          "symbol": "GOOGL",
+          "exchange": "NASD",
+          "category": "nasdaq100",
+          "strategy": "Benjamin Graham",
+          "score": 0.0,
+          "reasoning": "GOOGL: 그레이엄 전략 기준 부합도 낮음. 가치 평가 재검토 필요"
+        },
+        {
+          "symbol": "AMZN",
+          "exchange": "NASD",
+          "category": "nasdaq100",
+          "strategy": "Benjamin Graham",
+          "score": 0.0,
+          "reasoning": "AMZN: 그레이엄 전략 기준 부합도 낮음. 가치 평가 재검토 필요"
+        },
+        {
+          "symbol": "TSLA",
+          "exchange": "NASD",
+          "category": "nasdaq100",
+          "strategy": "Benjamin Graham",
+          "score": 0.0,
+          "reasoning": "TSLA: 그레이엄 전략 기준 부합도 낮음. 가치 평가 재검토 필요"
+        },
+        {
+          "symbol": "NVDA",
+          "exchange": "NASD",
+          "category": "nasdaq100",
+          "strategy": "Benjamin Graham",
+          "score": 0.0,
+          "reasoning": "NVDA: 그레이엄 전략 기준 부합도 낮음. 가치 평가 재검토 필요"
+        },
+        {
+          "symbol": "META",
+          "exchange": "NASD",
+          "category": "nasdaq100",
+          "strategy": "Benjamin Graham",
+          "score": 0.0,
+          "reasoning": "META: 그레이엄 전략 기준 부합도 낮음. 가치 평가 재검토 필요"
+        },
+        {
+          "symbol": "NFLX",
+          "exchange": "NASD",
+          "category": "nasdaq100",
+          "strategy": "Benjamin Graham",
+          "score": 0.0,
+          "reasoning": "NFLX: 그레이엄 전략 기준 부합도 낮음. 가치 평가 재검토 필요"
+        },
+        {
+          "symbol": "ADBE",
+          "exchange": "NASD",
+          "category": "nasdaq100",
+          "strategy": "Benjamin Graham",
+          "score": 0.0,
+          "reasoning": "ADBE: 그레이엄 전략 기준 부합도 낮음. 가치 평가 재검토 필요"
+        },
+        {
+          "symbol": "KRX",
+          "exchange": "NYSE",
+          "category": "kospi200_related",
+          "strategy": "Benjamin Graham",
+          "score": 0.0,
+          "reasoning": "KRX: 그레이엄 전략 기준 부합도 낮음. 가치 평가 재검토 필요"
+        }
+      ],
+      "top_candidates": [
+        {
+          "symbol": "QQQ",
+          "exchange": "NASD",
+          "category": "nasdaq100",
+          "strategy": "Benjamin Graham",
+          "score": 55.0,
+          "reasoning": "QQQ: 안전마진과 가치 투자 기준 충족. 저평가된 우량 자산"
+        },
+        {
+          "symbol": "EWY",
+          "exchange": "NYSE",
+          "category": "kospi200_related",
+          "strategy": "Benjamin Graham",
+          "score": 50.0,
+          "reasoning": "EWY: 안전마진과 가치 투자 기준 충족. 저평가된 우량 자산"
+        },
+        {
+          "symbol": "FLKR",
+          "exchange": "NYSE",
+          "category": "kospi200_related",
+          "strategy": "Benjamin Graham",
+          "score": 20.0,
+          "reasoning": "FLKR: 그레이엄 전략 기준 부합도 낮음. 가치 평가 재검토 필요"
+        },
+        {
+          "symbol": "ES2412",
+          "exchange": "CME",
+          "category": "sp500_futures",
+          "strategy": "Benjamin Graham",
+          "score": 0.0,
+          "reasoning": "ES2412: 그레이엄 전략 기준 부합도 낮음. 가치 평가 재검토 필요"
+        },
+        {
+          "symbol": "ES2503",
+          "exchange": "CME",
+          "category": "sp500_futures",
+          "strategy": "Benjamin Graham",
+          "score": 0.0,
+          "reasoning": "ES2503: 그레이엄 전략 기준 부합도 낮음. 가치 평가 재검토 필요"
+        },
+        {
+          "symbol": "ES2506",
+          "exchange": "CME",
+          "category": "sp500_futures",
+          "strategy": "Benjamin Graham",
+          "score": 0.0,
+          "reasoning": "ES2506: 그레이엄 전략 기준 부합도 낮음. 가치 평가 재검토 필요"
+        },
+        {
+          "symbol": "ES2509",
+          "exchange": "CME",
+          "category": "sp500_futures",
+          "strategy": "Benjamin Graham",
+          "score": 0.0,
+          "reasoning": "ES2509: 그레이엄 전략 기준 부합도 낮음. 가치 평가 재검토 필요"
+        },
+        {
+          "symbol": "AAPL",
+          "exchange": "NASD",
+          "category": "nasdaq100",
+          "strategy": "Benjamin Graham",
+          "score": 0.0,
+          "reasoning": "AAPL: 그레이엄 전략 기준 부합도 낮음. 가치 평가 재검토 필요"
+        },
+        {
+          "symbol": "MSFT",
+          "exchange": "NASD",
+          "category": "nasdaq100",
+          "strategy": "Benjamin Graham",
+          "score": 0.0,
+          "reasoning": "MSFT: 그레이엄 전략 기준 부합도 낮음. 가치 평가 재검토 필요"
+        },
+        {
+          "symbol": "GOOGL",
+          "exchange": "NASD",
+          "category": "nasdaq100",
+          "strategy": "Benjamin Graham",
+          "score": 0.0,
+          "reasoning": "GOOGL: 그레이엄 전략 기준 부합도 낮음. 가치 평가 재검토 필요"
+        }
+      ]
+    }
+  },
+  "final_selection": {
+    "ai_analysis": "Gemini AI 사용 불가로 기본 점수 기반 선정",
+    "final_top5": [
+      {
+        "rank": 1,
+        "symbol": "META",
+        "exchange": "NASD",
+        "final_score": 80.0,
+        "ai_reasoning": "점수 기반 선정: META: 높은 성장 잠재력과 혁신성. 시장 확장 가능성이 큰 성장주",
+        "recommended_weight": 20.0
+      },
+      {
+        "rank": 2,
+        "symbol": "TSLA",
+        "exchange": "NASD",
+        "final_score": 60.0,
+        "ai_reasoning": "점수 기반 선정: TSLA: 높은 성장 잠재력과 혁신성. 시장 확장 가능성이 큰 성장주",
+        "recommended_weight": 20.0
+      },
+      {
+        "rank": 3,
+        "symbol": "NVDA",
+        "exchange": "NASD",
+        "final_score": 60.0,
+        "ai_reasoning": "점수 기반 선정: NVDA: 높은 성장 잠재력과 혁신성. 시장 확장 가능성이 큰 성장주",
+        "recommended_weight": 20.0
+      },
+      {
+        "rank": 4,
+        "symbol": "QQQ",
+        "exchange": "NASD",
+        "final_score": 55.0,
+        "ai_reasoning": "점수 기반 선정: QQQ: 안전마진과 가치 투자 기준 충족. 저평가된 우량 자산",
+        "recommended_weight": 20.0
+      },
+      {
+        "rank": 5,
+        "symbol": "GOOGL",
+        "exchange": "NASD",
+        "final_score": 50.0,
+        "ai_reasoning": "점수 기반 선정: GOOGL: 높은 성장 잠재력과 혁신성. 시장 확장 가능성이 큰 성장주",
+        "recommended_weight": 20.0
+      }
+    ],
+    "selection_time": "2025-06-25 12:31:20.545834",
+    "reasoning": "투자 대가 전략별 점수 합산을 통한 Top5 선정"
+  },
+  "summary": {
+    "total_analyzed": 51,
+    "strategies_used": 3,
+    "final_top5_count": 5
+  }
+}

@@ -1,0 +1,210 @@
+{
+  "sp500_futures": [
+    {
+      "exchange": "CME",
+      "symbol": "ES2412",
+      "data": {
+        "rsym": "",
+        "zdiv": "",
+        "base": "",
+        "pvol": "",
+        "last": "",
+        "sign": "",
+        "diff": "",
+        "rate": "",
+        "tvol": "",
+        "tamt": "",
+        "ordy": ""
+      },
+      "timestamp": "2025-06-25 12:25:40.136465"
+    },
+    {
+      "exchange": "CME",
+      "symbol": "ES2503",
+      "data": {
+        "rsym": "",
+        "zdiv": "",
+        "base": "",
+        "pvol": "",
+        "last": "",
+        "sign": "",
+        "diff": "",
+        "rate": "",
+        "tvol": "",
+        "tamt": "",
+        "ordy": ""
+      },
+      "timestamp": "2025-06-25 12:25:41.136636"
+    },
+    {
+      "exchange": "CME",
+      "symbol": "ES2506",
+      "data": {
+        "rsym": "",
+        "zdiv": "",
+        "base": "",
+        "pvol": "",
+        "last": "",
+        "sign": "",
+        "diff": "",
+        "rate": "",
+        "tvol": "",
+        "tamt": "",
+        "ordy": ""
+      },
+      "timestamp": "2025-06-25 12:25:42.151806"
+    },
+    {
+      "exchange": "CME",
+      "symbol": "ES2509",
+      "data": {
+        "rsym": "",
+        "zdiv": "",
+        "base": "",
+        "pvol": "",
+        "last": "",
+        "sign": "",
+        "diff": "",
+        "rate": "",
+        "tvol": "",
+        "tamt": "",
+        "ordy": ""
+      },
+      "timestamp": "2025-06-25 12:25:43.152833"
+    }
+  ],
+  "nasdaq100": [
+    {
+      "exchange": "NASD",
+      "symbol": "QQQ",
+      "data": {
+        "rt_cd": "2",
+        "msg_cd": "OPSQ2002",
+        "msg1": "ERROR INVALID INPUT_FILED NOT FOUND(GUBN)"
+      },
+      "timestamp": "2025-06-25 12:25:44.135954"
+    },
+    {
+      "exchange": "NASD",
+      "symbol": "AAPL",
+      "data": {
+        "rt_cd": "2",
+        "msg_cd": "OPSQ2002",
+        "msg1": "ERROR INVALID INPUT_FILED NOT FOUND(GUBN)"
+      },
+      "timestamp": "2025-06-25 12:25:45.133454"
+    },
+    {
+      "exchange": "NASD",
+      "symbol": "MSFT",
+      "data": {
+        "rt_cd": "2",
+        "msg_cd": "OPSQ2002",
+        "msg1": "ERROR INVALID INPUT_FILED NOT FOUND(GUBN)"
+      },
+      "timestamp": "2025-06-25 12:25:46.137413"
+    },
+    {
+      "exchange": "NASD",
+      "symbol": "GOOGL",
+      "data": {
+        "rt_cd": "2",
+        "msg_cd": "OPSQ2002",
+        "msg1": "ERROR INVALID INPUT_FILED NOT FOUND(GUBN)"
+      },
+      "timestamp": "2025-06-25 12:25:47.145782"
+    },
+    {
+      "exchange": "NASD",
+      "symbol": "AMZN",
+      "data": {
+        "rt_cd": "2",
+        "msg_cd": "OPSQ2002",
+        "msg1": "ERROR INVALID INPUT_FILED NOT FOUND(GUBN)"
+      },
+      "timestamp": "2025-06-25 12:25:48.135498"
+    },
+    {
+      "exchange": "NASD",
+      "symbol": "TSLA",
+      "data": {
+        "rt_cd": "2",
+        "msg_cd": "OPSQ2002",
+        "msg1": "ERROR INVALID INPUT_FILED NOT FOUND(GUBN)"
+      },
+      "timestamp": "2025-06-25 12:25:49.131253"
+    },
+    {
+      "exchange": "NASD",
+      "symbol": "NVDA",
+      "data": {
+        "rt_cd": "2",
+        "msg_cd": "OPSQ2002",
+        "msg1": "ERROR INVALID INPUT_FILED NOT FOUND(GUBN)"
+      },
+      "timestamp": "2025-06-25 12:25:50.155510"
+    },
+    {
+      "exchange": "NASD",
+      "symbol": "META",
+      "data": {
+        "rt_cd": "2",
+        "msg_cd": "OPSQ2002",
+        "msg1": "ERROR INVALID INPUT_FILED NOT FOUND(GUBN)"
+      },
+      "timestamp": "2025-06-25 12:25:51.167706"
+    },
+    {
+      "exchange": "NASD",
+      "symbol": "NFLX",
+      "data": {
+        "rt_cd": "2",
+        "msg_cd": "OPSQ2002",
+        "msg1": "ERROR INVALID INPUT_FILED NOT FOUND(GUBN)"
+      },
+      "timestamp": "2025-06-25 12:25:52.135721"
+    },
+    {
+      "exchange": "NASD",
+      "symbol": "ADBE",
+      "data": {
+        "rt_cd": "2",
+        "msg_cd": "OPSQ2002",
+        "msg1": "ERROR INVALID INPUT_FILED NOT FOUND(GUBN)"
+      },
+      "timestamp": "2025-06-25 12:25:53.136294"
+    }
+  ],
+  "kospi200_related": [
+    {
+      "exchange": "NYSE",
+      "symbol": "EWY",
+      "data": {
+        "rt_cd": "2",
+        "msg_cd": "OPSQ2002",
+        "msg1": "ERROR INVALID INPUT_FILED NOT FOUND(GUBN)"
+      },
+      "timestamp": "2025-06-25 12:25:54.141314"
+    },
+    {
+      "exchange": "NYSE",
+      "symbol": "FLKR",
+      "data": {
+        "rt_cd": "2",
+        "msg_cd": "OPSQ2002",
+        "msg1": "ERROR INVALID INPUT_FILED NOT FOUND(GUBN)"
+      },
+      "timestamp": "2025-06-25 12:25:55.140578"
+    },
+    {
+      "exchange": "NYSE",
+      "symbol": "KRX",
+      "data": {
+        "rt_cd": "2",
+        "msg_cd": "OPSQ2002",
+        "msg1": "ERROR INVALID INPUT_FILED NOT FOUND(GUBN)"
+      },
+      "timestamp": "2025-06-25 12:25:56.154763"
+    }
+  ]
+}

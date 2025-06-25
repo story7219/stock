@@ -1,0 +1,318 @@
+{
+  "sp500_futures": [
+    {
+      "exchange": "CME",
+      "symbol": "ES2412",
+      "price_data": {
+        "rsym": "",
+        "zdiv": "",
+        "base": "",
+        "pvol": "",
+        "last": "",
+        "sign": "",
+        "diff": "",
+        "rate": "",
+        "tvol": "",
+        "tamt": "",
+        "ordy": ""
+      },
+      "realtime_data": null,
+      "timestamp": "2025-06-25 12:38:55.500540"
+    },
+    {
+      "exchange": "CME",
+      "symbol": "ES2503",
+      "price_data": {
+        "rsym": "",
+        "zdiv": "",
+        "base": "",
+        "pvol": "",
+        "last": "",
+        "sign": "",
+        "diff": "",
+        "rate": "",
+        "tvol": "",
+        "tamt": "",
+        "ordy": ""
+      },
+      "realtime_data": null,
+      "timestamp": "2025-06-25 12:38:57.500542"
+    },
+    {
+      "exchange": "CME",
+      "symbol": "ES2506",
+      "price_data": {
+        "rsym": "",
+        "zdiv": "",
+        "base": "",
+        "pvol": "",
+        "last": "",
+        "sign": "",
+        "diff": "",
+        "rate": "",
+        "tvol": "",
+        "tamt": "",
+        "ordy": ""
+      },
+      "realtime_data": null,
+      "timestamp": "2025-06-25 12:38:59.497675"
+    },
+    {
+      "exchange": "CME",
+      "symbol": "ES2509",
+      "price_data": {
+        "rsym": "",
+        "zdiv": "",
+        "base": "",
+        "pvol": "",
+        "last": "",
+        "sign": "",
+        "diff": "",
+        "rate": "",
+        "tvol": "",
+        "tamt": "",
+        "ordy": ""
+      },
+      "realtime_data": null,
+      "timestamp": "2025-06-25 12:39:01.499909"
+    }
+  ],
+  "nasdaq100": [
+    {
+      "exchange": "NASD",
+      "symbol": "QQQ",
+      "data": {
+        "rsym": "",
+        "zdiv": "",
+        "base": "",
+        "pvol": "",
+        "last": "",
+        "sign": "",
+        "diff": "",
+        "rate": "",
+        "tvol": "",
+        "tamt": "",
+        "ordy": ""
+      },
+      "timestamp": "2025-06-25 12:39:01.533598"
+    },
+    {
+      "exchange": "NASD",
+      "symbol": "AAPL",
+      "data": {
+        "rsym": "",
+        "zdiv": "",
+        "base": "",
+        "pvol": "",
+        "last": "",
+        "sign": "",
+        "diff": "",
+        "rate": "",
+        "tvol": "",
+        "tamt": "",
+        "ordy": ""
+      },
+      "timestamp": "2025-06-25 12:39:01.561177"
+    },
+    {
+      "exchange": "NASD",
+      "symbol": "MSFT",
+      "data": {
+        "rsym": "",
+        "zdiv": "",
+        "base": "",
+        "pvol": "",
+        "last": "",
+        "sign": "",
+        "diff": "",
+        "rate": "",
+        "tvol": "",
+        "tamt": "",
+        "ordy": ""
+      },
+      "timestamp": "2025-06-25 12:39:01.593110"
+    },
+    {
+      "exchange": "NASD",
+      "symbol": "GOOGL",
+      "data": {
+        "rsym": "",
+        "zdiv": "",
+        "base": "",
+        "pvol": "",
+        "last": "",
+        "sign": "",
+        "diff": "",
+        "rate": "",
+        "tvol": "",
+        "tamt": "",
+        "ordy": ""
+      },
+      "timestamp": "2025-06-25 12:39:01.626576"
+    },
+    {
+      "exchange": "NASD",
+      "symbol": "AMZN",
+      "data": {
+        "rsym": "",
+        "zdiv": "",
+        "base": "",
+        "pvol": "",
+        "last": "",
+        "sign": "",
+        "diff": "",
+        "rate": "",
+        "tvol": "",
+        "tamt": "",
+        "ordy": ""
+      },
+      "timestamp": "2025-06-25 12:39:01.659521"
+    },
+    {
+      "exchange": "NASD",
+      "symbol": "TSLA",
+      "data": {
+        "rsym": "",
+        "zdiv": "",
+        "base": "",
+        "pvol": "",
+        "last": "",
+        "sign": "",
+        "diff": "",
+        "rate": "",
+        "tvol": "",
+        "tamt": "",
+        "ordy": ""
+      },
+      "timestamp": "2025-06-25 12:39:01.685854"
+    },
+    {
+      "exchange": "NASD",
+      "symbol": "NVDA",
+      "data": {
+        "rsym": "",
+        "zdiv": "",
+        "base": "",
+        "pvol": "",
+        "last": "",
+        "sign": "",
+        "diff": "",
+        "rate": "",
+        "tvol": "",
+        "tamt": "",
+        "ordy": ""
+      },
+      "timestamp": "2025-06-25 12:39:01.714235"
+    },
+    {
+      "exchange": "NASD",
+      "symbol": "META",
+      "data": {
+        "rsym": "",
+        "zdiv": "",
+        "base": "",
+        "pvol": "",
+        "last": "",
+        "sign": "",
+        "diff": "",
+        "rate": "",
+        "tvol": "",
+        "tamt": "",
+        "ordy": ""
+      },
+      "timestamp": "2025-06-25 12:39:01.744257"
+    },
+    {
+      "exchange": "NASD",
+      "symbol": "NFLX",
+      "data": {
+        "rsym": "",
+        "zdiv": "",
+        "base": "",
+        "pvol": "",
+        "last": "",
+        "sign": "",
+        "diff": "",
+        "rate": "",
+        "tvol": "",
+        "tamt": "",
+        "ordy": ""
+      },
+      "timestamp": "2025-06-25 12:39:01.771440"
+    },
+    {
+      "exchange": "NASD",
+      "symbol": "ADBE",
+      "data": {
+        "rsym": "",
+        "zdiv": "",
+        "base": "",
+        "pvol": "",
+        "last": "",
+        "sign": "",
+        "diff": "",
+        "rate": "",
+        "tvol": "",
+        "tamt": "",
+        "ordy": ""
+      },
+      "timestamp": "2025-06-25 12:39:01.800809"
+    }
+  ],
+  "kospi200_related": [
+    {
+      "exchange": "NYSE",
+      "symbol": "EWY",
+      "data": {
+        "rsym": "",
+        "zdiv": "",
+        "base": "",
+        "pvol": "",
+        "last": "",
+        "sign": "",
+        "diff": "",
+        "rate": "",
+        "tvol": "",
+        "tamt": "",
+        "ordy": ""
+      },
+      "timestamp": "2025-06-25 12:39:01.831152"
+    },
+    {
+      "exchange": "NYSE",
+      "symbol": "FLKR",
+      "data": {
+        "rsym": "",
+        "zdiv": "",
+        "base": "",
+        "pvol": "",
+        "last": "",
+        "sign": "",
+        "diff": "",
+        "rate": "",
+        "tvol": "",
+        "tamt": "",
+        "ordy": ""
+      },
+      "timestamp": "2025-06-25 12:39:01.864467"
+    },
+    {
+      "exchange": "NYSE",
+      "symbol": "KRX",
+      "data": {
+        "rsym": "",
+        "zdiv": "",
+        "base": "",
+        "pvol": "",
+        "last": "",
+        "sign": "",
+        "diff": "",
+        "rate": "",
+        "tvol": "",
+        "tamt": "",
+        "ordy": ""
+      },
+      "timestamp": "2025-06-25 12:39:01.899604"
+    }
+  ]
+}

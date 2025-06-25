@@ -1,0 +1,29 @@
+{
+  "KOSPI200": {
+    "market_name": "Korean KOSPI 200",
+    "total_stocks_analyzed": 0,
+    "strategy_name": "stanley_druckenmiller",
+    "market_sentiment": "중립적",
+    "market_trend": "분석 불가",
+    "analysis_summary": "KOSPI200 시장에서 stanley_druckenmiller 전략으로 추천할 종목이 없습니다.",
+    "top_recommendations": []
+  },
+  "NASDAQ100": {
+    "market_name": "NASDAQ 100",
+    "total_stocks_analyzed": 0,
+    "strategy_name": "stanley_druckenmiller",
+    "market_sentiment": "중립적",
+    "market_trend": "분석 불가",
+    "analysis_summary": "NASDAQ100 시장에서 stanley_druckenmiller 전략으로 추천할 종목이 없습니다.",
+    "top_recommendations": []
+  },
+  "SP500": {
+    "market_name": "S&P 500",
+    "total_stocks_analyzed": 0,
+    "strategy_name": "stanley_druckenmiller",
+    "market_sentiment": "중립적",
+    "market_trend": "분석 불가",
+    "analysis_summary": "SP500 시장에서 stanley_druckenmiller 전략으로 추천할 종목이 없습니다.",
+    "top_recommendations": []
+  }
+}

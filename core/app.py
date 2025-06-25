@@ -128,7 +128,7 @@ class CompleteAutomationSystem:
                 "max_backups": 10
             },
             "notifications": {
-                "email_enabled": False,  # 이메일 설정 필요시 True
+                "telegram_enabled": False,  # 텔레그램 설정 필요시 True
                 "console_only": True
             }
         }

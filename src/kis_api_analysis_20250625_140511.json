@@ -1,0 +1,17 @@
+{
+  "timestamp": "2025-06-25T14:05:08.718603",
+  "available_categories": [],
+  "recommended_tr_ids": {},
+  "data_coverage": {
+    "kospi200": false,
+    "nasdaq100": false,
+    "sp500": false,
+    "futures": false,
+    "options": false
+  },
+  "next_steps": [
+    "❌ 현재 사용 가능한 API가 제한적입니다.",
+    "💡 추가 TR_ID나 API 권한이 필요할 수 있습니다.",
+    "📋 한투 API 문서에서 추가 TR_ID를 확인해보세요."
+  ]
+}

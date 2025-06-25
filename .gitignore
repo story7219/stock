@@ -1,12 +1,31 @@
-# Byte-compiled / optimized / DLL files
+# 📝 투자 분석 시스템 Git 무시 파일 (.gitignore)
+# =================================================
+#
+# 이 파일은 Git 버전 관리에서 제외할 파일과 디렉토리를 정의합니다.
+# 코스피200·나스닥100·S&P500 AI 기반 투자 분석 시스템에서 
+# 보안, 성능, 그리고 협업 효율성을 위해 특정 파일들을 추적하지 않습니다.
+#
+# 주요 무시 대상:
+# 🐍 Python 관련: 컴파일된 파일, 캐시, 패키지 빌드 파일
+# 🔐 보안 관련: API 키, 환경 변수, 인증 정보
+# 📊 데이터 파일: 대용량 데이터, 캐시, 임시 분석 결과
+# 🛠️ 개발 도구: IDE 설정, 로그 파일, 테스트 결과
+# 🖥️ 시스템 파일: OS별 메타데이터, 임시 파일
+#
+# 이 설정을 통해 저장소 크기를 최적화하고,
+# 민감한 정보의 노출을 방지하며, 협업 시 충돌을 최소화합니다.
+
+# 🐍 Python 바이트코드 및 컴파일 파일
+# Python이 실행 시 생성하는 최적화된 바이트코드 파일들
 __pycache__/
 *.py[cod]
 *$py.class
 
-# C extensions
+# 🔧 C 확장 모듈 (Python C 확장으로 컴파일된 파일)
 *.so
 
-# Distribution / packaging
+# 📦 패키지 배포 및 빌드 관련 파일
+# setuptools, pip, wheel 등이 생성하는 배포용 파일들
 .Python
 build/
 develop-eggs/
@@ -27,17 +46,18 @@ share/python-wheels/
 *.egg
 MANIFEST
 
-# PyInstaller
-#  Usually these files are written by a python script from a template
-#  before PyInstaller builds the exe, so as to inject date/other infos into it.
+# 🏗️ PyInstaller 관련 파일
+# 실행 파일 생성 시 자동으로 만들어지는 메타데이터 파일들
 *.manifest
 *.spec
 
-# Installer logs
+# 📋 설치 로그 파일
+# pip 설치/삭제 과정에서 생성되는 로그 파일들
 pip-log.txt
 pip-delete-this-directory.txt
 
-# Unit test / coverage reports
+# 🧪 테스트 및 코드 커버리지 관련 파일
+# pytest, coverage, tox 등 테스트 도구가 생성하는 파일들
 htmlcov/
 .tox/
 .nox/
@@ -51,58 +71,67 @@ coverage.xml
 .hypothesis/
 .pytest_cache/
 
-# Translations
+# 🌐 국제화 관련 파일
+# 다국어 지원을 위한 번역 파일들
 *.mo
 *.pot
 
-# Django stuff:
+# 🎸 Django 웹 프레임워크 관련 파일
+# Django 프로젝트에서 생성되는 설정 및 데이터베이스 파일들
 *.log
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
 
-# Flask stuff:
+# 🍶 Flask 웹 프레임워크 관련 파일
+# Flask 애플리케이션의 인스턴스 및 캐시 파일들
 instance/
 .webassets-cache
 
-# Scrapy stuff:
+# 🕷️ Scrapy 웹 스크래핑 관련 파일
+# 웹 스크래핑 프레임워크의 임시 파일들
 .scrapy
 
-# Sphinx documentation
+# 📚 Sphinx 문서화 도구 관련 파일
+# 자동 생성되는 문서 빌드 파일들
 docs/_build/
 
-# PyBuilder
+# 🏗️ PyBuilder 빌드 도구 관련 파일
+# 빌드 프로세스에서 생성되는 임시 파일들
 target/
 
-# Jupyter Notebook
+# 📓 Jupyter Notebook 관련 파일
+# 노트북 실행 시 생성되는 체크포인트 파일들
 .ipynb_checkpoints
 
-# IPython
+# 🐍 IPython 관련 파일
+# 대화형 Python 환경의 프로필 및 설정 파일들
 profile_default/
 ipython_config.py
 
-# pyenv
+# 🐍 pyenv Python 버전 관리 파일
+# Python 버전 관리 도구의 로컬 버전 설정 파일
 .python-version
 
-# pipenv
-#   According to pypa/pipenv#598, it is recommended to include Pipfile.lock in version control.
-#   However, in case of collaboration, if having platform-specific dependencies or dependencies
-#   having no cross-platform support, pipenv may install different versions of packages depending
-#   on the platform. These differences will end up in the Pipfile.lock file.
-#   In such cases, it may be desirable to ignore the Pipfile.lock file.
+# 📦 pipenv 패키지 관리 관련 파일
+# 협업 시 플랫폼별 의존성 차이로 인한 충돌 방지
 # Pipfile.lock
 
-# PEP 582; used by poetry, pdm and other tools
+# 📦 PEP 582 관련 패키지 디렉토리
+# poetry, pdm 등 현대적 패키지 관리 도구가 사용하는 디렉토리
 __pypackages__/
 
-# Celery stuff
+# 🌶️ Celery 분산 작업 큐 관련 파일
+# 백그라운드 작업 스케줄러의 실행 정보 파일들
 celerybeat-schedule
 celerybeat.pid
 
-# SageMath parsed files
+# 🧮 SageMath 관련 파일
+# 수학 계산 소프트웨어의 파싱된 파일들
 *.sage.py
 
-# Environments
+# 🌍 가상환경 디렉토리
+# Python 가상환경의 모든 형태를 포함 (venv, virtualenv, conda 등)
 .env
 .venv
 env/
@@ -111,73 +140,84 @@ ENV/
 env.bak/
 venv.bak/
 
-# Spyder project settings
+# 🕸️ Spyder IDE 관련 파일
+# Spyder 통합 개발환경의 프로젝트 설정 파일들
 .spyderproject
 .spyderworkspace
 
-# Rope project settings
+# 🪢 Rope 리팩토링 도구 관련 파일
+# Python 코드 리팩토링 도구의 프로젝트 설정 파일들
 .ropeproject
 
-# mkdocs documentation
+# 📖 MkDocs 문서화 도구 관련 파일
+# 정적 사이트 생성기의 빌드 결과물
 /site
 
-# mypy
+# 🔍 타입 체킹 도구 관련 파일
+# mypy, pyre, pytype 등 정적 타입 검사 도구의 캐시 파일들
 .mypy_cache/
 .dmypy.json
 dmypy.json
-
-# Pyre type checker
 .pyre/
-
-# pytype static type analyzer
 .pytype/
 
-# Cython debug symbols
+# 🔧 Cython 디버그 관련 파일
+# Cython 확장 모듈의 디버그 심볼 파일들
 cython_debug/
 
-# VS Code
+# 💻 VS Code IDE 관련 파일
+# Visual Studio Code의 작업공간 설정 파일들
 .vscode/
 
-# Custom files
-*.log
-*.json
-*.db
-*.sqlite3
+# 📁 프로젝트별 커스텀 파일들
+# 투자 분석 시스템에서 생성되는 다양한 결과 파일들
+*.log                    # 모든 로그 파일
+*.json                   # JSON 형태의 분석 결과 파일
+*.db                     # 데이터베이스 파일
+*.sqlite3               # SQLite 데이터베이스 파일
 
-# Cache
-/historical_data_cache/
-/docs_cache/
+# 💾 캐시 디렉토리
+# 성능 향상을 위한 임시 데이터 저장소
+/historical_data_cache/  # 과거 주가 데이터 캐시
+/docs_cache/            # 문서 캐시
 
-# Charts and Backtest Results
-/charts/
-/test_charts/
-/backtest_results/
+# 📈 차트 및 백테스트 결과
+# 기술적 분석 차트와 전략 백테스트 결과물들
+/charts/                # 생성된 차트 이미지들
+/test_charts/           # 테스트용 차트들
+/backtest_results/      # 백테스트 결과 데이터
 
-# Reports
-/bandit_report.json
-/current_filtered_stocks.json
-/test_filtered_stocks.json
+# 📊 분석 리포트 파일들
+# 보안 검사 및 종목 필터링 결과 리포트들
+/bandit_report.json              # 보안 취약점 검사 결과
+/current_filtered_stocks.json    # 현재 필터링된 종목 목록
+/test_filtered_stocks.json       # 테스트용 필터링된 종목 목록
 
-# API keys and tokens (if named this way)
-kis_token.json
-daily_api_count.json
-trading_state.json
+# 🔐 API 토큰 및 인증 파일들
+# 한국투자증권 API 및 기타 서비스 인증 정보
+kis_token.json          # KIS API 토큰
+daily_api_count.json    # 일일 API 호출 횟수 추적
+trading_state.json      # 거래 상태 정보
 
-# IDE settings
-.idea/
+# 🛠️ IDE 설정 파일들
+# 통합 개발환경의 프로젝트별 설정 파일들
+.idea/                  # IntelliJ IDEA / PyCharm 설정
 
-# OS generated files
-.DS_Store
-Thumbs.db
+# 🖥️ 운영체제별 시스템 파일들
+# macOS, Windows에서 자동 생성되는 메타데이터 파일들
+.DS_Store              # macOS Finder 정보
+Thumbs.db              # Windows 썸네일 캐시
 
-# 보안 파일들
-.env
-mcp.json
-*.key
-*.secret
-config/credentials.json
+# 🔒 보안 관련 파일들 (중요!)
+# API 키, 인증 정보, 민감한 설정 파일들 - 절대 Git에 포함하면 안됨
+.env                           # 환경 변수 파일 (API 키 포함)
+mcp.json                       # MCP 설정 파일
+*.key                          # 모든 키 파일
+*.secret                       # 모든 시크릿 파일
+config/credentials.json        # 인증 정보 파일
 
-# API 키 관련 파일들
-api_keys/
-credentials/
-secrets/ 
+# 🗂️ API 키 관련 디렉토리들
+# 인증 정보가 저장되는 모든 디렉토리들
+api_keys/                      # API 키 저장 폴더
+credentials/                   # 인증 정보 저장 폴더
+secrets/                       # 비밀 정보 저장 폴더 

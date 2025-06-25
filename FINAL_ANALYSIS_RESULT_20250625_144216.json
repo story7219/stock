@@ -1,0 +1,238 @@
+{
+  "timestamp": "20250625_144216",
+  "total_stocks_analyzed": 20,
+  "final_analysis": {
+    "top5_selections": [
+      {
+        "rank": 1,
+        "symbol": "NVDA",
+        "name": "NVIDIA Corp.",
+        "category": "nasdaq100",
+        "selected_strategy": "Peter Lynch",
+        "confidence_score": 95,
+        "reasoning": "AI 시장의 핵심 기업으로, 현재 시장 상황인 AI/기술주 강세 지속에 가장 큰 수혜를 받을 것으로 예상됩니다. 피터 린치 전략의 성장주 발굴, 기술주 선호에 부합하며, 높은 성장률과 시장 지배력을 바탕으로 장기적인 투자 가치가 높습니다. 높은 전략 점수(110)와 변동률(4.2%) 또한 이를 뒷받침합니다."
+      },
+      {
+        "rank": 2,
+        "symbol": "005930",
+        "name": "삼성전자",
+        "category": "kospi200",
+        "selected_strategy": "Warren Buffett",
+        "confidence_score": 90,
+        "reasoning": "반도체 업황 회복 기대감과 워런 버핏의 투자 포트폴리오에 포함되어 있다는 점에서 안정성과 성장성을 모두 확보할 수 있는 종목입니다. 워런 버핏 전략의 우량주 장기투자, 안정성 중시에 부합하며, 한국 시장의 대표 우량주로서 포트폴리오의 안정성을 높여줍니다. 높은 거래량(1500만)은 유동성 측면에서도 유리합니다."
+      },
+      {
+        "rank": 3,
+        "symbol": "GOOGL",
+        "name": "Alphabet Inc.",
+        "category": "nasdaq100",
+        "selected_strategy": "Peter Lynch",
+        "confidence_score": 85,
+        "reasoning": "AI 기술 발전의 선두 기업으로, 꾸준한 성장이 기대됩니다. 피터 린치 전략의 성장주 발굴에 부합하며, 다양한 사업 포트폴리오를 통해 안정적인 수익 창출이 가능합니다. 상대적으로 낮은 변동률(1.1%)은 안정적인 성장을 기대하게 합니다."
+      },
+      {
+        "rank": 4,
+        "symbol": "JNJ",
+        "name": "Johnson & Johnson",
+        "category": "sp500",
+        "selected_strategy": "Benjamin Graham",
+        "confidence_score": 80,
+        "reasoning": "안정적인 배당과 꾸준한 실적을 바탕으로 벤저민 그레이엄 전략의 가치투자, 안전마진 확보에 부합합니다. 경기 방어주로서 포트폴리오의 안정성을 더욱 강화해줍니다. 워런 버핏 전략에서도 높은 점수를 받았다는 점도 긍정적입니다."
+      },
+      {
+        "rank": 5,
+        "symbol": "TSLA",
+        "name": "Tesla Inc.",
+        "category": "nasdaq100",
+        "selected_strategy": "Peter Lynch",
+        "confidence_score": 75,
+        "reasoning": "전기차 시장의 선두주자로 높은 성장 잠력을 보유하고 있습니다. 피터 린치 전략의 성장주 발굴, 트렌드 추종에 부합하지만, 높은 변동성(3.5%)은 리스크 관리가 필요함을 시사합니다. 따라서 비중을 조절하여 투자하는 것이 권장됩니다."
+      }
+    ],
+    "market_analysis": "2025년 6월 현재 시장은 AI/기술주 강세, 금리 안정화, 글로벌 경제 회복세, ESG 투자 트렌드라는 특징을 보입니다. 이러한 상황은 기술주 중심의 성장주 투자에 유리한 환경을 조성하고 있습니다. 하지만 변동성 확대 가능성에도 유의해야 합니다.",
+    "risk_assessment": "기술주 중심의 포트폴리오는 시장 변동성에 민감할 수 있습니다. 따라서 개별 종목의 변동성 및 시장 상황을 주시하며 리스크 관리에 힘써야 합니다. 분산 투자를 통해 개별 종목 리스크를 완화하고, 장기적인 관점에서 투자하는 것이 중요합니다.",
+    "investment_recommendation": "Top 5 종목을 중심으로 투자 포트폴리오를 구성하되, 시장 상황 변화에 따라 비중 조절 및 리밸런싱을 실시하는 것이 좋습니다. 장기적인 관점에서 투자를 지속하면서, 정기적인 모니터링을 통해 리스크를 관리하는 것이 중요합니다. 특히 TSLA와 같은 고변동성 종목은 비중 조절에 신중해야 합니다. 또한, 시장 상황과 개인의 투자 성향을 고려하여 투자 비중을 조절하는 것이 필요합니다."
+  },
+  "all_stocks_data": [
+    {
+      "symbol": "005930",
+      "name": "삼성전자",
+      "exchange": "KRX",
+      "category": "kospi200",
+      "current_price": 73000,
+      "volume": 15000000,
+      "change_rate": 1.2
+    },
+    {
+      "symbol": "000660",
+      "name": "SK하이닉스",
+      "exchange": "KRX",
+      "category": "kospi200",
+      "current_price": 125000,
+      "volume": 8000000,
+      "change_rate": 2.1
+    },
+    {
+      "symbol": "035420",
+      "name": "NAVER",
+      "exchange": "KRX",
+      "category": "kospi200",
+      "current_price": 195000,
+      "volume": 3000000,
+      "change_rate": -0.8
+    },
+    {
+      "symbol": "051910",
+      "name": "LG화학",
+      "exchange": "KRX",
+      "category": "kospi200",
+      "current_price": 420000,
+      "volume": 1500000,
+      "change_rate": 1.5
+    },
+    {
+      "symbol": "207940",
+      "name": "삼성바이오로직스",
+      "exchange": "KRX",
+      "category": "kospi200",
+      "current_price": 850000,
+      "volume": 500000,
+      "change_rate": 0.7
+    },
+    {
+      "symbol": "AAPL",
+      "name": "Apple Inc.",
+      "exchange": "NASDAQ",
+      "category": "nasdaq100",
+      "current_price": 195.5,
+      "volume": 45000000,
+      "change_rate": 1.8
+    },
+    {
+      "symbol": "MSFT",
+      "name": "Microsoft Corp.",
+      "exchange": "NASDAQ",
+      "category": "nasdaq100",
+      "current_price": 420.3,
+      "volume": 25000000,
+      "change_rate": 2.2
+    },
+    {
+      "symbol": "GOOGL",
+      "name": "Alphabet Inc.",
+      "exchange": "NASDAQ",
+      "category": "nasdaq100",
+      "current_price": 165.2,
+      "volume": 18000000,
+      "change_rate": 1.1
+    },
+    {
+      "symbol": "AMZN",
+      "name": "Amazon.com Inc.",
+      "exchange": "NASDAQ",
+      "category": "nasdaq100",
+      "current_price": 185.4,
+      "volume": 30000000,
+      "change_rate": 0.9
+    },
+    {
+      "symbol": "TSLA",
+      "name": "Tesla Inc.",
+      "exchange": "NASDAQ",
+      "category": "nasdaq100",
+      "current_price": 245.6,
+      "volume": 85000000,
+      "change_rate": 3.5
+    },
+    {
+      "symbol": "META",
+      "name": "Meta Platforms Inc.",
+      "exchange": "NASDAQ",
+      "category": "nasdaq100",
+      "current_price": 520.8,
+      "volume": 22000000,
+      "change_rate": 1.7
+    },
+    {
+      "symbol": "NVDA",
+      "name": "NVIDIA Corp.",
+      "exchange": "NASDAQ",
+      "category": "nasdaq100",
+      "current_price": 875.2,
+      "volume": 40000000,
+      "change_rate": 4.2
+    },
+    {
+      "symbol": "NFLX",
+      "name": "Netflix Inc.",
+      "exchange": "NASDAQ",
+      "category": "nasdaq100",
+      "current_price": 680.5,
+      "volume": 8000000,
+      "change_rate": -1.2
+    },
+    {
+      "symbol": "SPY",
+      "name": "SPDR S&P 500 ETF",
+      "exchange": "NYSE",
+      "category": "sp500",
+      "current_price": 575.2,
+      "volume": 55000000,
+      "change_rate": 0.8
+    },
+    {
+      "symbol": "VOO",
+      "name": "Vanguard S&P 500 ETF",
+      "exchange": "NYSE",
+      "category": "sp500",
+      "current_price": 520.4,
+      "volume": 12000000,
+      "change_rate": 0.7
+    },
+    {
+      "symbol": "BRK-B",
+      "name": "Berkshire Hathaway Inc.",
+      "exchange": "NYSE",
+      "category": "sp500",
+      "current_price": 450.8,
+      "volume": 3500000,
+      "change_rate": 0.5
+    },
+    {
+      "symbol": "UNH",
+      "name": "UnitedHealth Group Inc.",
+      "exchange": "NYSE",
+      "category": "sp500",
+      "current_price": 580.3,
+      "volume": 2800000,
+      "change_rate": 1.3
+    },
+    {
+      "symbol": "JNJ",
+      "name": "Johnson & Johnson",
+      "exchange": "NYSE",
+      "category": "sp500",
+      "current_price": 155.7,
+      "volume": 8500000,
+      "change_rate": 0.2
+    },
+    {
+      "symbol": "V",
+      "name": "Visa Inc.",
+      "exchange": "NYSE",
+      "category": "sp500",
+      "current_price": 285.9,
+      "volume": 6200000,
+      "change_rate": 1.1
+    },
+    {
+      "symbol": "PG",
+      "name": "Procter & Gamble Co.",
+      "exchange": "NYSE",
+      "category": "sp500",
+      "current_price": 165.4,
+      "volume": 4800000,
+      "change_rate": 0.3
+    }
+  ]
+}

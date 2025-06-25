@@ -74,11 +74,9 @@ AI_MAX_TOKENS=2048
 
 # === 알림 설정 (선택) ===
 
-# 이메일 알림 (SMTP 설정)
-SMTP_SERVER=smtp.gmail.com
-SMTP_PORT=587
-SMTP_USERNAME=your_email@gmail.com
-SMTP_PASSWORD=your_app_password
+# 텔레그램 봇 설정
+TELEGRAM_BOT_TOKEN=your_telegram_bot_token
+TELEGRAM_CHAT_ID=your_telegram_chat_id
 
 # Slack 웹훅 URL
 SLACK_WEBHOOK_URL=https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK
