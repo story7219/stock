@@ -1,0 +1,110 @@
+# test_main.py - Main Executable 모듈
+# 역할: Main Executable 관련 기능 제공
+
+
+"""
+🧪 메인 시스템 테스트 스크립트
+================================================================
+파일명: test_main.py
+역할: 메인 시스템의 기본 기능을 테스트하는 스크립트
+"""
+
+import asyncio
+import logging
+import sys
+from pathlib import Path
+from modules.unified_signal_generator import (
+    UnifiedSignalGenerator, SignalWeights
+)
+
+
+# 로깅 설정
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s | %(levelname)-8s | %(name)-20s | %(message)s'
+)
+logger = logging.getLogger(__name__)
+
+
+async def test_basic_functionality():
+    """기본 기능 테스트"""
+    try:
+        logger.info("🧪 기본 기능 테스트 시작")
+
+        # 1. 모듈 임포트 테스트
+        logger.info("📦 모듈 임포트 테스트")
+        try:
+            from modules.unified_signal_generator import (
+                UnifiedSignalGenerator, SignalWeights
+            )
+            logger.info("✅ unified_signal_generator 모듈 임포트 성공")
+        except ImportError as e:
+            logger.warning(
+                f"⚠️ unified_signal_generator 모듈 임포트 실패: {e}"
+            )
+
+        # 2. 설정 파일 테스트
+        logger.info("⚙️ 설정 파일 테스트")
+        config_path = Path("configs/unified_config.yaml")
+        if config_path.exists():
+            logger.info("✅ 설정 파일 존재 확인")
+        else:
+            logger.warning("⚠️ 설정 파일 없음")
+
+        # 3. 디렉토리 생성 테스트
+        logger.info("📁 디렉토리 생성 테스트")
+        directories = ["logs", "results", "trades", "test_results"]
+        for dir_name in directories:
+            Path(dir_name).mkdir(exist_ok=True)
+            logger.info(f"✅ {dir_name} 디렉토리 생성/확인")
+
+        # 4. 간단한 신호 생성 테스트
+        logger.info("🚀 간단한 신호 생성 테스트")
+        try:
+            config = {
+                'ml_weight': 0.4,
+                'dl_weight': 0.3,
+                'gemini_weight': 0.3,
+                'threshold': 0.6,
+                'min_confidence': 0.5
+            }
+
+            generator = UnifiedSignalGenerator(config)
+
+            # 테스트 데이터
+            test_data = {
+                # ... (이전 코드)
+            }
+            # 신호 생성
+            result = await generator.generate_unified_signal(
+                symbol="AAPL",
+                technical_data=test_data['technical'],
+                news=test_data['news'],
+                financial_data=test_data['financial']
+            )
+            # ... (이전 코드)
+
+        except Exception as e:
+            logger.error(f"❌ 신호 생성 테스트 실패: {e}")
+
+        logger.info("🎉 기본 기능 테스트 완료!")
+
+    except Exception as e:
+        logger.error(f"❌ 기본 기능 테스트 실패: {e}")
+        raise
+
+
+async def main():
+    """메인 함수"""
+    try:
+        await test_basic_functionality()
+    except KeyboardInterrupt:
+        logger.info("👋 사용자에 의해 테스트 중단")
+    except Exception as e:
+        logger.error(f"❌ 테스트 실행 실패: {e}")
+        sys.exit(1)
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
+    

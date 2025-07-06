@@ -1,0 +1,76 @@
+```python
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+🚀 최적화된 투자 분석 시스템 - 핵심 모듈
+====================================
+"""
+from __future__ import annotations
+
+# optimized_core 모듈이 없는 경우를 대비한 예외 처리
+try:
+    from .optimized_core import (
+        get_core,
+        initialize_core,
+        OptimizedCore,
+        SystemConfig,
+        PerformanceMonitor,
+        MultiLevelCache,
+        OptimizedConnectionPool,
+        AsyncTaskManager,
+        MemoryOptimizer,
+    )
+except ImportError:
+    # optimized_core가 없는 경우 기본값 설정 (None으로)
+    get_core = None
+    initialize_core = None
+    OptimizedCore = None
+    SystemConfig = None
+    PerformanceMonitor = None
+    MultiLevelCache = None
+    OptimizedConnectionPool = None
+    AsyncTaskManager = None
+    MemoryOptimizer = None
+
+from .base_interfaces import (
+    StockData,
+    MarketData,
+    AnalysisResult,
+    TechnicalIndicators,
+    InvestmentStrategy,
+)
+
+from .config import Config as CoreConfig
+from .cache_manager import CacheManager
+from .connection_pool import ConnectionPool
+from .memory_optimizer import MemoryOptimizer as MemOpt
+from .async_executor import AsyncExecutor
+
+__all__ = [
+    # 핵심 시스템
+    "get_core",
+    "initialize_core",
+    "OptimizedCore",
+    "SystemConfig",
+    # 성능 최적화
+    "PerformanceMonitor",
+    "MultiLevelCache",
+    "OptimizedConnectionPool",
+    "AsyncTaskManager",
+    "MemoryOptimizer",
+    # 인터페이스
+    "StockData",
+    "MarketData",
+    "AnalysisResult",
+    "TechnicalIndicators",
+    "InvestmentStrategy",
+    # 개별 컴포넌트
+    "CoreConfig",
+    "CacheManager",
+    "ConnectionPool",
+    "MemOpt",
+    "AsyncExecutor",
+]
+
+__version__ = "3.0.0"
+```

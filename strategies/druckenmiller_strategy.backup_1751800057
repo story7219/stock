@@ -1,0 +1,79 @@
+```python
+"""
+스탠리 드러켄밀러 투자 전략
+- 매크로 경제 분석과 기술적 분석 결합
+- 추세 추종과 모멘텀 중시
+- 리스크 관리와 집중 투자
+"""
+import pandas as pd
+import numpy as np
+from typing import Dict, List, Any, Optional
+import asyncio
+
+from .base_strategy import BaseStrategy, StrategyResult
+from ..data.models import StockData, TechnicalIndicators
+
+
+class DruckenmillerStrategy(BaseStrategy):
+    """스탠리 드러켄밀러 투자 전략"""
+
+    def __init__(self):
+        super().__init__(
+            name="stanley_druckenmiller",
+            description="매크로 경제 분석과 기술적 분석을 결합한 추세 추종 전략",
+            parameters={
+                'trend_period': 50,
+                'momentum_period': 20,
+                'volume_threshold': 1.5,
+                'rsi_oversold': 30,
+                'rsi_overbought': 70,
+                'macd_signal_threshold': 0.1,
+                'adx_trend_threshold': 25,
+                'volatility_threshold': 0.3
+            }
+        )
+
+    async def analyze_stock(self, stock_data: StockData) -> StrategyResult:
+        """드러켄밀러 전략으로 종목 분석"""
+        if not self.validate_stock_data(stock_data):
+            return StrategyResult(
+                stock_code=stock_data.symbol,
+                score=0.0,
+                signals={},
+                reasons=["데이터 부족 또는 유효하지 않음"],
+                risk_level="UNKNOWN",
+                confidence=0.0
+            )
+        try:
+            indicators = self._calculate_technical_indicators(stock_data)
+            signals = await self._analyze_druckenmiller_signals(
+                stock_data, indicators
+            )
+            score = self._calculate_total_score(signals, indicators)
+            reasons = self._generate_investment_reasons(
+                signals, indicators
+            )
+            volatility = self._calculate_volatility(stock_data)
+            risk_level = self.get_risk_level(volatility)
+            confidence = self._calculate_confidence(signals, indicators)
+            return StrategyResult(
+                stock_code=stock_data.symbol,
+                score=score,
+                signals=signals,
+                reasons=reasons,
+                risk_level=risk_level,
+                confidence=confidence,
+                technical_indicators=indicators
+            )
+        except Exception as e:
+            return StrategyResult(
+                stock_code=stock_data.symbol,
+                score=0.0,
+                signals={},
+                reasons=[f"분석 오류: {str(e)}"],
+                risk_level="UNKNOWN",
+                confidence=0.0
+            )
+
+    # ... (rest of the code)
+```

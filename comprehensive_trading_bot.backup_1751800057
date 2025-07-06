@@ -1,0 +1,79 @@
+```python
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+🚀 종합 실전매매 봇 시스템 v1.0
+===============================
+
+파일명: comprehensive_trading_bot.py
+역할: 자본금 5억으로 국내/해외 주식/선물/옵션 종합 실전매매
+- 국내 2.5억: 주식 1.5억, 선물 0.5억, 옵션 0.5억
+- 해외 2.5억: 주식 1.5억, 선물 0.5억, 옵션 0.5억
+- ML/DL/Gemini AI + 투자대가 20명 전략 통합
+- 실시간 데이터 수집 및 자동매매
+- 리스크 관리 및 성과 추적
+"""
+
+import asyncio
+import logging
+import json
+import time
+import sqlite3
+import os
+from datetime import datetime, timedelta
+from typing import Dict, List, Optional, Any, Tuple
+from dataclasses import dataclass, field
+from enum import Enum
+import numpy as np
+import pandas as pd
+from concurrent.futures import ThreadPoolExecutor
+import requests
+import websockets
+import random
+import traceback
+
+# 로깅 설정
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler('logs/comprehensive_trading.log', encoding='utf-8'),
+        logging.StreamHandler()
+    ]
+)
+logger = logging.getLogger(__name__)
+
+# ... (나머지 코드는 동일)
+
+# ================================
+# 메인 트레이딩 봇
+# ================================
+
+class ComprehensiveTradingBot:
+    # ... (나머지 코드는 동일)
+    
+    async def run(self):
+        """메인 실행"""
+        logger.info("🚀 종합 실전매매 봇 시작")
+        self.is_running = True
+        
+        try:
+            while self.is_running:
+                # 매매 사이클 실행
+                await self.run_trading_cycle()
+                
+                # 대기 (5분)
+                await asyncio.sleep(300)
+                
+        except KeyboardInterrupt:
+            logger.info("⏹️ 사용자에 의해 중단")
+        except Exception as e:
+            logger.error(f"실행 중 오류: {e}")
+            logger.error(traceback.format_exc())
+        finally:
+            self.is_running = False
+            logger.info("🏁 종합 실전매매 봇 종료")
+
+
+# ... (나머지 코드는 동일)
+```

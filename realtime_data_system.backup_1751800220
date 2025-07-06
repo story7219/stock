@@ -1,0 +1,82 @@
+# realtime_data_system.py - Test 모듈
+# 역할: Test 관련 기능 제공
+
+```python
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+🚀 실시간 데이터 시스템 v1.0
+=====================================
+
+실제 API 키를 활용한 실시간 데이터 수집 및 ML/DL 학습 시스템
+- 한국투자증권 API 실시간 주식 데이터
+- Gemini AI 뉴스/공시 감정분석
+- 텔레그램 실시간 알림
+- 24시간 자동 데이터 수집 및 학습
+"""
+
+import os
+import json
+import time
+import logging
+import requests
+import pandas as pd
+import numpy as np
+from datetime import datetime, timedelta
+from typing import Dict, List, Any, Optional
+import threading
+import queue
+import asyncio
+import aiohttp
+from dataclasses import dataclass
+
+# 로깅 설정
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler('realtime_system.log', encoding='utf-8'),
+        logging.StreamHandler()
+    ]
+)
+logger = logging.getLogger(__name__)
+
+@dataclass
+class MarketData:
+    """시장 데이터 구조체"""
+    symbol: str
+    price: float
+    change: float
+    change_rate: float
+    volume: int
+    timestamp: datetime
+    high: float = 0.0
+    low: float = 0.0
+    open: float = 0.0
+
+# ... (나머지 코드는 동일)
+
+    # ... (나머지 코드는 동일)
+    
+    async def collect_market_data(self):
+        """시장 데이터 수집 루프"""
+        while self.running:
+            try:
+                # 시장 데이터 수집
+                market_data = self.kis_api.get_multiple_stocks(self.symbols)
+                if market_data:
+                    # 큐에 데이터 저장
+                    for data in market_data:
+                        self.market_data_queue.put(data)
+                    logger.info(f"시장 데이터 수집 완료: {len(market_data)}개 종목")
+                    # 텔레그램 알림 (5분마다)
+                    if datetime.now().minute % 5 == 0:
+                        self.telegram.send_market_update(market_data)
+                # 30초 대기
+                await asyncio.sleep(30)
+            except Exception as e:
+                logger.error(f"시장 데이터 수집 오류: {e}")
+                await asyncio.sleep(60)
+    
+    # ... (나머지 코드는 동일)
+```

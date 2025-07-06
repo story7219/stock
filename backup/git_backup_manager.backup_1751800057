@@ -1,0 +1,487 @@
+#!/usr/bin/env python3
+"""
+🔄 깃허브 자동 백업 관리자
+========================
+
+깃허브 저장소를 통한 자동 데이터 백업 시스템입니다.
+정기적인 커밋, 푸시, 브랜치 관리, 충돌 해결을 자동화합니다.
+"""
+
+import asyncio
+import logging
+import os
+import subprocess
+import json
+import shutil
+from datetime import datetime, timedelta
+from typing import Dict, List, Any, Optional, Tuple
+from pathlib import Path
+import git
+from git import Repo, GitCommandError
+import yaml
+
+logger = logging.getLogger(__name__)
+
+class GitBackupManager:
+    """깃허브 자동 백업 관리자"""
+    
+    def __init__(self, 
+                 repo_path: str = ".",
+                 remote_url: str = None,
+                 backup_branch: str = "backup",
+                 auto_backup_interval: int = 3600,  # 1시간
+                 max_backup_history: int = 30):  # 30개 백업 유지
+        
+        self.repo_path = Path(repo_path)
+        self.remote_url = remote_url
+        self.backup_branch = backup_branch
+        self.auto_backup_interval = auto_backup_interval
+        self.max_backup_history = max_backup_history
+        
+        # 백업 설정
+        self.backup_config = {
+            'include_patterns': [
+                '*.py', '*.json', '*.yaml', '*.yml', '*.md', '*.txt',
+                'requirements.txt', 'pyproject.toml', 'setup.py'
+            ],
+            'exclude_patterns': [
+                '__pycache__', '*.pyc', '*.pyo', '*.pyd',
+                '.git', '.env', '*.log', 'temp_*', 'cache_*',
+                'node_modules', '.DS_Store', 'Thumbs.db'
+            ],
+            'data_dirs': ['data', 'reports', 'logs', 'models'],
+            'config_dirs': ['config', 'src/config']
+        }
+        
+        # 백업 상태
+        self.is_backup_running = False
+        self.last_backup_time = None
+        self.backup_task = None
+        
+        # 깃 저장소
+        self.repo = None
+        self._initialize_repo()
+        
+        logger.info("🔄 깃허브 자동 백업 관리자 초기화 완료")
+    
+    def _initialize_repo(self):
+        """깃 저장소 초기화"""
+        try:
+            if (self.repo_path / '.git').exists():
+                self.repo = Repo(self.repo_path)
+                logger.info(f"기존 깃 저장소 로드: {self.repo_path}")
+            else:
+                self.repo = Repo.init(self.repo_path)
+                logger.info(f"새 깃 저장소 초기화: {self.repo_path}")
+            
+            # 원격 저장소 설정
+            if self.remote_url:
+                self._setup_remote()
+            
+        except Exception as e:
+            logger.error(f"깃 저장소 초기화 오류: {e}")
+            raise
+    
+    def _setup_remote(self):
+        """원격 저장소 설정"""
+        try:
+            if 'origin' not in [remote.name for remote in self.repo.remotes]:
+                self.repo.create_remote('origin', self.remote_url)
+                logger.info(f"원격 저장소 추가: {self.remote_url}")
+            else:
+                origin = self.repo.remotes.origin
+                origin.set_url(self.remote_url)
+                logger.info(f"원격 저장소 URL 업데이트: {self.remote_url}")
+        
+        except Exception as e:
+            logger.error(f"원격 저장소 설정 오류: {e}")
+    
+    async def start_auto_backup(self):
+        """자동 백업 시작"""
+        if self.is_backup_running:
+            return
+        
+        self.is_backup_running = True
+        self.backup_task = asyncio.create_task(self._auto_backup_loop())
+        
+        logger.info("🚀 자동 백업 시작")
+    
+    async def stop_auto_backup(self):
+        """자동 백업 중지"""
+        self.is_backup_running = False
+        if self.backup_task:
+            self.backup_task.cancel()
+            try:
+                await self.backup_task
+            except asyncio.CancelledError:
+                pass
+        
+        logger.info("🛑 자동 백업 중지")
+    
+    async def _auto_backup_loop(self):
+        """자동 백업 루프"""
+        while self.is_backup_running:
+            try:
+                # 백업 실행
+                await self.create_backup()
+                
+                # 대기
+                await asyncio.sleep(self.auto_backup_interval)
+                
+            except Exception as e:
+                logger.error(f"자동 백업 오류: {e}")
+                await asyncio.sleep(300)  # 5분 후 재시도
+    
+    async def create_backup(self, backup_name: str = None) -> bool:
+        """백업 생성"""
+        try:
+            if not backup_name:
+                backup_name = f"backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+            
+            logger.info(f"💾 백업 생성 시작: {backup_name}")
+            
+            # 1. 변경사항 확인
+            if not self._has_changes():
+                logger.info("변경사항이 없어 백업을 건너뜁니다.")
+                return True
+            
+            # 2. 백업 브랜치 생성/전환
+            await self._create_backup_branch(backup_name)
+            
+            # 3. 파일 추가
+            await self._add_files()
+            
+            # 4. 커밋
+            commit_message = f"🔄 자동 백업: {backup_name}\n\n- 백업 시간: {datetime.now().isoformat()}\n- 변경된 파일: {self._get_changed_files_count()}개"
+            await self._commit_changes(commit_message)
+            
+            # 5. 원격 저장소 푸시
+            await self._push_to_remote()
+            
+            # 6. 백업 히스토리 정리
+            await self._cleanup_old_backups()
+            
+            self.last_backup_time = datetime.now()
+            logger.info(f"✅ 백업 완료: {backup_name}")
+            
+            return True
+            
+        except Exception as e:
+            logger.error(f"백업 생성 실패: {e}")
+            return False
+    
+    def _has_changes(self) -> bool:
+        """변경사항 확인"""
+        try:
+            # 스테이징되지 않은 변경사항
+            unstaged = self.repo.index.diff(None)
+            
+            # 스테이징된 변경사항
+            staged = self.repo.index.diff('HEAD')
+            
+            # 추적되지 않는 파일
+            untracked = self.repo.untracked_files
+            
+            return len(unstaged) > 0 or len(staged) > 0 or len(untracked) > 0
+            
+        except Exception as e:
+            logger.error(f"변경사항 확인 오류: {e}")
+            return False
+    
+    async def _create_backup_branch(self, backup_name: str):
+        """백업 브랜치 생성/전환"""
+        try:
+            # 현재 브랜치 저장
+            current_branch = self.repo.active_branch.name
+            
+            # 백업 브랜치 생성
+            branch_name = f"{self.backup_branch}/{backup_name}"
+            
+            if branch_name in [branch.name for branch in self.repo.branches]:
+                # 기존 브랜치로 전환
+                self.repo.heads[branch_name].checkout()
+                logger.info(f"기존 백업 브랜치로 전환: {branch_name}")
+            else:
+                # 새 브랜치 생성
+                new_branch = self.repo.create_head(branch_name)
+                new_branch.checkout()
+                logger.info(f"새 백업 브랜치 생성: {branch_name}")
+            
+            # main 브랜치로 돌아가기
+            self.repo.heads[current_branch].checkout()
+            
+        except Exception as e:
+            logger.error(f"백업 브랜치 생성 오류: {e}")
+            raise
+    
+    async def _add_files(self):
+        """파일 추가"""
+        try:
+            # 백업할 파일들 찾기
+            files_to_add = self._get_files_to_backup()
+            
+            if not files_to_add:
+                logger.info("백업할 파일이 없습니다.")
+                return
+            
+            # 파일 추가
+            for file_path in files_to_add:
+                try:
+                    self.repo.index.add([str(file_path)])
+                    logger.debug(f"파일 추가: {file_path}")
+                except Exception as e:
+                    logger.warning(f"파일 추가 실패: {file_path} - {e}")
+            
+            logger.info(f"총 {len(files_to_add)}개 파일 추가됨")
+            
+        except Exception as e:
+            logger.error(f"파일 추가 오류: {e}")
+            raise
+    
+    def _get_files_to_backup(self) -> List[Path]:
+        """백업할 파일 목록 생성"""
+        files_to_backup = []
+        
+        for pattern in self.backup_config['include_patterns']:
+            for file_path in self.repo_path.rglob(pattern):
+                if self._should_backup_file(file_path):
+                    files_to_backup.append(file_path)
+        
+        # 데이터 디렉토리 추가
+        for data_dir in self.backup_config['data_dirs']:
+            data_path = self.repo_path / data_dir
+            if data_path.exists():
+                for file_path in data_path.rglob('*'):
+                    if file_path.is_file() and self._should_backup_file(file_path):
+                        files_to_backup.append(file_path)
+        
+        return list(set(files_to_backup))  # 중복 제거
+    
+    def _should_backup_file(self, file_path: Path) -> bool:
+        """파일 백업 여부 확인"""
+        # 제외 패턴 체크
+        for exclude_pattern in self.backup_config['exclude_patterns']:
+            if exclude_pattern in str(file_path):
+                return False
+        
+        # 파일 크기 체크 (100MB 이상 제외)
+        if file_path.stat().st_size > 100 * 1024 * 1024:
+            return False
+        
+        return True
+    
+    async def _commit_changes(self, message: str):
+        """변경사항 커밋"""
+        try:
+            if not self.repo.index.diff('HEAD'):
+                logger.info("커밋할 변경사항이 없습니다.")
+                return
+            
+            self.repo.index.commit(message)
+            logger.info(f"커밋 완료: {message[:50]}...")
+            
+        except Exception as e:
+            logger.error(f"커밋 오류: {e}")
+            raise
+    
+    async def _push_to_remote(self):
+        """원격 저장소로 푸시"""
+        try:
+            if 'origin' not in [remote.name for remote in self.repo.remotes]:
+                logger.warning("원격 저장소가 설정되지 않았습니다.")
+                return
+            
+            origin = self.repo.remotes.origin
+            
+            # 현재 브랜치 푸시
+            current_branch = self.repo.active_branch.name
+            origin.push(current_branch)
+            
+            # 백업 브랜치들 푸시
+            for branch in self.repo.branches:
+                if branch.name.startswith(f"{self.backup_branch}/"):
+                    try:
+                        origin.push(branch.name)
+                        logger.info(f"백업 브랜치 푸시: {branch.name}")
+                    except Exception as e:
+                        logger.warning(f"백업 브랜치 푸시 실패: {branch.name} - {e}")
+            
+            logger.info("원격 저장소 푸시 완료")
+            
+        except Exception as e:
+            logger.error(f"푸시 오류: {e}")
+            raise
+    
+    async def _cleanup_old_backups(self):
+        """오래된 백업 정리"""
+        try:
+            backup_branches = [
+                branch for branch in self.repo.branches 
+                if branch.name.startswith(f"{self.backup_branch}/")
+            ]
+            
+            if len(backup_branches) <= self.max_backup_history:
+                return
+            
+            # 오래된 순으로 정렬
+            backup_branches.sort(key=lambda b: b.commit.committed_datetime)
+            
+            # 초과분 삭제
+            branches_to_delete = backup_branches[:-self.max_backup_history]
+            
+            for branch in branches_to_delete:
+                try:
+                    self.repo.delete_head(branch.name, force=True)
+                    logger.info(f"오래된 백업 브랜치 삭제: {branch.name}")
+                except Exception as e:
+                    logger.warning(f"백업 브랜치 삭제 실패: {branch.name} - {e}")
+            
+            logger.info(f"백업 정리 완료: {len(branches_to_delete)}개 삭제")
+            
+        except Exception as e:
+            logger.error(f"백업 정리 오류: {e}")
+    
+    def _get_changed_files_count(self) -> int:
+        """변경된 파일 수 반환"""
+        try:
+            unstaged = len(self.repo.index.diff(None))
+            staged = len(self.repo.index.diff('HEAD'))
+            untracked = len(self.repo.untracked_files)
+            return unstaged + staged + untracked
+        except:
+            return 0
+    
+    async def restore_backup(self, backup_name: str) -> bool:
+        """백업 복원"""
+        try:
+            branch_name = f"{self.backup_branch}/{backup_name}"
+            
+            if branch_name not in [branch.name for branch in self.repo.branches]:
+                logger.error(f"백업 브랜치를 찾을 수 없습니다: {branch_name}")
+                return False
+            
+            # 백업 브랜치로 전환
+            self.repo.heads[branch_name].checkout()
+            
+            # 파일 복원
+            await self._restore_files_from_branch(branch_name)
+            
+            # main 브랜치로 돌아가기
+            self.repo.heads['main'].checkout()
+            
+            logger.info(f"✅ 백업 복원 완료: {backup_name}")
+            return True
+            
+        except Exception as e:
+            logger.error(f"백업 복원 실패: {e}")
+            return False
+    
+    async def _restore_files_from_branch(self, branch_name: str):
+        """브랜치에서 파일 복원"""
+        try:
+            # 백업 브랜치의 파일들을 현재 브랜치로 복사
+            backup_branch = self.repo.heads[branch_name]
+            
+            for file_path in self.repo_path.rglob('*'):
+                if file_path.is_file() and self._should_backup_file(file_path):
+                    try:
+                        # 백업 브랜치의 파일 내용 가져오기
+                        file_content = backup_branch.commit.tree[str(file_path.relative_to(self.repo_path))].data_stream.read()
+                        
+                        # 파일 복원
+                        with open(file_path, 'wb') as f:
+                            f.write(file_content)
+                        
+                        logger.debug(f"파일 복원: {file_path}")
+                        
+                    except Exception as e:
+                        logger.warning(f"파일 복원 실패: {file_path} - {e}")
+            
+            logger.info("파일 복원 완료")
+            
+        except Exception as e:
+            logger.error(f"파일 복원 오류: {e}")
+            raise
+    
+    def get_backup_list(self) -> List[Dict[str, Any]]:
+        """백업 목록 반환"""
+        try:
+            backup_list = []
+            
+            for branch in self.repo.branches:
+                if branch.name.startswith(f"{self.backup_branch}/"):
+                    backup_name = branch.name.replace(f"{self.backup_branch}/", "")
+                    
+                    backup_list.append({
+                        'name': backup_name,
+                        'branch': branch.name,
+                        'created_at': branch.commit.committed_datetime.isoformat(),
+                        'commit_hash': branch.commit.hexsha[:8],
+                        'message': branch.commit.message.split('\n')[0]
+                    })
+            
+            # 생성일 기준 정렬
+            backup_list.sort(key=lambda x: x['created_at'], reverse=True)
+            
+            return backup_list
+            
+        except Exception as e:
+            logger.error(f"백업 목록 조회 오류: {e}")
+            return []
+    
+    def get_backup_status(self) -> Dict[str, Any]:
+        """백업 상태 반환"""
+        return {
+            'is_running': self.is_backup_running,
+            'last_backup': self.last_backup_time.isoformat() if self.last_backup_time else None,
+            'backup_interval': self.auto_backup_interval,
+            'max_history': self.max_backup_history,
+            'backup_count': len(self.get_backup_list()),
+            'has_changes': self._has_changes(),
+            'changed_files_count': self._get_changed_files_count()
+        }
+    
+    def save_backup_report(self, output_dir: str = "reports/backup"):
+        """백업 리포트 저장"""
+        output_path = Path(output_dir)
+        output_path.mkdir(parents=True, exist_ok=True)
+        
+        report = {
+            'timestamp': datetime.now().isoformat(),
+            'status': self.get_backup_status(),
+            'backup_list': self.get_backup_list(),
+            'config': self.backup_config
+        }
+        
+        report_path = output_path / f"backup_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+        with open(report_path, 'w', encoding='utf-8') as f:
+            json.dump(report, f, indent=2, ensure_ascii=False, default=str)
+        
+        logger.info(f"📊 백업 리포트 저장: {report_path}")
+
+# 전역 인스턴스
+git_backup_manager = GitBackupManager()
+
+async def start_git_backup():
+    """깃 백업 시작"""
+    await git_backup_manager.start_auto_backup()
+
+async def stop_git_backup():
+    """깃 백업 중지"""
+    await git_backup_manager.stop_auto_backup()
+
+def get_backup_status():
+    """백업 상태 조회"""
+    return git_backup_manager.get_backup_status()
+
+def get_backup_list():
+    """백업 목록 조회"""
+    return git_backup_manager.get_backup_list()
+
+async def create_manual_backup(backup_name: str = None):
+    """수동 백업 생성"""
+    return await git_backup_manager.create_backup(backup_name)
+
+async def restore_backup(backup_name: str):
+    """백업 복원"""
+    return await git_backup_manager.restore_backup(backup_name) 

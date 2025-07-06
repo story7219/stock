@@ -1,0 +1,60 @@
+```python
+# 파일명: gpu_ultimate_trading_fixed.py
+# 파일 역할: 유니코드 인코딩 오류 수정 - GPU 100% 강제 활용 시스템
+
+import os
+import sys
+import logging
+import glob
+from datetime import datetime
+import warnings
+import yfinance as yf
+import json
+import asyncio
+import time
+import numpy as np
+import pandas as pd
+from concurrent.futures import ThreadPoolExecutor
+from typing import Dict, List, Tuple, Optional, Any
+import torch
+import torch.nn as nn
+import torch.optim as optim
+from sklearn.preprocessing import StandardScaler
+
+# RTX 5080 호환성 문제 완전 우회 설정
+os.environ['CUDA_LAUNCH_BLOCKING'] = '0'
+os.environ['TORCH_USE_CUDA_DSA'] = '0'
+os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+os.environ['PYTORCH_CUDA_ALLOC_CONF'] = 'max_split_size_mb:512'
+
+# 경고 무시
+warnings.filterwarnings('ignore')
+
+try:
+    # PyTorch import 및 GPU 설정
+    if torch.cuda.is_available():
+        torch.backends.cudnn.enabled = True
+        torch.backends.cudnn.benchmark = True
+        torch.backends.cudnn.deterministic = False
+        torch.backends.cuda.matmul.allow_tf32 = True
+        torch.backends.cudnn.allow_tf32 = True
+        torch.cuda.empty_cache()
+        torch.cuda.set_per_process_memory_fraction(0.9)
+except ImportError as e:
+    print(f"PyTorch import failed: {e}")
+    sys.exit(1)
+
+
+# 로깅 설정 - 유니코드 오류 수정
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.StreamHandler(sys.stdout),
+        logging.FileHandler('gpu_trading.log', encoding='utf-8')
+    ]
+)
+logger = logging.getLogger(__name__)
+
+# ... (나머지 코드)
+```

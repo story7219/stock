@@ -1,0 +1,79 @@
+```python
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+🚀 통합 투자 시스템 메인 실행 파일
+================================================================
+파일명: main.py
+역할: 사용자가 원하는 시스템을 선택하여 실행하는 메인 파일
+- ML/DL/Gemini AI 상호보완 자동매매 시스템
+- 통합 분석 시스템
+- Streamlit 대시보드
+- 간단한 테스트 실행
+"""
+
+import sys
+import os
+from pathlib import Path
+import subprocess
+import platform
+
+def print_banner():
+    """시스템 배너 출력"""
+    print("\n" + "=" * 60)
+    print("🚀 통합 투자 시스템 v4.0")
+    print("=" * 60)
+    print("📊 ML/DL/Gemini AI 상호보완 자동매매 시스템")
+    print("📈 실시간 분석 및 백테스트")
+    print("🖥️  Streamlit 대시보드")
+    print("🧪 시스템 테스트")
+    print("=" * 60)
+
+def print_menu():
+    """메뉴 출력"""
+    print("\n실행할 시스템을 선택하세요:")
+    print("1. ML/DL/Gemini AI 자동매매 시스템")
+    print("2. 통합 분석 시스템")
+    print("3. Streamlit 대시보드")
+    print("4. 간단한 신호 생성 테스트")
+    print("5. 전체 시스템 테스트")
+    print("6. 사용법 및 설정 가이드")
+    print("0. 종료")
+    print("-" * 60)
+
+def run_auto_trading_system():
+    """자동매매 시스템 실행"""
+    print("\nML/DL/Gemini AI 자동매매 시스템 시작...")
+    try:
+        result = subprocess.run(
+            [sys.executable, "auto_trading_main.py"],
+            capture_output=True, text=True, check=True,
+            cwd=os.path.dirname(os.path.abspath(__file__))  # 현재 파일 경로
+        )
+        print("자동매매 시스템 실행 완료")
+    except FileNotFoundError as e:
+        print(f"auto_trading_main.py 파일이 없습니다.: {e}")
+    except subprocess.CalledProcessError as e:
+        print(f"자동매매 시스템 실행 실패: {e.stderr}")
+    except Exception as e:
+        print(f"자동매매 시스템 실행 오류: {e}")
+
+
+def main():
+    print_banner()
+    while True:
+        print_menu()
+        choice = input("선택: ")
+
+        if choice == '1':
+            run_auto_trading_system()
+        elif choice == '0':
+            print("종료합니다.")
+            break
+        else:
+            print("잘못된 선택입니다. 다시 시도하세요.")
+
+
+if __name__ == "__main__":
+    main()
+```

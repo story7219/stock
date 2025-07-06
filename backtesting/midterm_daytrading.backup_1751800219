@@ -1,0 +1,83 @@
+# midterm_daytrading.py - Test 모듈
+# 역할: Test 관련 기능 제공
+
+```python
+"""
+중기투자 & 데이트레이딩 백테스트 시스템
+1. 중기투자: 1-6개월 보유
+2. 데이트레이딩: 하루 3번 전후 매매
+"""
+
+import pandas as pd
+import numpy as np
+from typing import Dict, List, Tuple, Any, Optional
+from datetime import datetime, timedelta
+import logging
+import yfinance as yf
+import talib
+from dataclasses import dataclass
+
+logger = logging.getLogger(__name__)
+
+
+@dataclass
+class TradeRecord:
+    """거래 기록"""
+    strategy: str  # 'midterm' or 'daytrading'
+    symbol: str
+    entry_date: datetime
+    entry_price: float
+    exit_date: Optional[datetime]
+    exit_price: Optional[float]
+    position_size: float
+    pnl: Optional[float]
+    holding_days: Optional[int]
+    trade_count: int = 1  # 데이트레이딩의 경우 하루 거래 횟수
+
+
+class MidtermStrategy:
+    """중기투자 전략 (1-6개월)"""
+
+    def __init__(self, config: Dict[str, Any]):
+        self.min_holding_days = config.get('min_holding_days', 30)  # 최소 1개월
+        self.max_holding_days = config.get('max_holding_days', 180)  # 최대 6개월
+        self.position_size = config.get('position_size', 0.2)  # 자본의 20%
+
+    def generate_signals(self, df: pd.DataFrame) -> List[Dict]:
+        """중기투자 신호 생성"""
+        signals = []
+        # 기술적 지표 계산
+        df['SMA_50'] = df['Close'].rolling(50).mean()
+        df['SMA_200'] = df['Close'].rolling(200).mean()
+        df['RSI'] = talib.RSI(df['Close'].values, timeperiod=14)
+        # MACD
+        df['MACD'], df['MACD_signal'], df['MACD_hist'] = talib.MACD(
+            df['Close'].values, fastperiod=12, slowperiod=26, signalperiod=9
+        )
+        # 볼륨 분석
+        df['Volume_SMA'] = df['Volume'].rolling(20).mean()
+        df['Volume_ratio'] = df['Volume'] / df['Volume_SMA']
+        # 추세 강도
+        df['ADX'] = talib.ADX(df['High'].values, df['Low'].values,
+                              df['Close'].values, timeperiod=14)
+        for i in range(200, len(df)):
+            # 중기 매수 조건
+            buy_conditions = [
+                df['Close'].iloc[i] > df['SMA_50'].iloc[i],  # 단기 이평선 위
+                df['SMA_50'].iloc[i] > df['SMA_200'].iloc[i],  # 장기 상승 추세
+                df['RSI'].iloc[i] < 65,  # 과매수 아님
+                df['MACD'].iloc[i] > df['MACD_signal'].iloc[i],  # MACD 상승
+                df['Volume_ratio'].iloc[i] > 1.2,  # 거래량 증가
+                df['ADX'].iloc[i] > 25  # 추세 강함
+            ]
+            if all(buy_conditions):
+                signals.append({
+                    'date': df.index[i],
+                    'type': 'buy',
+                    'price': df['Close'].iloc[i],
+                    'strength': self._calculate_signal_strength(df, i)
+                })
+        return signals
+
+    # ... (나머지 코드는 동일)
+```

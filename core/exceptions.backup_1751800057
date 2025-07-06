@@ -1,0 +1,94 @@
+```python
+"""
+⚠️ 시스템 예외 정의
+=================
+
+시스템에서 사용하는 커스텀 예외 클래스들을 정의합니다.
+"""
+
+
+class SystemError(Exception):
+    """시스템 관련 기본 예외"""
+    def __init__(self, message: str, error_code: str | None = None):
+        self.message = message
+        self.error_code = error_code or "SYS_ERROR"
+        super().__init__(self.message)
+
+
+class ConfigurationError(SystemError):
+    """설정 관련 예외"""
+    def __init__(self, message: str):
+        super().__init__(message, "CONFIG_ERROR")
+
+
+class DataCollectionError(SystemError):
+    """데이터 수집 관련 예외"""
+    def __init__(self, message: str, source: str | None = None):
+        self.source = source
+        super().__init__(message, "DATA_ERROR")
+
+
+class StrategyError(SystemError):
+    """전략 분석 관련 예외"""
+    def __init__(self, message: str, strategy_name: str | None = None):
+        self.strategy_name = strategy_name
+        super().__init__(message, "STRATEGY_ERROR")
+
+
+class APIError(SystemError):
+    """API 호출 관련 예외"""
+    def __init__(self, message: str, api_name: str | None = None,
+                 status_code: int | None = None, error_code: str | None = None):
+        self.api_name = api_name
+        self.status_code = status_code
+        self.error_code = error_code or "API_ERROR"
+        super().__init__(message)
+
+
+class CacheError(SystemError):
+    """캐시 관련 예외"""
+    def __init__(self, message: str):
+        super().__init__(message, "CACHE_ERROR")
+
+
+class ReportGenerationError(SystemError):
+    """리포트 생성 관련 예외"""
+    def __init__(self, message: str):
+        super().__init__(message, "REPORT_ERROR")
+
+
+class NotificationError(SystemError):
+    """알림 관련 예외"""
+    def __init__(self, message: str, service: str | None = None):
+        self.service = service
+        super().__init__(message, "NOTIFICATION_ERROR")
+
+
+class ValidationError(SystemError):
+    """유효성 검증 관련 예외"""
+    def __init__(self, message: str, field: str | None = None):
+        self.field = field
+        super().__init__(message, "VALIDATION_ERROR")
+
+
+class InsufficientDataError(DataCollectionError):
+    """데이터 부족 예외"""
+    def __init__(self, message: str, required_count: int | None = None,
+                 actual_count: int | None = None):
+        self.required_count = required_count
+        self.actual_count = actual_count
+        super().__init__(message, "INSUFFICIENT_DATA_ERROR")
+
+
+class RateLimitError(APIError):
+    """API 요청 제한 예외"""
+    def __init__(self, message: str, retry_after: int | None = None):
+        self.retry_after = retry_after
+        super().__init__(message, error_code="RATE_LIMIT_ERROR", status_code=429)
+
+
+class AuthenticationError(APIError):
+    """인증 관련 예외"""
+    def __init__(self, message: str, api_name: str | None = None):
+        super().__init__(message, api_name, 401, "AUTHENTICATION_ERROR")
+```

@@ -1,0 +1,75 @@
+# real_time_trading_system.py - Test 모듈
+# 역할: Test 관련 기능 제공
+
+```python
+# 파일명: real_time_trading_system.py
+# 파일 역할: 실전매매에 바로 적용 가능한 머신러닝+딥러닝+Gemini AI 통합 시스템
+
+import asyncio
+import logging
+import sqlite3
+import json
+import time
+from datetime import datetime, timedelta
+from typing import Dict, List, Tuple, Optional, Any
+from dataclasses import dataclass
+from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
+import numpy as np
+import pandas as pd
+from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
+from sklearn.preprocessing import StandardScaler, MinMaxScaler
+from sklearn.model_selection import cross_val_score
+from sklearn.metrics import mean_squared_error, accuracy_score
+import joblib
+import gc
+import psutil
+import os
+from pathlib import Path
+
+# 로깅 설정
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler('logs/real_time_trading.log'),
+        logging.StreamHandler()
+    ]
+)
+logger = logging.getLogger(__name__)
+
+@dataclass
+class MarketSignal:
+    """시장 신호 데이터 클래스"""
+    timestamp: datetime
+    symbol: str
+    signal_type: str  # 'buy', 'sell', 'hold'
+    confidence: float  # 0.0 ~ 1.0
+    price: float
+    volume: int
+    ml_score: float
+    dl_score: float
+    gemini_score: float
+    ensemble_score: float
+    market_condition: str  # 'bull', 'bear', 'sideways', 'event'
+
+# ... (나머지 코드는 동일)
+
+class EnsemblePredictor:
+    """앙상블 예측 클래스"""
+    # ... (나머지 코드는 동일)
+    def predict(self, ml_score: float, dl_score: float, gemini_score: float, 
+                market_condition: str) -> float:
+        """앙상블 예측"""
+        try:
+            weights = self.calculate_weights_by_market_condition(market_condition)
+            ensemble_score = (
+                weights.get('ml', 0) * ml_score +
+                weights.get('dl', 0) * dl_score +
+                weights.get('gemini', 0) * gemini_score
+            )
+            return ensemble_score
+        except Exception as e:
+            logger.error(f"앙상블 예측 오류: {e}")
+            return 0.5
+# ... (나머지 코드는 동일)
+```

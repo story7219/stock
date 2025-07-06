@@ -1,0 +1,124 @@
+# setup_project.py - Test 모듈
+# 역할: Test 관련 기능 제공
+
+```python
+# -*- coding: utf-8 -*-
+"""
+🛠️ 프로젝트 설정 자동화 스크립트 v1.0
+=====================================
+
+📋 시스템 역할:
+- 주식 투자 AI 시스템의 필수 디렉토리, 설정 파일, 환경 변수 템플릿,
+  패키지 설치 상태를 자동으로 점검·생성
+- 신규 환경/서버/개발자 온보딩 시 반복되는 초기 세팅을 자동화하여
+  실수 방지 및 생산성 향상
+
+🔧 주요 기능:
+1. 필수 디렉토리 자동 생성 (데이터, 로그, 리포트 등)
+2. 시스템/전략/알림 설정 파일 자동 생성 (YAML)
+3. 환경 변수 템플릿(.env.example) 자동 생성
+4. Python 버전 및 필수 패키지 설치 여부 점검
+5. 실행 방법 및 추가 안내 자동 출력
+
+⚙️ 자동화 항목:
+- configs/settings.yaml, strategy_config.yaml, notification_config.yaml
+- .env.example (API 키, DB, Telegram 등)
+- outputs, logs, data 등 주요 폴더
+- requirements.txt 기반 패키지 설치 상태
+
+💡 사용 예시:
+1. python setup_project.py
+2. 모든 환경/설정/패키지 자동 점검 및 안내
+
+⚠️ 주의사항:
+- 실제 운영 전 .env 파일에 API 키 등 민감 정보 직접 입력 필요
+- requirements.txt 최신화 및 패키지 충돌 여부 별도 확인 권장
+- 자동 생성된 설정 파일은 프로젝트 환경에 맞게
+  추가 수정 필요
+"""
+
+import os
+import sys
+from pathlib import Path
+
+print("=" * 80)
+print("주식 투자 AI 시스템 - 프로젝트 설정")
+print("=" * 80)
+
+# 1. 필수 디렉토리 생성
+directories = [
+    "configs", "outputs", "outputs/reports",
+    "outputs/opportunities", "outputs/portfolios",
+    "logs", "data", "data/market_cache"
+]
+
+print("\n[1] 디렉토리 생성")
+for directory in directories:
+    Path(directory).mkdir(parents=True, exist_ok=True)
+    print(f"✓ {directory} 생성/확인")
+
+# 2. 기본 설정 파일 생성
+print("\n[2] 설정 파일 생성")
+
+# ... (나머지 코드는 동일)
+
+# 4. 실행 가능 여부 확인
+print("\n[4] 시스템 점검")
+
+# Python 버전 확인
+python_version = sys.version_info
+print(f"✓ Python 버전: {python_version.major}.{python_version.minor}.{python_version.micro}")
+
+# 필수 패키지 확인
+print("\n필수 패키지 확인:")
+required_packages = [
+    "requests", "pyyaml", "pandas", "yfinance", "pykrx", "ta",
+    "scikit-learn", "sqlalchemy", "aiohttp", "cachetools"
+]
+
+missing_packages = []
+for package in required_packages:
+    try:
+        __import__(package)
+        print(f"✓ {package} 설치됨")
+    except ImportError:
+        print(f"✗ {package} 미설치")
+        missing_packages.append(package)
+
+# 5. 설치 안내
+if missing_packages:
+    print("\n" + "=" * 80)
+    print("⚠️  필수 패키지 설치 필요")
+    print("=" * 80)
+    print("\n다음 명령어로 설치하세요:")
+    print(f"\npip install -r requirements.txt")
+    print("\n또는 개별 설치:")
+    print(f"pip install {' '.join(missing_packages)}")
+else:
+    print("\n✅ 모든 필수 패키지가 설치되어 있습니다.")
+
+# 6. 실행 방법 안내
+print("\n" + "=" * 80)
+print("🚀 실행 방법")
+print("=" * 80)
+
+print("""
+1. 환경 변수 설정:
+   - .env.example을 .env로 복사
+   - API 키 입력 (최소한 GEMINI_API_KEY 필요)
+
+2. 단일 종목 분석:
+   python app/main.py analyze --ticker AAPL
+
+3. 시장 스캔:
+   python app/main.py scan --market KOSPI200
+
+4. 포트폴리오 추천:
+   python app/main.py portfolio --budget 10000000 --risk MEDIUM
+
+5. 도움말:
+   python app/main.py -h
+""")
+
+print("\n설정 완료!")
+```

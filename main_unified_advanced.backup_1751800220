@@ -1,0 +1,64 @@
+# main_unified_advanced.py - Main Executable 모듈
+# 역할: Main Executable 관련 기능 제공
+
+```python
+# 통합 고급 분석 시스템 메인 실행 스크립트
+# Unified Advanced Analysis System Main Execution Script
+
+import asyncio
+import pandas as pd
+import numpy as np
+from datetime import datetime, timedelta
+from typing import Dict, List, Optional
+import warnings
+warnings.filterwarnings('ignore')
+
+# 모듈 임포트
+from analysis.ichimoku_time_analysis import analyze_ichimoku_time_theory
+from modules.us_options_realtime import analyze_us_options_realtime
+from modules.global_news_collector import analyze_global_news_realtime
+from modules.deep_learning_strategies import analyze_deep_learning_strategies
+from data.collectors import collect_market_data
+from modules.notification_system import send_telegram_alert
+
+class UnifiedAdvancedAnalyzer:
+    """통합 고급 분석 시스템"""
+    
+    def __init__(self):
+        """통합 분석기 초기화"""
+        self.analysis_results = {}
+        self.market_data: Dict[str, pd.DataFrame] = {}
+        self.symbols = {
+            'korean': ['005930.KS', '000660.KS', '035420.KS',
+                       '051910.KS', '006400.KS'],
+            'us_stocks': ['AAPL', 'TSLA', 'MSFT', 'GOOGL', 'AMZN'],
+            'us_etfs': ['SPY', 'QQQ', 'IWM', 'TLT', 'GLD'],
+            'us_options': ['AAPL', 'TSLA', 'SPY', 'QQQ']
+        }
+        
+    async def collect_all_market_data(self) -> Dict[str, pd.DataFrame]:
+        """모든 시장 데이터 수집"""
+        try:
+            print("=== 시장 데이터 수집 시작 ===")
+            all_symbols = []
+            for category in self.symbols.values():
+                all_symbols.extend(category)
+            unique_symbols = list(set(all_symbols))
+            market_data = {}
+            for symbol in unique_symbols:
+                try:
+                    print(f"{symbol} 데이터 수집 중...")
+                    data = collect_market_data(symbol, period='1y')
+                    if not data.empty:
+                        market_data[symbol] = data
+                except Exception as e:
+                    print(f"{symbol} 데이터 수집 오류: {e}")
+            self.market_data = market_data
+            print(f"총 {len(market_data)}개 심볼 데이터 수집 완료")
+            return market_data
+        except Exception as e:
+            print(f"시장 데이터 수집 오류: {e}")
+            return {}
+    
+    # ... (나머지 함수들) ...
+```

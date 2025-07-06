@@ -1,0 +1,83 @@
+# kis_stock_realtime.py - Api Integration 모듈
+# 역할: Api Integration 관련 기능 제공
+
+```python
+# -*- coding: utf-8 -*-
+"""
+한투 OpenAPI 실시간 시스템 - 주식 실시간 데이터 통합 관리 모듈
+============================================================
+실전/모의투자 자동 분리, REST+웹소켓 통합, 예외처리, 콜백 구조, 유지보수성
+커서룰 100% 적용: 최신 Python 문법, 함수/클래스 분리, 한글 주석, 방어코드, 성능/안정성/테스트
+"""
+
+import os
+import asyncio
+import aiohttp
+import websockets
+import logging
+import json
+import time
+import hashlib
+import hmac
+import base64
+from typing import List, Dict, Any, Callable, Optional, Union
+from datetime import datetime, timedelta
+from dataclasses import dataclass, field
+from dotenv import load_dotenv
+from collections import deque
+import sqlite3
+import threading
+from concurrent.futures import ThreadPoolExecutor
+
+# 환경설정 자동 로드
+load_dotenv()
+
+# 로깅 설정
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler('kis_stock_realtime.log', encoding='utf-8'),
+        logging.StreamHandler()
+    ]
+)
+logger = logging.getLogger(__name__)
+
+@dataclass
+class TokenInfo:
+    access_token: str
+    token_type: str = "Bearer"
+    expires_in: int = 86400
+    created_at: datetime = field(default_factory=datetime.now)
+    refresh_count: int = 0
+    
+    @property
+    def is_expired(self) -> bool:
+        expiry_time = self.created_at + timedelta(seconds=self.expires_in - 600)
+        return datetime.now() >= expiry_time
+    
+    @property
+    def time_until_expiry(self) -> timedelta:
+        return (self.created_at + timedelta(seconds=self.expires_in)) - datetime.now()
+
+@dataclass
+class RateLimitInfo:
+    calls_per_second: deque = field(default_factory=lambda: deque(maxlen=20))
+    calls_per_minute: deque = field(default_factory=lambda: deque(maxlen=1000))
+    max_per_second: int = 20
+    max_per_minute: int = 1000
+    
+    def can_make_call(self) -> bool:
+        now = time.time()
+        while self.calls_per_second and now - self.calls_per_second[0] > 1:
+            self.calls_per_second.popleft()
+        while self.calls_per_minute and now - self.calls_per_minute[0] > 60:
+            self.calls_per_minute.popleft()
+        return (len(self.calls_per_second) < self.max_per_second and
+                len(self.calls_per_minute) < self.max_per_minute)
+    
+    def record_call(self) -> None:
+        now = time.time()
+        self.calls_per_second.append(now)
+        self.calls_per_minute.append(now)
+```

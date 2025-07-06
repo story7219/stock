@@ -1,0 +1,79 @@
+```python
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+🧠 ML/DL 데이터 정제 및 전처리 엔진
+=====================================
+
+머신러닝/딥러닝 학습을 위한 종합적인 데이터 정제 시스템
+- 대용량 데이터 전처리 및 정규화
+- 특성 엔지니어링 및 선택
+- 시계열 데이터 처리
+- 결측값 및 이상치 처리
+- 데이터 품질 검증
+- GPU 가속 처리 지원
+- 메모리 최적화
+
+최적화 대상:
+  • 대용량 데이터셋 (수백만 개 샘플)
+  • 고차원 특성 (수천 개 컬럼)
+  • 실시간 데이터 스트림
+  • GPU 메모리 효율성
+"""
+
+import os
+import json
+import logging
+import numpy as np
+import pandas as pd
+from datetime import datetime, timedelta
+from typing import Dict, List, Any, Optional, Tuple, Union
+from dataclasses import dataclass
+from pathlib import Path
+import warnings
+warnings.filterwarnings('ignore')
+
+# ML 라이브러리
+from sklearn.preprocessing import StandardScaler, MinMaxScaler, RobustScaler
+from sklearn.feature_selection import SelectKBest, f_regression, mutual_info_regression
+from sklearn.decomposition import PCA
+from sklearn.impute import SimpleImputer, KNNImputer
+from sklearn.ensemble import IsolationForest
+from sklearn.cluster import DBSCAN
+
+# 시계열 처리
+from scipy import stats
+from scipy.signal import savgol_filter
+
+# 병렬 처리
+from joblib import Parallel, delayed
+import multiprocessing as mp
+
+# GPU 지원 (선택적)
+try:
+    import cupy as cp
+    import cudf
+    GPU_AVAILABLE = True
+except ImportError:
+    GPU_AVAILABLE = False
+
+# 로깅 설정
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
+
+@dataclass
+class DataQualityMetrics:
+    """데이터 품질 지표"""
+    total_samples: int
+    total_features: int
+    missing_rate: float
+    outlier_rate: float
+    duplicate_rate: float
+    data_types: Dict[str, int]
+    memory_usage: float
+    processing_time: float
+
+class MLDataProcessor:
+    # ... (나머지 코드 동일)
+```

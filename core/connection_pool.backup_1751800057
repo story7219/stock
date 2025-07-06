@@ -1,0 +1,47 @@
+```python
+"""
+Connection pool manager for HTTP requests and database connections.
+"""
+import asyncio
+import logging
+import time
+from typing import Dict, Optional, Any, List, Coroutine
+from dataclasses import dataclass
+from contextlib import asynccontextmanager
+import aiohttp
+import ssl
+from urllib.parse import urlparse
+
+try:
+    import asyncpg
+    ASYNCPG_AVAILABLE = True
+except ImportError:
+    ASYNCPG_AVAILABLE = False
+
+logger = logging.getLogger(__name__)
+
+
+@dataclass
+class ConnectionStats:
+    """Connection pool statistics."""
+    total_connections: int = 0
+    active_connections: int = 0
+    idle_connections: int = 0
+    failed_connections: int = 0
+    total_requests: int = 0
+    avg_response_time: float = 0.0
+    last_reset: float = 0.0
+
+
+class HTTPConnectionPool:
+    # ... (이전 코드 생략)
+
+    async def request(self,
+                     method: str,
+                     url: str,
+                     *,  # Keyword-only arguments
+                     **kwargs: Any) -> Optional[aiohttp.ClientResponse]:
+        """Make HTTP request with rate limiting and retry logic."""
+        # ... (이전 코드 생략)
+        # ... (이후 코드 생략)
+```

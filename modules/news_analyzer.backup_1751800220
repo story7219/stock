@@ -1,0 +1,113 @@
+# news_analyzer.py - Analysis Engine 모듈
+# 역할: Analysis Engine 관련 기능 제공
+
+```python
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+# 파일명: news_analyzer.py
+# 역할: 뉴스 데이터 수집 및 감성 분석을 담당하는 모듈
+# - 실시간 뉴스 수집 및 키워드 추출
+# - 감성 분석을 통한 시장 심리 파악
+# - 뉴스 기반 투자 신호 생성
+
+"""
+뉴스 분석 모듈 v2.0
+
+주요 기능:
+- 실시간 뉴스 수집
+- 감성 분석 및 점수 계산
+- 키워드 추출 및 트렌드 분석
+- 뉴스 기반 투자 신호 생성
+"""
+import logging
+from typing import List, Dict, Any, Optional
+from enum import Enum, auto
+from dataclasses import dataclass, field
+from datetime import datetime
+
+logger = logging.getLogger(__name__)
+
+class NewsAnalyzer:
+    """
+    뉴스 분석기 (임시 플레이스홀더)
+    unified_investment_system.py의 임포트 오류를 해결하기 위해 생성되었습니다.
+    """
+    def __init__(self):
+        logger.info("📰 뉴스 분석기 (임시) 초기화")
+
+    def analyze(self, news_items: List[Any]) -> Dict[str, Any]:
+        """
+        뉴스 아이템들을 분석합니다. (임시)
+        """
+        logger.warning("임시 뉴스 분석기가 호출되었습니다. 실제 분석 로직이 필요합니다.")
+        return {
+            "overall_sentiment": "neutral",
+            "trending_topics": [],
+            "hot_stocks": []
+        }
+    
+    def analyze_news_batch(self, news_items: List[Any]) -> Dict[str, Any]:
+        """
+        뉴스 배치 분석 (임시)
+        """
+        logger.warning("임시 뉴스 배치 분석기가 호출되었습니다.")
+        return {
+            "market_sentiment": "neutral",
+            "key_topics": [],
+            "stock_mentions": {},
+            "analysis_summary": "Mock 분석 결과"
+        } 
+
+# 역할: 뉴스 감성 분류를 위한 열거형
+# 입력: 없음
+# 출력: NewsSentiment 열거형
+class NewsSentiment(Enum):
+    """뉴스 감성 분류"""
+    VERY_POSITIVE = auto()
+    POSITIVE = auto()
+    NEUTRAL = auto()
+    NEGATIVE = auto()
+    VERY_NEGATIVE = auto()
+
+# 역할: 뉴스 소스 정의를 위한 열거형
+# 입력: 없음
+# 출력: NewsSource 열거형
+class NewsSource(Enum):
+    """뉴스 소스 정의"""
+    RSS_FEED = auto()
+    WEB_SCRAPING = auto()
+    API = auto()
+    SOCIAL_MEDIA = auto()
+
+# 역할: 개별 뉴스 아이템 정보를 저장하는 데이터 클래스
+# 입력: 제목, 내용, 소스, 발행일, URL 등
+# 출력: NewsItem 인스턴스
+@dataclass
+class NewsItem:
+    """뉴스 아이템"""
+    title: str
+    content: str
+    source: str
+    published_date: datetime
+    url: str
+    symbol: Optional[str] = None
+    sentiment: Optional[NewsSentiment] = None
+    sentiment_score: float = 0.0
+    keywords: List[str] = field(default_factory=list)
+    relevance_score: float = 0.0
+
+# 역할: 뉴스 분석 결과를 저장하는 데이터 클래스
+# 입력: 심볼, 분석된 뉴스 리스트, 평균 감성 점수 등
+# 출력: NewsAnalysisResult 인스턴스
+@dataclass
+class NewsAnalysisResult:
+    """뉴스 분석 결과"""
+    symbol: str
+    news_items: List[NewsItem]
+    average_sentiment: float
+    sentiment_trend: str
+    key_topics: List[str]
+    investment_signal: str
+    confidence: float
+    analysis_date: datetime = field(default_factory=datetime.now)
+```

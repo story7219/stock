@@ -1,0 +1,48 @@
+```python
+import logging
+import sys
+import os
+import argparse
+import ast
+import json
+from datetime import datetime
+from pathlib import Path
+from typing import Dict, List, Any
+import subprocess
+
+# 💗 로깅 설정 (INFO 레벨, 시간 포함 포맷)
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
+
+class AutoRefactor:
+    """💗 자동 리팩토링 메인 엔진 클래스"""
+    
+    def __init__(self, project_root: str = ".", dry_run: bool = True):
+        """💗 리팩토링 도구 초기화"""
+        self.project_root = Path(project_root)
+        self.dry_run = dry_run
+        self.changes_made: List[Dict[str, Any]] = []
+        self.refactor_stats = {
+            'files_processed': 0,
+            'changes_applied': 0,
+            'errors': 0,
+            'improvements': []
+        }
+        logger.info(f"🔄 자동 리팩토링 도구 초기화 "
+                    f"(DryRun: {dry_run})")
+
+    def format_code_with_black(self) -> bool:
+        """💗 Black으로 코드 포맷팅 (PEP8 준수)"""
+        logger.info("🎨 Black으로 코드 포맷팅 중...")
+        try:
+            cmd = ['black', '--check', '--diff',
+                   str(self.project_root)]
+            if not self.dry_run:
+                cmd = ['black', str(self.project_root)]
+            result = subprocess.run(cmd,
+                                    capture_output=True,
+                                    text=True,
+                                    timeout=300)
+            # ... (나머지 코드 동일)
+```

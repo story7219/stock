@@ -1,0 +1,74 @@
+```python
+# 파일명: gpu_ultimate_trading.py
+# 파일 역할: RTX 5080 호환성 문제 완전 우회 - GPU 100% 강제 활용 시스템
+
+import os
+import sys
+import subprocess
+import logging
+from datetime import datetime
+import warnings
+import torch
+import torch.nn as nn
+import torch.optim as optim
+import torch.nn.functional as F
+import numpy as np
+import pandas as pd
+import asyncio
+from concurrent.futures import ThreadPoolExecutor
+import yfinance as yf
+import json
+from sklearn.preprocessing import StandardScaler
+
+# RTX 5080 호환성 문제 완전 우회 설정
+os.environ['CUDA_LAUNCH_BLOCKING'] = '0'
+os.environ['TORCH_USE_CUDA_DSA'] = '0'
+os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+os.environ['PYTORCH_CUDA_ALLOC_CONF'] = 'max_split_size_mb:512'
+
+# 경고 무시
+warnings.filterwarnings('ignore')
+
+try:
+    # PyTorch 및 필요한 라이브러리 가져오기
+    import torch
+    import torch.nn as nn
+    import torch.optim as optim
+    import torch.nn.functional as F
+    import numpy as np
+    import pandas as pd
+    import asyncio
+    from concurrent.futures import ThreadPoolExecutor
+    import yfinance as yf
+    import json
+    from sklearn.preprocessing import StandardScaler
+    
+    # RTX 5080 강제 호환 설정
+    if torch.cuda.is_available():
+        torch.backends.cudnn.enabled = True
+        torch.backends.cudnn.benchmark = True
+        torch.backends.cudnn.deterministic = False
+        torch.backends.cuda.matmul.allow_tf32 = True
+        torch.backends.cudnn.allow_tf32 = True
+        
+        # GPU 메모리 사전 할당
+        torch.cuda.empty_cache()
+        torch.cuda.set_per_process_memory_fraction(0.9)
+        
+except ImportError as e:
+    print(f"❌ PyTorch 가져오기 실패: {e}")
+    sys.exit(1)
+
+# 로깅 설정
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.StreamHandler(),
+        logging.FileHandler('gpu_trading.log')
+    ]
+)
+logger = logging.getLogger(__name__)
+
+# ... (나머지 코드) ...
+```

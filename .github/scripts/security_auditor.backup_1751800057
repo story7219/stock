@@ -1,0 +1,65 @@
+```python
+"""
+🔒 보안 감사 시스템
+투자 시스템의 보안 취약점을 자동으로 검사하고 보고하는 도구
+"""
+
+import os
+import sys
+import json
+import re
+import ast
+import subprocess
+import logging
+from pathlib import Path
+from typing import Dict, List, Any, Set
+from datetime import datetime
+import hashlib
+
+# 로깅 설정
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
+
+class SecurityAuditor:
+    """보안 감사 도구"""
+    
+    def __init__(self, project_root: str = "."):
+        self.project_root = Path(project_root)
+        self.vulnerabilities = []
+        self.security_score = 100
+        
+        # 보안 패턴 정의
+        self.security_patterns = {
+            'hardcoded_secrets': [
+                r'(?i)(password|pwd|secret|key|token)\s*=\s*["\'][^"\']{8,}["\']',
+                r'(?i)(api_key|apikey|access_key)\s*=\s*["\'][^"\']{10,}["\']',
+                r'(?i)(private_key|secret_key)\s*=\s*["\'][^"\']{20,}["\']',
+            ],
+            'sql_injection': [
+                r'(?i)execute\s*\(\s*["\'].*%s.*["\']',
+                r'(?i)cursor\.execute\s*\(\s*["\'].*\+.*["\']',
+                r'(?i)query\s*=\s*["\'].*%.*["\']',
+            ],
+            'command_injection': [
+                r'(?i)os\.system\s*\(',
+                r'(?i)subprocess\.call\s*\(',
+                r'(?i)eval\s*\(',
+                r'(?i)exec\s*\(',
+            ],
+            'insecure_random': [
+                r'(?i)random\.random\s*\(',
+                r'(?i)random\.randint\s*\(',
+                r'(?i)random\.choice\s*\(',
+            ],
+            'debug_info': [
+                r'(?i)print\s*\(\s*.*password.*\)',
+                r'(?i)print\s*\(\s*.*secret.*\)',
+                r'(?i)print\s*\(\s*.*token.*\)',
+                r'(?i)logging\.debug\s*\(\s*.*password.*\)',
+            ]
+        }
+        # ... (나머지 코드는 동일)
+```

@@ -1,0 +1,132 @@
+```python
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+🇺🇸 다중 소스 미국 파생상품 데이터 수집기
+===========================================
+KIS API 파생상품 승인 대기 중 사용할 수 있는 대안 데이터 소스들
+"""
+
+import asyncio
+import json
+import logging
+import os
+from dataclasses import dataclass, field
+from datetime import datetime, timedelta
+from typing import Dict, List, Optional, Any, Callable
+import aiohttp
+import yfinance as yf
+from dotenv import load_dotenv
+
+# 환경 변수 로드
+load_dotenv()
+
+logger = logging.getLogger(__name__)
+
+@dataclass
+class USDerivativeData:
+    """미국 파생상품 데이터 구조"""
+    symbol: str
+    name: str
+    underlying: str
+    derivative_type: str  # 'future', 'option', 'etf'
+    contract_type: str = ""  # 'call', 'put' for options
+    strike_price: float = 0.0
+    expiry_date: str = ""
+    current_price: float = 0.0
+    bid: float = 0.0
+    ask: float = 0.0
+    volume: int = 0
+    open_interest: int = 0
+    change: float = 0.0
+    change_percent: float = 0.0
+    implied_volatility: float = 0.0
+    delta: float = 0.0
+    gamma: float = 0.0
+    theta: float = 0.0
+    vega: float = 0.0
+    currency: str = "USD"
+    exchange: str = ""
+    data_source: str = ""
+    timestamp: datetime = field(default_factory=datetime.now)
+
+    def to_dict(self) -> Dict[str, Any]:
+        """딕셔너리로 변환"""
+        return {
+            'symbol': self.symbol,
+            'name': self.name,
+            'underlying': self.underlying,
+            'derivative_type': self.derivative_type,
+            'contract_type': self.contract_type,
+            'strike_price': self.strike_price,
+            'expiry_date': self.expiry_date,
+            'current_price': self.current_price,
+            'bid': self.bid,
+            'ask': self.ask,
+            'volume': self.volume,
+            'open_interest': self.open_interest,
+            'change': self.change,
+            'change_percent': self.change_percent,
+            'implied_volatility': self.implied_volatility,
+            'delta': self.delta,
+            'gamma': self.gamma,
+            'theta': self.theta,
+            'vega': self.vega,
+            'currency': self.currency,
+            'exchange': self.exchange,
+            'data_source': self.data_source,
+            'timestamp': self.timestamp.isoformat()
+        }
+
+
+class MultiSourceUSDerivatives:
+    # ... (rest of the code)
+    async def get_yahoo_finance_data(self, symbols: List[str]) \
+            -> List[USDerivativeData]:
+        derivatives = []
+        try:
+            for symbol in symbols:
+                if symbol not in self.index_etfs:
+                    continue
+                info = self.index_etfs[symbol]
+                try:
+                    ticker = yf.Ticker(symbol)
+                    data = ticker.history(period="1d", interval="1m")
+                    if not data.empty:
+                        latest = data.iloc[-1]
+                        previous = data.iloc[-2] if len(data) > 1 else latest
+                        change = latest['Close'] - previous['Close']
+                        change_pct = (
+                            (change / previous['Close']) * 100
+                            if previous['Close'] != 0
+                            else 0
+                        )
+                        derivative = USDerivativeData(
+                            symbol=symbol,
+                            name=info['name'],
+                            underlying=info['underlying'],
+                            derivative_type=info['type'],
+                            current_price=float(latest['Close']),
+                            volume=int(latest['Volume']),
+                            change=float(change),
+                            change_percent=float(change_pct),
+                            exchange='NYSE' if symbol in ['SPY', 'DIA', 'IWM'] \
+                                else 'NASDAQ',
+                            data_source='Yahoo Finance'
+                        )
+                        derivatives.append(derivative)
+                        await self.notify_callbacks(derivative)
+                        logger.info(
+                            f"✅ {symbol} 데이터 수집: "
+                            f"${derivative.current_price:.2f} "
+                            f"({derivative.change_percent:+.2f}%)"
+                        )
+                except Exception as e:
+                    logger.error(f"{symbol} 데이터 수집 오류: {e}")
+                    continue
+                await asyncio.sleep(0.1)
+        except Exception as e:
+            logger.error(f"Yahoo Finance 데이터 수집 오류: {e}")
+        return derivatives
+    # ... (rest of the code)
+```

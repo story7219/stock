@@ -1,0 +1,79 @@
+# unified_data_collector.py - Core Module 모듈
+# 역할: Core Module 관련 기능 제공
+
+```python
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+💾 통합 데이터 수집기 (과거 데이터 최대치)
+==============================================
+
+파일명: modules/unified_data_collector.py
+역할: 백테스트에 필요한 모든 과거 데이터를 현실적으로 가능한 최대치로 수집, 정제, 결합합니다.
+- 계층적 데이터 결합: yfinance (장기) + KIS API (단기/정확도) + DART (재무) + FRED (거시)
+- 데이터 클리닝 및 전처리
+- 최종 분석용 데이터프레임 생성
+"""
+
+import logging
+import pandas as pd
+import yfinance as yf
+from pandas_datareader import data as pdr
+from datetime import datetime
+from typing import List, Optional
+
+# (실제 구현 시 KIS, DART API 클라이언트 필요)
+# from .kis_api import KISAPIClient
+# from .dart_api import DARTAPIClient
+
+logger = logging.getLogger(__name__)
+
+
+class UnifiedDataCollector:
+    """
+    다양한 소스로부터 과거 데이터를 수집, 정제, 결합하여
+    백테스트에 사용할 최종 데이터셋을 생성하는 클래스.
+    """
+
+    def __init__(self, start_date: str = "1990-01-01"):
+        self.start_date = pd.to_datetime(start_date)
+        self.end_date = pd.to_datetime(datetime.now().strftime("%Y-%m-%d"))
+
+        # (실제 사용 시 API 클라이언트 초기화)
+        # self.kis_client = KISAPIClient()
+        # self.dart_client = DARTAPIClient()
+
+        yf.pdr_override()  # pandas-datareader와 yfinance 연동
+        logger.info(f"통합 데이터 수집기 초기화 완료 (시작일: {self.start_date})")
+
+    def get_full_historical_data(self,
+                                 symbol_map: dict,
+                                 fred_symbols: Optional[List[str]] = None) -> pd.DataFrame:
+        """
+        한 종목에 대한 모든 과거 데이터를 최대치로 수집하고 결합합니다.
+
+        Args:
+            symbol_map (dict): 각 API에서 사용할 종목 코드 맵.
+                               (예: {'yfinance': '005930.KS', 'kis': '005930', 'dart': '00126380'})
+            fred_symbols (Optional[List[str]]): 수집할 FRED 거시 경제 지표 코드 리스트.
+
+        Returns:
+            pd.DataFrame: 모든 데이터가 결합되고 전처리된 최종 데이터프레임.
+        """
+        logger.info(f"'{symbol_map.get('yfinance', 'N/A')}'에 대한 최대 과거 데이터 수집 시작...")
+
+        # 1. yfinance로 장기 가격 데이터 수집 (기본 뼈대)
+        price_df = self._get_yfinance_data(symbol_map.get('yfinance'))
+        if price_df.empty:
+            logger.error("yfinance 데이터 수집 실패. 프로세스를 중단합니다.")
+            return pd.DataFrame()
+
+        # ... (나머지 코드는 동일)
+
+    def _get_yfinance_data(self, symbol: str) -> pd.DataFrame:
+        try:
+            return pdr.get_data_yahoo(symbol, self.start_date, self.end_date)
+        except Exception as e:
+            logger.error(f"yfinance 데이터 수집 오류: {e}")
+            return pd.DataFrame()
+```

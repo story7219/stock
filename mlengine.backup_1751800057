@@ -1,0 +1,113 @@
+```python
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+🧠 실시간 ML/DL 엔진 v2.0 (최적화 버전)
+=====================================
+
+실전매매 적용 가능한 머신러닝/딥러닝 통합 시스템
+- 머신러닝 70% + 딥러닝 30% 앙상블 구조
+- Gemini AI 뉴스/공시 감정분석 통합
+- 24시간 실시간 학습 및 예측
+- 텔레그램 실시간 알림 시스템
+- GPU 가속 딥러닝 모델
+- 백테스트 및 성능 평가 자동화
+
+최적화 대상 PC 사양:
+  • CPU: Intel i9-14900KF (24코어, 32스레드)
+  • GPU: NVIDIA RTX 5080 (대용량 VRAM)
+  • RAM: DDR5 32GB
+  • 저장공간: NVMe SSD 1TB
+
+최적화 전략:
+  • 멀티스레드/멀티프로세싱 최대 활용 (n_jobs=-1)
+  • 대용량 데이터 캐싱 및 메모리 효율화
+  • GPU 활용(PyTorch/TensorFlow GPU 가속)
+  • 대규모 앙상블/딥러닝 확장성 고려
+  • 실시간 데이터 수집 및 빠른 I/O
+  • 병렬 차트 생성, 대용량 이미지 처리
+  • 고성능 파라미터(트리 개수, 딥러닝 확장 등)
+  • 메모리/CPU/GPU 사용량 실시간 모니터링
+  • 자동 재학습 및 성능 개선 알림
+"""
+
+from dotenv import load_dotenv
+load_dotenv()  # .env 파일 자동 로드
+
+import os
+import json
+import pickle
+import logging
+import numpy as np
+import pandas as pd
+from datetime import datetime, timedelta
+from typing import Dict, List, Any, Optional, Tuple, Union
+from dataclasses import dataclass
+from pathlib import Path
+import warnings
+warnings.filterwarnings('ignore')
+
+# ML 라이브러리
+from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
+from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import train_test_split, cross_val_score
+from sklearn.preprocessing import StandardScaler, MinMaxScaler
+from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error
+from sklearn.pipeline import Pipeline
+
+# API 관련
+import requests
+from PIL import Image
+import io
+import base64
+
+# 텔레그램 알림 함수 추가
+import requests as _requests
+
+import time
+import traceback
+import psutil
+
+# ... (중략) ...
+
+# ... (기존 코드) ...
+
+# ... (여기까지 기존 코드) ...
+
+# (1705번째 줄 근처에서 수정된 부분) (가정)
+
+# ... (기존 코드) ...
+
+
+    def _calculate_performance_metrics(self, y_true: Union[np.ndarray, pd.Series], y_pred: Union[np.ndarray, pd.Series]) -> Dict[str, float]:
+        """성능 지표 계산"""
+        try:
+            # numpy 배열로 변환
+            y_true_arr = np.array(y_true, dtype=float)
+            y_pred_arr = np.array(y_pred, dtype=float)
+            
+            mse = mean_squared_error(y_true_arr, y_pred_arr)
+            r2 = r2_score(y_true_arr, y_pred_arr)
+            mae = mean_absolute_error(y_true_arr, y_pred_arr)
+            
+            # 정확도 계산 (방향성 예측)
+            direction_true = np.sign(y_true_arr)
+            direction_pred = np.sign(y_pred_arr)
+            accuracy = np.mean(direction_true == direction_pred) * 100
+            
+            # 수익률 계산 (가상)
+            profit_rate = accuracy * 0.3  # 정확도 기반 수익률 추정
+            
+            return {
+                'mse': float(mse),
+                'r2': float(r2),
+                'mae': float(mae),
+                'accuracy': float(accuracy),
+                'profit_rate': float(profit_rate)
+            }
+        except Exception as e:
+            logger.error(f"성능 지표 계산 실패: {e}")
+            return {'mse': 0.0, 'r2': 0.0, 'mae': 0.0, 'accuracy': 0.0, 'profit_rate': 0.0}
+        
+# ... (나머지 코드) ...
+```

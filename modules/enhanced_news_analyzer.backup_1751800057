@@ -1,0 +1,72 @@
+```python
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+고급 뉴스 분석기 - 한국어/영어 구분 처리
+한국주식/선물: 한국어 뉴스 분석
+해외주식/선물: 영어 뉴스 분석
+"""
+import logging
+import asyncio
+import aiohttp
+import feedparser
+from typing import Dict, List, Any, Optional, Tuple
+from dataclasses import dataclass
+from datetime import datetime, timedelta
+import json
+import re
+
+# 고급 감정분석기 import
+try:
+    from .advanced_sentiment_analyzer import (
+        AdvancedSentimentAnalyzer, SentimentResult
+    )
+    SENTIMENT_AVAILABLE = True
+except ImportError:
+    try:
+        from advanced_sentiment_analyzer import (
+            AdvancedSentimentAnalyzer, SentimentResult
+        )
+        SENTIMENT_AVAILABLE = True
+    except ImportError:
+        SENTIMENT_AVAILABLE = False
+
+logger = logging.getLogger(__name__)
+
+@dataclass
+class NewsArticle:
+    """뉴스 기사 정보"""
+    title: str
+    content: str
+    url: str
+    source: str
+    published_date: datetime
+    market_type: str  # "korean", "english", "mixed"
+    language: str
+    sentiment_score: float
+    confidence: float
+    keywords: List[str]
+    summary: str
+
+
+@dataclass
+class NewsAnalysisResult:
+    """뉴스 분석 결과"""
+    articles: List[NewsArticle]
+    sentiment_summary: Dict[str, Any]
+    market_sentiment: float
+    trending_topics: List[str]
+    risk_level: str  # "low", "medium", "high"
+    analysis_timestamp: datetime
+
+
+class EnhancedNewsAnalyzer:
+    """고급 뉴스 분석기 - 한국어/영어 구분 처리"""
+
+    def __init__(self):
+        """뉴스 분석기 초기화"""
+        self.sentiment_analyzer = (
+            AdvancedSentimentAnalyzer() if SENTIMENT_AVAILABLE else None
+        )
+        # ... (나머지 코드는 동일)
+```

@@ -1,0 +1,126 @@
+```python
+#!/usr/bin/env python3
+"""
+💻 시스템 성능 모니터링 모듈 (System Performance Monitor)
+======================================================
+
+사용자 컴퓨터의 하드웨어 스펙과 실시간 성능을 모니터링하여
+최적화된 작업 실행을 지원하는 경량화된 모니터링 시스템입니다.
+
+주요 기능:
+1. 하드웨어 스펙 감지 (Hardware Specification Detection)
+   - CPU: 코어 수, 최대 주파수, 현재 사용률
+   - 메모리: 총 용량, 사용 가능 용량, 사용률
+   - 디스크: 총 용량, 여유 공간, I/O 성능
+   - 시스템 아키텍처 및 운영체제 정보
+
+2. 실시간 성능 모니터링 (Real-time Performance Monitoring)
+   - CPU 사용률 실시간 추적
+   - 메모리 사용량 및 가용성 모니터링
+   - 디스크 I/O 성능 측정
+   - 시스템 부하 상태 분석
+
+3. 지능형 리소스 관리 (Intelligent Resource Management)
+   - ML 작업 실행 가능 여부 자동 판단
+   - 시스템 부하에 따른 배치 크기 최적화
+   - CPU 코어 수에 맞는 워커 수 추천
+   - 메모리 상황에 따른 작업 조정
+
+4. 적응형 성능 최적화 (Adaptive Performance Optimization)
+   - 시스템 스펙에 맞는 설정 자동 조정
+   - 부하 상황에 따른 작업 우선순위 조정
+   - 리소스 부족 시 자동 대기 및 재시도
+   - 최적 실행 시점 추천
+
+5. 안전성 보장 (Safety Assurance)
+   - 시스템 과부하 방지
+   - 메모리 부족 상황 사전 감지
+   - 자동 임계값 설정 및 관리
+   - 비상 상황 자동 대응
+
+모니터링 지표:
+- CPU 사용률 임계값: 85%
+- 메모리 사용률 임계값: 80%
+- 최소 여유 메모리: 2GB
+- 디스크 I/O 성능 추적
+
+시스템 상태 분류:
+- 최적: CPU < 50%, 메모리 < 60%
+- 양호: CPU < 70%, 메모리 < 75%
+- 보통: CPU < 85%, 메모리 < 85%
+- 과부하: 임계값 초과
+
+추천 설정:
+- 배치 크기: 메모리 용량에 따라 4-32 조정
+- 워커 수: CPU 코어의 50-75% 활용
+- ML 실행: 리소스 여유도에 따른 실행 제어
+
+특징:
+- 경량화: TensorFlow 의존성 제거로 최소 리소스 사용
+- 실시간: 1초 단위 성능 데이터 수집
+- 적응형: 하드웨어 스펙에 맞는 자동 최적화
+- 안정성: 시스템 보호를 위한 다중 안전장치
+
+이 모니터는 다양한 사용자 환경에서 투자 분석 시스템이
+안정적이고 효율적으로 동작하도록 보장합니다.
+"""
+
+import psutil
+import time
+import logging
+from typing import Dict, Any, Optional
+from dataclasses import dataclass
+from datetime import datetime, timedelta
+
+logger = logging.getLogger(__name__)
+
+@dataclass
+class SystemSpecs:
+    cpu_count: int
+    cpu_freq_max: float  # GHz
+    ram_total_gb: float
+    ram_available_gb: float
+    disk_total_gb: float
+    disk_free_gb: float
+    gpu_memory_mb: Optional[float] = None
+
+@dataclass
+class PerformanceMetrics:
+    cpu_usage_percent: float
+    memory_usage_percent: float
+    memory_available_gb: float
+    disk_io_read_mb: float
+    disk_io_write_mb: float
+    timestamp: datetime
+
+class SystemMonitor:
+    def __init__(self):
+        self.system_specs = self._get_system_specs()
+        self.cpu_threshold = 85.0
+        self.memory_threshold = 80.0
+        self.performance_history = []
+        logger.info(
+            f"시스템 모니터 초기화: RAM {self.system_specs.ram_total_gb:.1f}GB, CPU {self.system_specs.cpu_count}코어"
+        )
+
+    def _get_system_specs(self) -> SystemSpecs:
+        cpu_count = psutil.cpu_count() or 1
+        cpu_freq = psutil.cpu_freq()
+        cpu_freq_max = cpu_freq.max / 1000 if cpu_freq else 0.0
+        memory = psutil.virtual_memory()
+        ram_total_gb = memory.total / (1024**3)
+        ram_available_gb = memory.available / (1024**3)
+        disk = psutil.disk_usage('/')
+        disk_total_gb = disk.total / (1024**3)
+        disk_free_gb = disk.free / (1024**3)
+        return SystemSpecs(
+            cpu_count=cpu_count,
+            cpu_freq_max=cpu_freq_max,
+            ram_total_gb=ram_total_gb,
+            ram_available_gb=ram_available_gb,
+            disk_total_gb=disk_total_gb,
+            disk_free_gb=disk_free_gb,
+        )
+
+    # ... (rest of the code)
+```

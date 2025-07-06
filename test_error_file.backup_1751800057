@@ -1,0 +1,42 @@
+```python
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+테스트용 오류 파일 - continuous_error_fix.py 시스템 테스트용
+"""
+
+# 구문 오류: 괄호 불일치
+def test_function():
+    print("Hello World")
+
+# 들여쓰기 오류
+if True:
+    print("Wrong indentation")
+
+# 따옴표 불일치
+message = "This is a test string"
+
+# 콜론 누락
+def another_function():
+    pass
+
+# 잘못된 임포트
+try:
+    import invalid_module_that_does_not_exist
+except ModuleNotFoundError as e:
+    print(f"에러: {e}")
+
+
+# 타입 힌트 오류
+def type_hint_error(x: str) -> int:
+    return int(x)
+
+# 줄 길이 초과 (79자)
+very_long_line_with_many_characters = "test"
+
+# 탭 사용 (스페이스 대신)
+def tab_function():
+    pass
+
+# 파일 끝에 빈 줄 없음
+```

@@ -1,0 +1,26 @@
+"""
+🔄 백업 패키지
+============
+
+깃허브 자동 백업 및 데이터 관리 기능을 제공합니다.
+"""
+
+from .git_backup_manager import (
+    GitBackupManager,
+    start_git_backup,
+    stop_git_backup,
+    get_backup_status,
+    get_backup_list,
+    create_manual_backup,
+    restore_backup
+)
+
+__all__ = [
+    'GitBackupManager',
+    'start_git_backup',
+    'stop_git_backup',
+    'get_backup_status',
+    'get_backup_list',
+    'create_manual_backup',
+    'restore_backup'
+] 

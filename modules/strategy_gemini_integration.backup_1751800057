@@ -1,0 +1,77 @@
+```python
+"""
+투자 대가 전략 + Gemini AI 통합 시스템
+모든 투자 대가 전략의 결과를 Gemini AI가 고품질 데이터로 최종 분석
+"""
+import asyncio
+from typing import Dict, List, Optional, Any
+from dataclasses import dataclass
+from datetime import datetime
+import pandas as pd
+from loguru import logger
+
+from .gemini_premium_data_processor import GeminiPremiumDataProcessor, ProcessedData
+from .investment_strategies import InvestmentStrategies
+from ..core.base_interfaces import (
+    StockData, 
+    InvestmentRecommendation, 
+    MarketType,
+    StrategyType
+)
+
+@dataclass
+class StrategyGeminiResult:
+    """전략 + Gemini AI 통합 결과"""
+    symbol: str
+    strategy_name: str
+    strategy_score: float
+    gemini_analysis: Dict[str, Any]
+    final_recommendation: str
+    confidence_score: float
+    reasoning: str
+    timestamp: datetime
+
+@dataclass
+class FinalTop5Selection:
+    """최종 Top5 선정 결과"""
+    market_type: MarketType
+    selected_stocks: List[StrategyGeminiResult]
+    selection_reasoning: str
+    market_overview: str
+    risk_assessment: str
+    portfolio_allocation: Dict[str, float]
+    gemini_master_analysis: str
+    timestamp: datetime
+
+class StrategyGeminiIntegration:
+    """투자 전략 + Gemini AI 통합 시스템"""
+    
+    def __init__(self):
+        """초기화"""
+        self.gemini_processor = GeminiPremiumDataProcessor()
+        self.investment_strategies = InvestmentStrategies()
+        logger.info("투자 전략 + Gemini AI 통합 시스템 초기화 완료")
+    
+    async def analyze_market_with_all_strategies(
+        self, 
+        market_type: MarketType,
+        symbols: List[str]
+    ) -> FinalTop5Selection:
+        """모든 투자 대가 전략으로 시장 분석 후 Gemini AI 최종 선정"""
+        
+        logger.info(f"🚀 {market_type.value} 시장 전체 전략 분석 시작 (종목 {len(symbols)}개)")
+        
+        # 1단계: 모든 전략으로 분석
+        strategy_results = await self._analyze_with_all_strategies(market_type, symbols)
+        
+        # 2단계: 각 종목별 Gemini AI 분석
+        gemini_results = await self._analyze_with_gemini(strategy_results)
+        
+        # 3단계: Gemini AI 최종 Top5 선정
+        final_selection = await self._gemini_final_selection(market_type, gemini_results)
+        
+        logger.info(f"✅ {market_type.value} 시장 분석 완료 - Top5 선정")
+        return final_selection
+    
+    # ... (나머지 코드는 동일)
+```

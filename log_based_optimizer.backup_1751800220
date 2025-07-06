@@ -1,0 +1,71 @@
+# log_based_optimizer.py - Test 모듈
+# 역할: Test 관련 기능 제공
+
+```python
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+📊 로그 기반 하이브리드 최적화 시스템
+=====================================
+
+이 모듈은 저장된 오류 기록을 분석하여 하이브리드 오류 수정 시스템의 
+성능을 자동으로 최적화합니다.
+
+🎯 주요 기능:
+1. 오류 패턴 분석 - 자주 발생하는 오류 유형 파악
+2. 수정 성공률 분석 - 각 방법별 성공률 계산
+3. 처리 시간 분석 - 병목 구간 파악
+4. 동적 가중치 조정 - 최적의 처리 비율 계산
+5. 캐시 최적화 - 자주 발생하는 오류 우선 캐싱
+"""
+
+import json
+import os
+import re
+import csv
+import time
+import logging
+from pathlib import Path
+from typing import Dict, List, Any, Tuple, Optional
+from datetime import datetime, timedelta
+from collections import defaultdict, Counter
+from dataclasses import dataclass
+import statistics
+
+# 프로젝트 루트 설정
+project_root = Path(__file__).resolve().parent
+
+# 로깅 설정
+logger = logging.getLogger(__name__)
+
+@dataclass
+class ErrorPattern:
+    """오류 패턴 데이터 클래스"""
+    error_type: str
+    error_message: str
+    fix_method: str
+    success_rate: float
+    avg_processing_time: float
+    occurrence_count: int
+    last_seen: datetime
+
+
+@dataclass
+class OptimizationRecommendation:
+    """최적화 권장사항"""
+    category: str
+    priority: str  # high, medium, low
+    recommendation: str
+    expected_improvement: str
+    implementation: Dict[str, Any]
+
+
+class LogAnalyzer:
+    """로그 분석 클래스"""
+
+    def __init__(self, log_dir: Optional[Path] = None):
+        self.log_dir = log_dir or project_root / 'logs'
+        self.performance_data_dir = project_root / 'performance_data'
+        self.cache_dir = project_root / 'cache'
+        # ... (기타 코드)
+```

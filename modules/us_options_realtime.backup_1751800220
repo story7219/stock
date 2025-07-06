@@ -1,0 +1,108 @@
+# us_options_realtime.py - Test 모듈
+# 역할: Test 관련 기능 제공
+
+```python
+# 미국 옵션 실시간 데이터 수집 및 분석 모듈
+# US Options Real-time Data Collection and Analysis Module
+
+import yfinance as yf
+import pandas as pd
+import numpy as np
+from typing import Dict, List, Tuple, Optional
+from datetime import datetime, timedelta
+import asyncio
+import aiohttp
+import json
+import warnings
+warnings.filterwarnings('ignore')
+
+class USOptionsRealtime:
+    """미국 옵션 실시간 데이터 수집 및 분석 클래스"""
+    
+    def __init__(self):
+        """미국 옵션 실시간 초기화"""
+        self.session: Optional[aiohttp.ClientSession] = None
+        self.options_cache: Dict[str, pd.DataFrame] = {}
+        self.chain_cache: Dict[str, pd.DataFrame] = {}
+        
+    async def initialize_session(self) -> None:
+        """비동기 세션 초기화"""
+        if self.session is None:
+            self.session = aiohttp.ClientSession()
+    
+    async def close_session(self) -> None:
+        """세션 종료"""
+        if self.session:
+            await self.session.close()
+            self.session = None
+    
+    def get_options_chain(self, symbol: str,
+                         expiration_date: Optional[str] = None) -> pd.DataFrame:
+        """옵션 체인 데이터 수집"""
+        try:
+            ticker = yf.Ticker(symbol)
+            
+            # 만기일별 옵션 체인 수집
+            if expiration_date:
+                # 특정 만기일 옵션 체인
+                options = ticker.option_chain(expiration_date)
+                calls = options.calls
+                puts = options.puts
+                
+                # 콜 옵션 데이터
+                calls_df = pd.DataFrame(calls)
+                calls_df['option_type'] = 'call'
+                calls_df['expiration'] = expiration_date
+                
+                # 풋 옵션 데이터
+                puts_df = pd.DataFrame(puts)
+                puts_df['option_type'] = 'put'
+                puts_df['expiration'] = expiration_date
+                
+                # 통합 데이터프레임
+                options_df = pd.concat([calls_df, puts_df],
+                                       ignore_index=True)
+            
+            else:
+                # 모든 만기일 옵션 체인
+                options_df = self._get_all_options_chain(ticker)
+            
+            options_df = self._process_options_data(options_df, symbol)
+            
+            return options_df
+        
+        except Exception as e:
+            print(f"옵션 체인 수집 오류: {e}")
+            return pd.DataFrame()
+            
+    def _get_all_options_chain(self, ticker: yf.Ticker) -> pd.DataFrame:
+        all_options = []
+        try:
+            expiration_dates = ticker.options[:3]  # 최대 3개 만기일
+            for exp_date in expiration_dates:
+                options = ticker.option_chain(exp_date)
+                calls = options.calls
+                puts = options.puts
+
+                calls_df = pd.DataFrame(calls)
+                calls_df['option_type'] = 'call'
+                calls_df['expiration'] = exp_date
+                all_options.append(calls_df)
+
+                puts_df = pd.DataFrame(puts)
+                puts_df['option_type'] = 'put'
+                puts_df['expiration'] = exp_date
+                all_options.append(puts_df)
+
+        except Exception as e:
+            print(f"만기일 옵션 체인 수집 오류: {e}")
+        
+        if all_options:
+            return pd.concat(all_options, ignore_index=True)
+        else:
+            return pd.DataFrame()
+    
+    def _process_options_data(self, options_df: pd.DataFrame, symbol: str) -> pd.DataFrame:
+        # ... (나머지 코드는 동일)
+        return options_df
+```

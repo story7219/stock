@@ -1,0 +1,73 @@
+```python
+"""
+Data processors for cleaning, transforming, and enriching stock data.
+"""
+import asyncio
+import logging
+import numpy as np
+import pandas as pd
+from typing import Dict, List, Optional, Any, Union, Callable, Tuple
+from datetime import datetime, timedelta
+from dataclasses import dataclass
+from concurrent.futures import ThreadPoolExecutor
+import warnings
+
+# 상대 임포트 오류 방지
+try:
+    from ..core.cache_manager import CacheManager
+    from ..core.memory_optimizer import MemoryOptimizer
+    from .models import StockData, MarketData, TechnicalIndicators, DataStatus
+except ImportError:
+    try:
+        from core.cache_manager import CacheManager
+        from core.memory_optimizer import MemoryOptimizer
+        from data.models import StockData, MarketData, TechnicalIndicators, DataStatus
+    except ImportError:
+        CacheManager = None
+        MemoryOptimizer = None
+        StockData = None
+        MarketData = None
+        TechnicalIndicators = None
+        DataStatus = None
+
+logger = logging.getLogger(__name__)
+warnings.filterwarnings('ignore', category=FutureWarning)
+
+
+@dataclass
+class ProcessingConfig:
+    """Data processing configuration."""
+    enable_outlier_detection: bool = True
+    outlier_threshold: float = 3.0
+    enable_missing_data_imputation: bool = True
+    enable_data_normalization: bool = True
+    enable_feature_engineering: bool = True
+    min_data_points: int = 10
+    max_missing_ratio: float = 0.3
+    enable_caching: bool = True
+    cache_ttl: int = 1800  # 30 minutes
+
+
+class DataProcessor:
+    """High-performance data processor with async capabilities."""
+
+    def __init__(self,
+                 config: Optional[ProcessingConfig] = None,
+                 cache_manager: Optional[CacheManager] = None,
+                 memory_optimizer: Optional[MemoryOptimizer] = None):
+        """Initialize data processor."""
+        self.config = config or ProcessingConfig()
+        self.cache_manager = cache_manager
+        self.memory_optimizer = memory_optimizer
+        self.thread_pool = ThreadPoolExecutor(
+            max_workers=min(16, (asyncio.get_event_loop().run_in_executor(None, asyncio.cpu_count) or 1) + 2))
+        self.stats = {
+            'processed_stocks': 0,
+            'cleaned_records': 0,
+            'imputed_values': 0,
+            'detected_outliers': 0,
+            'processing_time': 0.0
+        }
+
+    # ... (rest of the code)
+```

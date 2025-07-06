@@ -1,0 +1,88 @@
+```python
+"""
+Multi-level cache manager for the investment system.
+"""
+
+import asyncio
+import json
+import logging
+import pickle
+import time
+from typing import Any, Dict, List, Optional, Union
+from collections import OrderedDict
+from dataclasses import dataclass
+from functools import wraps
+import hashlib
+import threading
+import weakref
+
+try:
+    import redis.asyncio as redis
+    REDIS_AVAILABLE = True
+except ImportError:
+    REDIS_AVAILABLE = False
+
+logger = logging.getLogger(__name__)
+
+
+@dataclass
+class CacheItem:
+    """Cache item with metadata."""
+    value: Any
+    timestamp: float
+    ttl: int
+    access_count: int = 0
+    last_access: float = 0.0
+
+    def is_expired(self) -> bool:
+        """Check if cache item is expired."""
+        return time.time() - self.timestamp > self.ttl
+
+    def touch(self) -> None:
+        """Update access metadata."""
+        self.access_count += 1
+        self.last_access = time.time()
+
+
+class MemoryCache:
+    """Thread-safe in-memory cache with LRU eviction."""
+
+    def __init__(self, max_size: int = 1000, default_ttl: int = 3600):
+        self.max_size = max_size
+        self.default_ttl = default_ttl
+        self._cache: OrderedDict[str, CacheItem] = OrderedDict()
+        self._lock = threading.RLock()
+        self._stats = {
+            'hits': 0,
+            'misses': 0,
+            'evictions': 0,
+            'expired': 0
+        }
+
+    # ... (rest of the code, unchanged)
+
+
+class RedisCache:
+    """Redis-based cache for distributed caching."""
+
+    # ... (rest of the code, unchanged)
+
+
+class CacheManager:
+    """Multi-level cache manager."""
+
+    def __init__(self,
+                 memory_cache_size: int = 1000,
+                 default_ttl: int = 3600,
+                 redis_url: Optional[str] = None,
+                 enable_redis: bool = True):
+        self.default_ttl = default_ttl
+        self.memory_cache = MemoryCache(memory_cache_size, default_ttl)
+        self.redis_cache = RedisCache(redis_url, default_ttl) \
+            if redis_url and enable_redis else None
+        self._cleanup_interval = 300  # 5 minutes
+        self._cleanup_task: Optional[asyncio.Task] = None
+
+    # ... (rest of the code, unchanged)
+
+```

@@ -1,0 +1,71 @@
+```python
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+🔬 상세 백테스트 시스템 v2.0
+====================================
+
+파일명: detailed_backtester.py
+역할: 과거 데이터로 현재 전략의 성과를 상세히 분석 및 시각화
+- 종합 실전매매 봇의 모든 로직(AI, 투자대가, 리스크 관리)을 그대로 적용하여 백테스트
+- 상세 성과 지표 분석 (수익률, 샤프, 소르티노, 칼마, MDD, 승률, 손익비 등)
+- 다양한 시각화 (자산곡선, 낙폭, 월별 수익률 히트맵 등)
+- 최종 결과를 Markdown 리포트로 저장
+"""
+
+import asyncio
+import logging
+import json
+import time
+import sqlite3
+import os
+import random
+from datetime import datetime, timedelta
+from typing import Dict, List, Optional, Any, Tuple
+from dataclasses import dataclass, field
+from enum import Enum
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from pathlib import Path
+
+# 현재 프로젝트의 trading_bot에서 클래스 임포트
+try:
+    from comprehensive_trading_bot import (
+        MarketType, AssetType, TradeType, InvestmentStyle,
+        CapitalAllocation, TradingSymbol, Position,
+        INVESTMENT_MASTERS, select_master_by_market
+    )
+except ImportError:
+    print("❌ comprehensive_trading_bot.py에서 클래스를 임포트할 수 없습니다.")
+    # 임시용 더미 클래스 (실행을 위해)
+    class MarketType(Enum): DOMESTIC = "domestic"; OVERSEAS = "overseas"
+    class AssetType(Enum): STOCK = "stock"; FUTURES = "futures"; OPTIONS = "options"
+    class TradeType(Enum): BUY = "buy"; SELL = "sell"; HOLD = "hold"
+    class InvestmentStyle(Enum): MID_TERM = "mid_term"; DAY_TRADING = "day_trading"
+    @dataclass
+    class CapitalAllocation: total_capital: float = 500_000_000
+    @dataclass
+    class TradingSymbol: symbol: str; name: str; market_type: MarketType; asset_type: AssetType; investment_style: InvestmentStyle; allocation_ratio: float
+    @dataclass
+    class Position: symbol: str; market_type: MarketType; asset_type: AssetType; quantity: int; avg_price: float; current_price: float; pnl: float; pnl_rate: float; entry_time: datetime; last_update: datetime = field(default_factory=datetime.now); max_pnl_rate: Optional[float] = None
+    INVESTMENT_MASTERS = {1: {"name": "Test Master", "strategy": "Test", "market_condition": "bull"}}
+    def select_master_by_market(c): return INVESTMENT_MASTERS[1]
+
+
+# 로깅 설정
+log_dir = Path("logs")
+log_dir.mkdir(exist_ok=True)
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler(log_dir / 'detailed_backtester.log', encoding='utf-8'),
+        logging.StreamHandler()
+    ]
+)
+logger = logging.getLogger(__name__)
+
+# ... (나머지 코드)
+```

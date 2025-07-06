@@ -1,0 +1,17 @@
+# __init__.py - Test 모듈
+# 역할: Test 관련 기능 제공
+
+```python
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+💹 거래 시스템 패키지
+- 거래 실행, 리스크 관리, 포트폴리오 관리
+"""
+
+from .executor import TradeExecutor
+from .risk_manager import RiskManager
+from .portfolio import PortfolioManager
+
+__all__ = ['TradeExecutor', 'RiskManager', 'PortfolioManager']
+```

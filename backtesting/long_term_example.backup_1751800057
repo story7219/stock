@@ -1,0 +1,93 @@
+```python
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+장기 백테스트 시스템 (1962년 ~ 현재)
+60년 이상의 데이터를 사용하여 중기투자 전략의 강건성 검증
+"""
+import yfinance as yf
+import pandas as pd
+import numpy as np
+from datetime import datetime
+import logging
+from dataclasses import dataclass, asdict
+import json
+
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s - %(levelname)s - %(message)s')
+
+@dataclass
+class LongTermTrade:
+    """장기 거래 기록"""
+    entry_date: str
+    entry_price: float
+    exit_date: str
+    exit_price: float
+    holding_period_days: int
+    pnl_pct: float
+    reason_for_exit: str
+    market_era: str
+
+
+class LongTermBacktester:
+    """60년 장기 백테스터"""
+
+    def __init__(self, symbol: str,
+                 initial_capital: float = 10000.0):
+        self.symbol = symbol
+        self.initial_capital = initial_capital
+        self.capital = initial_capital
+        self.df = pd.DataFrame()
+        self.trades: list[LongTermTrade] = []
+        self.equity_curve = []
+
+    def _get_market_era(self, date: datetime) -> str:
+        """시장 시대 구분"""
+        year = date.year
+        # ... (기존 코드) ...
+
+    def _prepare_data(self):
+        """데이터 준비 및 지표 계산"""
+        logging.info(f"'{self.symbol}'의 최대 과거 데이터 다운로드 중...")
+        try:
+            ticker = yf.Ticker(self.symbol)
+            self.df = ticker.history(period="max", interval="1d")
+        except Exception as e:
+            logging.error(f"데이터 다운로드 오류: {e}")
+            # 에러 처리 추가
+            return
+
+        # ... (기존 코드) ...
+
+    def _calculate_rsi(self, prices: pd.Series,
+                       period: int = 14) -> pd.Series:
+        """RSI 계산 (TA-Lib 없이)"""
+        # ... (기존 코드) ...
+
+    def _calculate_atr(self, df: pd.DataFrame,
+                       period: int = 14) -> pd.Series:
+        """ATR 계산 (TA-Lib 없이)"""
+        # ... (기존 코드) ...
+
+
+    def run_backtest(self):
+        """백테스트 실행"""
+        self._prepare_data()
+        if self.df.empty:
+            logging.error(f"데이터가 없습니다. {self.symbol}")
+            return
+        # ... (기존 코드) ...
+
+    def _generate_report(self):
+        """결과 리포트 생성"""
+        # ... (기존 코드) ...
+
+def main():
+    """메인 실행 함수"""
+    symbol_to_test = 'AAPL'
+    # ... (기존 코드) ...
+
+
+if __name__ == "__main__":
+    main()
+```

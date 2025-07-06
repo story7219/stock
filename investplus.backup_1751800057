@@ -1,0 +1,109 @@
+```python
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+🚀 향상된 AI 투자 분석 시스템 v4.0
+=====================================
+모든 환경 변수를 활용한 완전한 투자 시스템
+- Gemini AI 고급 분석
+- 텔레그램 실시간 알림
+- 한국투자증권 API 연동
+- DART 공시정보 활용
+- Google 스프레드시트 연동
+- 고급 기술적 분석
+"""
+
+import os
+import asyncio
+import logging
+from datetime import datetime, timedelta
+from typing import Dict, List, Any, Optional, Tuple
+from dataclasses import dataclass, field
+import json
+import pandas as pd
+import numpy as np
+from pathlib import Path
+
+# 환경 변수 로드
+from dotenv import load_dotenv
+load_dotenv()
+
+# AI 및 API 라이브러리
+import google.generativeai as genai
+import yfinance as yf
+import requests
+from telegram import Bot
+import gspread
+from google.oauth2.service_account import Credentials
+
+# 내부 모듈
+from .core.optimized_core import get_core
+from .modules.unified_data_processor import get_processor
+from .modules.optimized_investment_strategies import get_strategy_engine
+from .modules.notification_system import NotificationSystem
+from .modules.technical_analysis import TechnicalAnalyzer
+from .modules.derivatives_monitor import get_derivatives_monitor, DerivativesMonitor
+
+logger = logging.getLogger(__name__)
+
+@dataclass
+class EnvironmentConfig:
+    """환경 변수 설정"""
+    # Gemini AI 설정
+    gemini_api_key: str = ""
+    gemini_model: str = "gemini-1.5-flash-8B"
+    gemini_temperature: float = 0.03
+    gemini_max_tokens: int = 8192
+    
+    # 텔레그램 설정
+    telegram_bot_token: str = ""
+    telegram_chat_id: str = ""
+    
+    # 한국투자증권 API
+    kis_app_key: str = ""
+    kis_app_secret: str = ""
+    kis_account_number: str = ""
+    
+    # DART API
+    dart_api_key: str = ""
+    
+    # Google 서비스
+    google_service_account_file: str = ""
+    google_spreadsheet_id: str = ""
+    google_worksheet_name: str = ""
+    
+    # GitHub API
+    github_api_token: str = ""
+    
+    # ZAPIER NLA API
+    zapier_nla_api_key: str = ""
+    
+    # 기타 설정
+    is_mock: bool = True
+    log_level: str = "INFO"
+    
+    @classmethod
+    def from_env(cls) -> "EnvironmentConfig":
+        """환경 변수에서 설정 로드"""
+        return cls(
+            gemini_api_key=os.getenv('GEMINI_API_KEY', ''),
+            gemini_model=os.getenv('GEMINI_MODEL', 'gemini-1.5-flash-8B'),
+            gemini_temperature=float(os.getenv('GEMINI_TEMPERATURE', '0.03')),
+            gemini_max_tokens=int(os.getenv('GEMINI_MAX_TOKENS', '8192')),
+            telegram_bot_token=os.getenv('TELEGRAM_BOT_TOKEN', ''),
+            telegram_chat_id=os.getenv('TELEGRAM_CHAT_ID', ''),
+            kis_app_key=os.getenv('LIVE_KIS_APP_KEY', ''),
+            kis_app_secret=os.getenv('LIVE_KIS_APP_SECRET', ''),
+            kis_account_number=os.getenv('LIVE_KIS_ACCOUNT_NUMBER', ''),
+            dart_api_key=os.getenv('DART_API_KEY', ''),
+            google_service_account_file=os.getenv('GOOGLE_SERVICE_ACCOUNT_FILE', ''),
+            google_spreadsheet_id=os.getenv('GOOGLE_SPREADSHEET_ID', ''),
+            google_worksheet_name=os.getenv('GOOGLE_WORKSHEET_NAME', ''),
+            github_api_token=os.getenv('GITHUB_API_TOKEN', ''),
+            zapier_nla_api_key=os.getenv('ZAPIER_NLA_API_KEY', ''),
+            is_mock=os.getenv('IS_MOCK', 'true').lower() == 'true',
+            log_level=os.getenv('LOG_LEVEL', 'INFO')
+        )
+
+# ... (rest of the code)
+```

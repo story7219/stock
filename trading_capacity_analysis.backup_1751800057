@@ -1,0 +1,72 @@
+
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+📊 시스템 매매 능력 분석 도구 v1.0
+====================================
+
+📋 시스템 역할:
+- 현재 투자 시스템의 하루 최대 매매 가능 횟수, 예상 승률, 시간·API 제약 등 실질적
+  매매 한계를 분석
+- 전략별/빈도별 승률, 수익률, 리스크를 정량적으로 산출하여 최적 매매 전략을 추천
+- 실제 운영 환경에서 시스템의 효율적 운용 한계와 개선 포인트를 진단
+
+🔧 주요 기능:
+1. 하루 최대 매매 횟수 산출 (시간, API, 시장별 제약 반영)
+2. 전략별·빈도별 예상 승률 및 수익률 계산
+3. 매매 빈도별 리스크 레벨 및 추천 점수 산출
+4. 최적 매매 전략 자동 추천 및 요약 리포트 출력
+
+📈 분석 항목:
+- 시스템 성능(분석/수집/주문 소요시간)
+- API별 일일 호출 한계(Gemini, 한투, Yahoo)
+- 시장별 거래 가능 시간(한국/미국)
+- 전략별/빈도별 승률 및 수익률 시뮬레이션
+- 리스크 레벨 및 추천도 평가
+
+💡 사용 예시:
+1. python trading_capacity_analysis.py
+2. 시스템 성능, 최대 매매 횟수, 추천 전략, 결론 요약 자동 출력
+
+⚠️ 주의사항:
+- 본 분석은 시스템 성능 및 API 한계, 과거 백테스트 기반의 통계적 추정치임
+- 실제 시장 상황, 네트워크 지연, 예외적 이벤트 등은 반영되지 않을 수 있음
+- 투자 판단의 참고 자료로 활용하고, 실제 운용 전 반드시 추가 검증 필요
+"""
+
+import time
+from datetime import datetime, timedelta
+
+class TradingCapacityAnalyzer:
+    def __init__(self):
+        # 현재 시스템 성능 기준
+        self.gemini_analysis_time = 12  # 초
+        self.data_collection_time = 8   # 초
+        self.order_execution_time = 5   # 초 (모의투자)
+        self.total_cycle_time = (
+            self.gemini_analysis_time
+            + self.data_collection_time
+            + self.order_execution_time
+        )
+
+        # API 제한
+        self.gemini_daily_limit = 1440  # 분당 60회 x 24시간
+        self.kis_daily_limit = 2000     # 한투 API 일일 제한
+        self.yahoo_daily_limit = 2000   # Yahoo Finance 제한
+
+        # 시장 시간
+        self.korean_market_hours = 6.5  # 9:00-15:30 (6.5시간)
+        self.us_market_hours = 6.5      # 23:30-06:00 (6.5시간)
+
+    def calculate_max_trades_per_day(self):
+        """하루 최대 매매 횟수 계산"""
+        # ... (기존 코드)
+        return {
+            "시간_기준_최대": max_by_time,
+            "Gemini_API_제한": max_by_gemini,
+            "한투_API_제한": max_by_kis,
+            "Yahoo_API_제한": max_by_yahoo,
+            "실제_최대_매매횟수": actual_limit
+        }
+
+    # ... (기존 코드)

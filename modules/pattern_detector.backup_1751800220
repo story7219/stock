@@ -1,0 +1,69 @@
+# pattern_detector.py - Test 모듈
+# 역할: Test 관련 기능 제공
+
+```python
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+🎯 기술적 패턴 탐지기
+=========================
+
+파일명: modules/pattern_detector.py
+역할: 시계열 데이터에서 실시간으로 주요 매매 패턴을 탐지합니다.
+- 추세전환 (Reversal) 패턴 탐지
+- 눌림목 매수 (Pullback Buy) 패턴 탐지
+- 돌파 매수 (Breakout Buy) 패턴 탐지
+"""
+
+import logging
+from dataclasses import dataclass
+from typing import List, Optional, Tuple
+import pandas as pd
+import numpy as np
+import asyncio
+
+logger = logging.getLogger(__name__)
+
+@dataclass
+class PatternSignal:
+    """패턴 탐지 신호"""
+    pattern_name: str = "NONE"  # "REVERSAL_BULLISH", "PULLBACK_BUY", "BREAKOUT_BUY", 등
+    detected_price: Optional[float] = None
+    confidence: float = 0.0 # 패턴의 신뢰도 (0.0 ~ 1.0)
+    reasoning: str = "N/A"
+
+
+class PatternDetector:
+    """
+    기술적 패턴 탐지기 클래스.
+    주어진 가격 데이터를 분석하여 매매에 활용할 수 있는
+    중요한 기술적 패턴들을 실시간으로 식별합니다.
+    """
+    def __init__(self, short_window: int = 20, long_window: int = 60):
+        self.short_window = short_window
+        self.long_window = long_window
+        logger.info("기술적 패턴 탐지기 초기화 완료")
+
+    def detect_all(self, data: pd.DataFrame) -> List[PatternSignal]:
+        """
+        주어진 데이터에서 가능한 모든 패턴을 탐지합니다.
+
+        Args:
+            data (pd.DataFrame): 'high', 'low', 'close', 'volume' 컬럼을 포함하는 데이터프레임.
+
+        Returns:
+            List[PatternSignal]: 탐지된 모든 패턴 신호의 리스트.
+        """
+        if len(data) < self.long_window:
+            return []
+
+        signals = [
+            self.detect_reversal(data),
+            self.detect_pullback(data),
+            self.detect_breakout(data)
+        ]
+        return [signal for signal in signals if signal.pattern_name != "NONE"]
+
+
+    # ... (나머지 코드는 동일)
+```

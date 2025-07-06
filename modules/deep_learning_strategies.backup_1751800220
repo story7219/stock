@@ -1,0 +1,87 @@
+# deep_learning_strategies.py - Test 모듈
+# 역할: Test 관련 기능 제공
+
+```python
+# 딥러닝 기반 고급 트레이딩 전략 모듈
+# Deep Learning Advanced Trading Strategies Module
+
+import numpy as np
+import pandas as pd
+import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras import layers
+from sklearn.preprocessing import MinMaxScaler, StandardScaler
+from sklearn.model_selection import train_test_split
+from typing import Dict, List, Tuple, Optional, Union
+from datetime import datetime, timedelta
+import warnings
+warnings.filterwarnings('ignore')
+
+class DeepLearningStrategies:
+    """딥러닝 기반 고급 트레이딩 전략 클래스"""
+    
+    def __init__(self):
+        """딥러닝 전략 초기화"""
+        self.models = {}
+        self.scalers = {}
+        self.feature_columns = []
+        self.target_columns = []
+        
+        # GPU 설정
+        self._setup_gpu()
+        
+        # 모델 하이퍼파라미터 (예시)
+        self.model_params = {
+            'lstm': {
+                'units': [50, 30, 20],
+                'dropout': 0.2,
+                'recurrent_dropout': 0.2,
+                'learning_rate': 0.001
+            },
+        }
+    
+    def prepare_sequences(self, df: pd.DataFrame, target_col: str = 'returns', 
+                         sequence_length: int = 60, prediction_horizon: int = 5) -> Tuple[np.ndarray, np.ndarray, StandardScaler]:
+        """시계열 데이터를 시퀀스로 변환"""
+        try:
+            # 피처 컬럼 선택 (open, high, low, close, volume 제외)
+            feature_cols = [col for col in df.columns if col not in ['open', 'high', 'low', 'close', 'volume', target_col]]
+            
+            # 결측치 처리 (에러 방지)
+            if not feature_cols:
+                raise ValueError("피처 컬럼이 없습니다.")
+            df_clean = df[feature_cols + [target_col]].dropna()
+            
+            # 데이터 정규화
+            scaler = StandardScaler()
+            scaled_data = scaler.fit_transform(df_clean)
+            
+            X, y = [], []
+            
+            for i in range(sequence_length, len(scaled_data) - prediction_horizon + 1):
+                # 입력 시퀀스
+                X.append(scaled_data[i-sequence_length:i])
+                
+                # 타겟 (미래 수익률)
+                future_returns = scaled_data[i:i+prediction_horizon, -1]
+                y.append(np.mean(future_returns))  # 평균 수익률
+            
+            return np.array(X), np.array(y), scaler
+            
+        except (ValueError, IndexError) as e:
+            print(f"시퀀스 준비 오류: {e}")
+            return np.array([]), np.array([]), None
+    # ... (나머지 코드 생략)
+
+    def _setup_gpu(self):
+      try:
+        # GPU 사용 설정 (필요에 따라 조정)
+          physical_devices = tf.config.list_physical_devices('GPU')
+          if physical_devices:
+              tf.config.set_visible_devices(physical_devices[0], 'GPU')  # 수정
+              tf.config.experimental.set_memory_growth(physical_devices[0], True)
+          else:
+              print("GPU가 사용 가능하지 않습니다.")
+      except Exception as e:
+          print(f"GPU 설정 오류: {e}")
+```

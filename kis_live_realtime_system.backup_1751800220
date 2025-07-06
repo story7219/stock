@@ -1,0 +1,94 @@
+# kis_live_realtime_system.py - Api Integration 모듈
+# 역할: Api Integration 관련 기능 제공
+
+```python
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+🚀 한국투자증권 LIVE API 최적화 실시간 시스템 v1.0
+====================================================
+
+LIVE KIS API 완전 활용 실시간 데이터 수집 시스템
+- 토큰 자동 갱신 및 만료 관리
+- API 호출 제한 준수 (1초당 20회, 1분당 1000회)
+- 웹소켓 실시간 시세 연결
+- 국내/해외 주식, 선물, 옵션 모든 데이터
+- 효율적인 큐잉 및 배치 처리
+- 실시간 알림 및 모니터링
+"""
+
+import os
+import json
+import time
+import logging
+import asyncio
+import websockets
+import requests
+import pandas as pd
+import numpy as np
+from datetime import datetime, timedelta
+from typing import Dict, List, Any, Optional, Tuple
+from dataclasses import dataclass, asdict
+import threading
+import queue
+from collections import defaultdict, deque
+import aiohttp
+import hashlib
+import hmac
+import base64
+from concurrent.futures import ThreadPoolExecutor
+import sqlite3
+
+# 로깅 설정
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler('kis_live_system.log', encoding='utf-8'),
+        logging.StreamHandler()
+    ]
+)
+logger = logging.getLogger(__name__)
+
+@dataclass
+class TokenInfo:
+    """토큰 정보 관리"""
+    access_token: str
+    token_type: str
+    expires_in: int
+    created_at: datetime
+
+    @property
+    def is_expired(self) -> bool:
+        """토큰 만료 여부 확인 (만료 10분 전 갱신)"""
+        expiry_time = self.created_at + \
+                      timedelta(seconds=self.expires_in - 600)
+        return datetime.now() >= expiry_time
+
+
+@dataclass
+class RateLimitInfo:
+    """API 호출 제한 관리"""
+    calls_per_second: deque
+    calls_per_minute: deque
+    max_per_second: int = 20
+    max_per_minute: int = 1000
+
+    def can_make_call(self) -> bool:
+        """API 호출 가능 여부 확인"""
+        now = time.time()
+        while self.calls_per_second and \
+                now - self.calls_per_second[0] > 1:
+            self.calls_per_second.popleft()
+        while self.calls_per_minute and \
+                now - self.calls_per_minute[0] > 60:
+            self.calls_per_minute.popleft()
+        return (len(self.calls_per_second) < self.max_per_second and
+                len(self.calls_per_minute) < self.max_per_minute)
+
+    def record_call(self):
+        """API 호출 기록"""
+        now = time.time()
+        self.calls_per_second.append(now)
+        self.calls_per_minute.append(now)
+```

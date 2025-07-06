@@ -1,0 +1,78 @@
+# crashmon.py - Test 모듈
+# 역할: Test 관련 기능 제공
+
+```python
+"""
+🚨 파생상품 폭락/폭등 전용 모니터링 시스템 v1.0
+===============================================
+
+📋 시스템 역할:
+- 코스피200 옵션/선물, 나스닥100 및 S&P500 지수 관련 파생상품 데이터를 실시간으로 모니터링하여,
+- 시장의 급격한 변동성(폭락 또는 폭등)을 나타내는 위험 신호를 사전에 감지하고,
+- Gemini AI를 통해 신호의 신뢰도를 분석한 후, 텔레그램으로 즉시 경고 알림을 발송하는 전문 모니터링 시스템
+
+🔧 주요 기능:
+1.  **다중 파생상품 모니터링**: KOSPI200, NASDAQ100, S&P500 관련 파생상품(옵션, 선물 등)
+    데이터 동시 수집
+2.  **고위험 신호 자동 감지**: 사전에 정의된 로직에 따라 시장의 '폭락(CRASH_WARNING)'
+    또는 '폭등(SURGE_WARNING)' 신호를 분석 및 필터링
+3.  **Gemini AI 심층 분석**: 감지된 고위험 신호의 원인과 시장에 미칠 영향에 대해
+    Gemini AI가 심층 분석 수행
+4.  **텔레그램 즉시 경고**: 고위험 신호 발생 시, AI 분석 결과를 포함한 상세 경고
+    메시지를 텔레그램으로 즉시 발송
+5.  **연속/단일 스캔 모드**: 사용자가 필요에 따라 지속적인 모니터링 또는 일회성
+    스캔을 선택하여 실행 가능
+6.  **알림 관리**: 유사한 경고가 단기간에 반복적으로 발송되는 것을 방지하는
+    중복 알림 제어 기능 포함
+
+💡 사용 예시:
+-   **연속 모니터링 (5분 간격, 최대 24시간)**:
+    `python derivatives_crash_monitor.py --mode continuous --interval 5`
+-   **일회성 스캔**: `python derivatives_crash_monitor.py --mode single`
+
+⚠️ 주의사항:
+-   `dotenv`, `python-telegram-bot` 등 필수 패키지 설치가 필요합니다.
+-   `src.modules.derivatives_monitor` 및 `src.modules.notification_system` 모듈이
+    필요합니다.
+-   Gemini AI 및 텔레그램 API 키가 `.env` 파일에 올바르게 설정되어 있어야 합니다.
+"""
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+import argparse
+import asyncio
+import json
+import logging
+import os
+import sys
+from datetime import datetime, timedelta
+from pathlib import Path
+from typing import Any, Dict, List, Optional
+
+# --- 필수 모듈 임포트 ---
+try:
+    from dotenv import load_dotenv
+    from src.modules.derivatives_monitor import get_derivatives_monitor, \
+        DerivativesMonitor
+    from src.modules.notification_system import NotificationSystem
+except ImportError as e:
+    print(f"❌ 필수 라이브러리 또는 모듈 누락: {e}")
+    print("‼️ 'pip install -r requirements.txt'를 실행하고, 모든 src 모듈이 존재하는지 확인해주세요.")
+    sys.exit(1)
+
+# --- 환경 변수 및 로깅 설정 ---
+load_dotenv()
+Path('logs').mkdir(exist_ok=True)
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.StreamHandler(sys.stdout),
+        logging.FileHandler('logs/derivatives_monitor.log', encoding='utf-8')
+    ]
+)
+logger = logging.getLogger(__name__)
+
+
+# ... (나머지 코드는 동일)
+```

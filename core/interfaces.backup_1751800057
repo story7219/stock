@@ -1,0 +1,173 @@
+```python
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+🔌 시스템 인터페이스
+=================
+
+Clean Architecture 패턴을 위한 추상 인터페이스 정의
+"""
+
+from abc import ABC, abstractmethod
+from typing import Dict, List, Any, Optional
+from datetime import datetime, timezone
+from dataclasses import dataclass
+
+@dataclass
+class StockData:
+    """주식 데이터 모델"""
+    symbol: str
+    market: str
+    current_price: float
+    volume: int
+    change_rate: float
+    market_cap: Optional[float] = None
+    pe_ratio: Optional[float] = None
+    pb_ratio: Optional[float] = None
+    roe: Optional[float] = None
+    debt_ratio: Optional[float] = None
+    dividend_yield: Optional[float] = None
+    timestamp: datetime = datetime.now(timezone.utc)  # UTC 타임존 사용
+
+
+class IDataCollector(ABC):
+    """데이터 수집 인터페이스"""
+
+    @abstractmethod
+    async def get_market_symbols(
+        self, market: str
+    ) -> List[str]:
+        """시장별 종목 코드 조회"""
+        pass
+
+    @abstractmethod
+    async def get_stock_data(
+        self, symbol: str
+    ) -> StockData:
+        """개별 종목 데이터 조회"""
+        pass
+
+    @abstractmethod
+    async def collect_market_data(
+        self, market: str
+    ) -> Dict[str, Any]:
+        """시장 전체 데이터 수집"""
+        pass
+
+
+class IStrategyAnalyzer(ABC):
+    """투자 전략 분석 인터페이스"""
+
+    @abstractmethod
+    async def analyze(
+        self, stock_data: StockData
+    ) -> Dict[str, float]:
+        """전략별 분석 점수 반환"""
+        pass
+
+    @abstractmethod
+    def get_available_strategies(self) -> List[str]:
+        """사용 가능한 전략 목록"""
+        pass
+
+
+class IMarketAnalyzer(ABC):
+    """시장 분석 인터페이스"""
+
+    @abstractmethod
+    async def analyze(
+        self, stock_data: StockData
+    ) -> Dict[str, Any]:
+        """기술적 분석 수행"""
+        pass
+
+    @abstractmethod
+    async def get_market_sentiment(
+        self, market: str
+    ) -> Dict[str, Any]:
+        """시장 심리 분석"""
+        pass
+
+
+class IAIAnalyzer(ABC):
+    """AI 분석 인터페이스"""
+
+    @abstractmethod
+    async def analyze(
+        self, stock_data: StockData
+    ) -> Dict[str, Any]:
+        """AI 기반 종합 분석"""
+        pass
+
+    @abstractmethod
+    async def predict_price(
+        self, stock_data: StockData
+    ) -> Dict[str, float]:
+        """가격 예측"""
+        pass
+
+
+class IReportGenerator(ABC):
+    """리포트 생성 인터페이스"""
+
+    @abstractmethod
+    async def generate_report(
+        self, results: Dict[str, Any], format_type: str
+    ) -> str:
+        """리포트 생성"""
+        pass
+
+    @abstractmethod
+    def get_supported_formats(self) -> List[str]:
+        """지원하는 형식 목록"""
+        pass
+
+
+class INotificationService(ABC):
+    """알림 서비스 인터페이스"""
+
+    @abstractmethod
+    async def send_analysis_complete(
+        self, results: Dict[str, Any]
+    ) -> bool:
+        """분석 완료 알림"""
+        pass
+
+    @abstractmethod
+    async def send_alert(self, message: str, level: str) -> bool:
+        """경고 알림"""
+        pass
+
+    @abstractmethod
+    def configure(self, config: Dict[str, Any]) -> None:
+        """알림 설정"""
+        pass
+
+
+class IBacktestEngine(ABC):
+    """백테스팅 엔진 인터페이스"""
+
+    @abstractmethod
+    async def run_backtest(
+        self, strategy: str, period: str
+    ) -> Dict[str, Any]:
+        """백테스팅 실행"""
+        pass
+
+
+class IRiskManager(ABC):
+    """리스크 관리 인터페이스"""
+
+    @abstractmethod
+    def assess_risk(self, portfolio: Dict[str, Any]) -> float:
+        """리스크 평가"""
+        pass
+
+    @abstractmethod
+    def suggest_position_size(
+        self, stock_data: StockData, risk_level: float
+    ) -> float:
+        """포지션 사이즈 제안"""
+        pass
+
+```

@@ -1,0 +1,56 @@
+# errlevel.py - Test 모듈
+# 역할: Test 관련 기능 제공
+
+```python
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+이 파일은 자동 오류 수정 시스템이 처리할 수 있는 오류의 유형과 성공률을
+분석하고, 시스템의 현재 수준을 평가하는 스크립트입니다.
+
+- 시스템이 수정 가능한 오류 유형(구문, 들여쓰기, 런타임, 인코딩 등)을
+명시적으로 나열하여 기능 범위를 정의합니다.
+- 현재 프로젝트 내 모든 Python 파일을 검사하여 실제 오류 상태(총 파일
+수, 오류 파일 수, 오류율, 유형별 분포)를 진단합니다.
+- 각 오류 유형별 예상 수정 성공률을 기반으로, 현재 프로젝트에 대한
+전체 예상 성공률을 계산합니다.
+- 계산된 성공률을 바탕으로 시스템의 현재 수준을 A+부터 C까지 등급으로
+평가하고, 구체적인 개선 방안(예: 로컬 규칙 강화, AI 프롬프트 최적화 등)을
+제안합니다.
+- 실제 테스트 결과를 요약하여 시스템의 강점과 약점을 보여줍니다.
+
+실행 예시:
+    python analyze_error_level.py
+"""
+import os
+import sys
+import ast
+import subprocess
+import re
+from typing import Dict, List, Any
+from datetime import datetime
+
+def analyze_error_capabilities():
+    """자동 오류 수정 시스템의 수준 분석"""
+    print("🔍 자동 오류 수정 시스템 수준 분석")
+    print("=" * 60)
+    print("\n📋 수정 가능한 오류 유형:")
+    print("✅ 구문 오류 (SyntaxError)")
+    print("  • 괄호 불일치 (unmatched)")
+    print("  • 잘못된 문법 (invalid syntax)")
+    print("  • trailing comma 오류")
+    print("  • null 바이트 제거")
+    print("✅ 들여쓰기 오류 (IndentationError)")
+    print("  • 불필요한 들여쓰기 제거")
+    print("  • 들여쓰기 레벨 조정")
+    print("  • 들여쓰기 블록 추가")
+    print("✅ 런타임 오류 (RuntimeError)")
+    print("  • ImportError: 모듈 import 추가")
+    print("  • AttributeError: None 체크 추가")
+    print("  • TypeError: datetime 비교, JSON 직렬화")
+    print("  • NameError: 변수 초기화")
+    print("✅ 인코딩 오류 (UnicodeDecodeError)")
+    print("  • 다양한 인코딩 자동 시도")
+    print("  • utf-8, cp949, euc-kr, latin-1")
+    # ... (나머지 코드)
+```

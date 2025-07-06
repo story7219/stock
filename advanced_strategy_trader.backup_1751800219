@@ -1,0 +1,90 @@
+# advanced_strategy_trader.py - Analysis Engine 모듈
+# 역할: Analysis Engine 관련 기능 제공
+
+```python
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+🤖 고급 전략 기반 자동매매 트레이더
+========================================
+
+파일명: advanced_strategy_trader.py
+역할: 모든 분석 모듈(파생, 일목, 패턴)을 총괄하여 최종 매매를 실행합니다.
+- 실시간 데이터 수집 루프
+- 각 분석 모듈에 데이터 전달 및 신호 수신
+- 신호 통합기(SignalIntegrator)를 통한 최종 의사결정
+- KIS API를 통한 실제(모의) 주문 실행
+- 포지션 및 리스크 관리
+"""
+
+import asyncio
+import logging
+from dataclasses import dataclass
+from typing import Dict, Any, List, Union
+import pandas as pd
+import numpy as np
+from datetime import datetime
+
+# 분석 모듈 임포트
+try:
+    from modules.derivatives_analyzer import DerivativesAnalyzer, DerivativesData, DerivativesSignal
+    from modules.ichimoku_analyzer import IchimokuAnalyzer, IchimokuData, IchimokuSignal
+    from modules.pattern_detector import PatternDetector, PatternSignal
+    from modules.signal_integrator import SignalIntegrator, FinalTradeDecision
+except ImportError:
+    print("❌ 분석 모듈 임포트에 실패했습니다. 경로를 확인해주세요.")
+    # 임시 더미 클래스 (이전과 동일)
+    class DerivativesAnalyzer:
+        def analyze(self, data: DerivativesData) -> DerivativesSignal:
+            return DerivativesSignal()
+    class IchimokuAnalyzer:
+        def analyze(self, data: IchimokuData) -> IchimokuSignal:
+            return IchimokuSignal()
+    class PatternDetector:
+        def detect_all(self, data: pd.DataFrame) -> List[PatternSignal]:
+            return []
+    class SignalIntegrator:
+        def integrate(self, *args: Any) -> FinalTradeDecision:
+            return FinalTradeDecision()
+    @dataclass
+    class DerivativesData: pass
+    @dataclass
+    class IchimokuData:
+        high: float
+        low: float
+        close: float
+    @dataclass
+    class FinalTradeDecision:
+        decision: str = "HOLD"
+        score: float = 0.0
+        confidence: float = 0.0
+        reasoning: Dict[str, Any] = None
+
+
+# 로깅 설정 (이전과 동일)
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler('logs/advanced_trader.log', encoding='utf-8'),
+        logging.StreamHandler()
+    ]
+)
+logger = logging.getLogger(__name__)
+
+class AdvancedStrategyTrader:
+    # ... (이전 코드와 동일)
+    
+    async def run(self):
+        # ... (이전 코드와 동일)
+
+            try:
+                # ... (이전 코드와 동일)
+            except KeyboardInterrupt:
+                self.is_running = False
+                logger.info("🛑 사용자에 의해 시스템이 중단되었습니다.")
+            except Exception as e:
+                logger.error(f"메인 루프 오류 발생: {e}", exc_info=True)
+                await asyncio.sleep(10) # 오류 발생 시 10초 대기
+    # ... (이전 코드와 동일)
+```

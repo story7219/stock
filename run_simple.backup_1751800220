@@ -1,0 +1,84 @@
+# run_simple.py - Main Executable 모듈
+# 역할: Main Executable 관련 기능 제공
+
+```python
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+🚀 간단한 실행 스크립트
+================================================================
+파일명: run_simple.py
+역할: ML/DL/Gemini AI 상호보완 신호 생성 시스템의 간단한 실행 스크립트
+"""
+
+import asyncio
+import logging
+import time
+import json
+from datetime import datetime
+from pathlib import Path
+from typing import Dict, List, Any, Optional
+
+# 로깅 설정
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s | %(levelname)-8s | %(name)-20s | %(message)s'
+)
+logger = logging.getLogger(__name__)
+
+class SimpleSignalGenerator:
+    """간단한 신호 생성기 (테스트용)"""
+    
+    def __init__(self, weights: Dict[str, float]):
+        self.weights = weights
+        self.ml_weight = weights.get('ml_weight', 0.4)
+        self.dl_weight = weights.get('dl_weight', 0.3)
+        self.gemini_weight = weights.get('gemini_weight', 0.3)
+        self.threshold = weights.get('threshold', 0.6)
+        self.min_confidence = weights.get('min_confidence', 0.5)
+    
+    def generate_ml_signal(self, technical_data: Dict[str, Any]) -> float:
+        """ML 신호 생성 (시뮬레이션)"""
+        try:
+            rsi = technical_data.get('rsi', 50.0)
+            macd = technical_data.get('macd', 0.0)
+            volume = technical_data.get('volume', 1000000)
+            
+            rsi_signal = max(0.0, min(1.0, (rsi - 30) / 40))
+            macd_signal = max(0.0, min(1.0, (macd + 1) / 2))
+            volume_signal = min(1.0, volume / 2000000)
+            
+            signal = (rsi_signal * self.ml_weight + macd_signal * self.ml_weight + volume_signal * self.ml_weight * 0.5)
+            return max(0.0, min(1.0, signal))
+            
+        except Exception as e:
+            logger.error(f"❌ ML 신호 생성 실패: {e}")
+            return 0.5
+    
+    def generate_dl_signal(self, news: List[str]) -> float:
+        """DL 신호 생성 (시뮬레이션)"""
+        signal = 0.0  # 예시 값
+        return signal
+
+    async def generate_gemini_signal(self, symbol: str, news: List[str], 
+                                   financial_data: Dict[str, Any]) -> float:
+        """Gemini AI 신호 생성 (시뮬레이션)"""
+        try:
+            per = financial_data.get('per', 15.0)
+            pbr = financial_data.get('pbr', 2.0)
+            roe = financial_data.get('roe', 12.0)
+            
+            per_signal = max(0.0, min(1.0, 1 - (per - 10) / 20))
+            pbr_signal = max(0.0, min(1.0, 1 - (pbr - 1) / 3))
+            roe_signal = max(0.0, min(1.0, roe / 20))
+            news_signal = self.generate_dl_signal(news)
+            
+            signal = (per_signal * self.gemini_weight * 0.4 + pbr_signal * self.gemini_weight * 0.3 + roe_signal * self.gemini_weight * 0.3 + news_signal * self.gemini_weight * 0.3)
+            return max(0.0, min(1.0, signal))
+            
+        except Exception as e:
+            logger.error(f"❌ Gemini AI 신호 생성 실패: {e}")
+            return 0.5
+    
+    # ... (기존 코드 동일)
+```

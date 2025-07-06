@@ -1,0 +1,126 @@
+# validators.py - Test 모듈
+# 역할: Test 관련 기능 제공
+
+```python
+"""
+Data validators for ensuring data quality and consistency.
+"""
+import asyncio
+import logging
+import numpy as np
+import pandas as pd
+from typing import Dict, List, Optional, Any, Union, Tuple, Set
+from datetime import datetime, timedelta
+from dataclasses import dataclass
+from enum import Enum
+import re
+
+from .models import StockData, MarketData, TechnicalIndicators, DataStatus
+
+logger = logging.getLogger(__name__)
+
+
+class ValidationLevel(Enum):
+    """Validation level enumeration."""
+    BASIC = "basic"
+    STANDARD = "standard"
+    STRICT = "strict"
+
+
+class ValidationResult(Enum):
+    """Validation result enumeration."""
+    PASS = "pass"
+    WARNING = "warning"
+    FAIL = "fail"
+
+
+@dataclass
+class ValidationRule:
+    """Validation rule definition."""
+    name: str
+    description: str
+    level: ValidationLevel
+    validator_func: str
+    parameters: Dict[str, Any] = None
+
+    def __post_init__(self):
+        if self.parameters is None:
+            self.parameters = {}
+
+
+@dataclass
+class ValidationIssue:
+    """Validation issue details."""
+    rule_name: str
+    level: ValidationLevel
+    result: ValidationResult
+    message: str
+    details: Dict[str, Any] = None
+    affected_fields: List[str] = None
+    timestamp: datetime = None
+
+    def __post_init__(self):
+        if self.details is None:
+            self.details = {}
+        if self.affected_fields is None:
+            self.affected_fields = []
+        if self.timestamp is None:
+            self.timestamp = datetime.now()
+
+
+@dataclass
+class ValidationReport:
+    """Comprehensive validation report."""
+    symbol: str
+    validation_level: ValidationLevel
+    overall_result: ValidationResult
+    issues: List[ValidationIssue]
+    statistics: Dict[str, Any]
+    timestamp: datetime = None
+
+    def __post_init__(self):
+        if self.timestamp is None:
+            self.timestamp = datetime.now()
+
+    @property
+    def is_valid(self) -> bool:
+        """Check if validation passed."""
+        return self.overall_result == ValidationResult.PASS
+
+    @property
+    def has_warnings(self) -> bool:
+        """Check if there are warnings."""
+        return any(
+            issue.result == ValidationResult.WARNING for issue in self.issues
+        )
+
+    @property
+    def has_errors(self) -> bool:
+        """Check if there are errors."""
+        return any(
+            issue.result == ValidationResult.FAIL for issue in self.issues
+        )
+
+
+class DataValidator:
+    """Comprehensive data validator with configurable rules."""
+
+    def __init__(
+        self, validation_level: ValidationLevel = ValidationLevel.STANDARD
+    ):
+        """Initialize data validator."""
+        self.validation_level = validation_level
+        self.rules = self._initialize_rules()
+        self.validation_stats = {
+            "total_validations": 0,
+            "passed_validations": 0,
+            "failed_validations": 0,
+            "warnings_count": 0,
+        }
+
+    def _initialize_rules(self) -> List[ValidationRule]:
+        """Initialize validation rules."""
+        rules = []
+        # ... (rest of the code)
+        return rules
+```

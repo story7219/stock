@@ -1,0 +1,56 @@
+# auto_trading_portfolio_system.py - Main Executable 모듈
+# 역할: Main Executable 관련 기능 제공
+
+```python
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+🚀 자본금 5억 국내/해외 반분할 자동매매 포트폴리오 시스템
+===========================================================
+
+파일명: auto_trading_portfolio_system.py
+역할: 자본금 5억을 국내/해외 반씩 나누어 주식/선물/옵션 자동매매
+- 국내 2.5억: 주식 1.5억, 선물 0.5억, 옵션 0.5억
+- 해외 2.5억: 주식 1.5억, 선물 0.5억, 옵션 0.5억
+- 중기투자 2종목 + 데이트레이딩(매수/매도 2번 전후)
+- ML/DL/Gemini AI + 투자대가 전략 통합
+"""
+
+import asyncio
+import logging
+import json
+import time
+import sqlite3
+from datetime import datetime, timedelta
+from typing import Dict, List, Optional, Any, Tuple, Union
+from dataclasses import dataclass
+from enum import Enum
+import numpy as np
+import pandas as pd
+from concurrent.futures import ThreadPoolExecutor
+import os
+from pathlib import Path
+
+# 프로젝트 모듈 임포트
+try:
+    from modules.unified_investment_strategies import UnifiedInvestmentStrategies, select_master_by_market
+    from kis_live_realtime_system import KISLiveAPI
+except ImportError as e:
+    print(f"모듈 임포트 오류: {e}")
+
+# ... (나머지 코드는 동일)
+
+    async def generate_trading_signal(self, symbol: str, market_type: MarketType, 
+                                    asset_type: AssetType, investment_type: InvestmentType) -> Optional[TradingSignal]:
+        """매매 신호 생성"""
+        try:
+            # ... (나머지 코드는 동일)
+            signal = TradingSignal(
+                # ... (나머지 코드는 동일)
+            )
+            return signal
+        except Exception as e:
+            logger.error(f"매매 신호 생성 실패: {e}")
+            return None
+    # ... (나머지 코드는 동일)
+```

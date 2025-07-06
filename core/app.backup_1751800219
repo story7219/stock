@@ -1,0 +1,112 @@
+# app.py - Test 모듈
+# 역할: Test 관련 기능 제공
+
+```python
+# 🚀 완전 자동화 투자 분석 시스템 v4.0
+# - 코스피200·나스닥100·S&P500 전체 종목 자동 분석
+# - 투자 대가 전략 적용 + Gemini AI 판단
+# - 시스템 리소스 최적화 (RAM 16GB, i5-4460 환경)
+# - 24시간 무인 운영 가능
+# - 자동 백업 및 오류 복구
+
+from dataclasses import dataclass, asdict
+from datetime import datetime, timedelta
+from logging.handlers import RotatingFileHandler
+from ml_engine import LightweightMLEngine
+from scheduler import InvestmentScheduler
+from system_monitor import SystemMonitor
+from typing import Dict, List, Optional, Any
+import asyncio
+import importlib.util
+import json
+import logging
+import os
+import psutil
+import schedule
+import subprocess
+import sys
+import threading
+import time
+import traceback
+import warnings
+import zipfile
+
+
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+🚀 완전 자동화 투자 분석 시스템 v4.0
+========================================
+- 코스피200·나스닥100·S&P500 전체 종목 자동 분석
+- 투자 대가 전략 적용 + Gemini AI 판단
+- 시스템 리소스 최적화 (RAM 16GB, i5-4460 환경)
+- 24시간 무인 운영 가능
+- 자동 백업 및 오류 복구
+"""
+
+
+# 경고 메시지 억제
+warnings.filterwarnings('ignore')
+
+# 프로젝트 경로 설정
+PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, PROJECT_ROOT)
+sys.path.insert(0, os.path.join(PROJECT_ROOT, 'src'))
+
+# 로깅 설정
+def setup_logging():
+    """고급 로깅 시스템 설정"""
+    log_dir = os.path.join(PROJECT_ROOT, 'logs')
+    os.makedirs(log_dir, exist_ok=True)
+
+    log_format = '%(asctime)s | %(levelname)-8s | %(name)-20s | %(message)s'
+
+    # 파일 핸들러 (일별 로테이션)
+    file_handler = RotatingFileHandler(
+        os.path.join(log_dir, 'automation.log'),
+        maxBytes=10*1024*1024,  # 10MB
+        backupCount=7,
+        encoding='utf-8'
+    )
+    file_handler.setFormatter(logging.Formatter(log_format))
+
+    # 콘솔 핸들러
+    console_handler = logging.StreamHandler()
+    console_handler.setFormatter(logging.Formatter(
+        '%(asctime)s | %(levelname)-8s | %(message)s'
+    ))
+
+    # 루트 로거 설정
+    logger = logging.getLogger()
+    logger.setLevel(logging.INFO)
+    logger.addHandler(file_handler)
+    logger.addHandler(console_handler)
+
+    return logger
+
+logger = setup_logging()
+
+@dataclass
+class SystemStatus:
+    """시스템 상태 정보"""
+    cpu_percent: float
+    memory_percent: float
+    available_memory_gb: float
+    disk_free_gb: float
+    is_healthy: bool
+    timestamp: datetime
+
+@dataclass
+class AnalysisResult:
+    """분석 결과 정보"""
+    top5_stocks: List[Dict[str, Any]]
+    analysis_time: datetime
+    processing_duration: float
+    strategy_scores: Dict[str, float]
+    market_indices: Dict[str, Dict[str, float]]
+    ai_reasoning: str
+
+class CompleteAutomationSystem:
+    """완전 자동화 투자 분석 시스템"""
+    # ... (rest of the code)
+```

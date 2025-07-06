@@ -1,0 +1,99 @@
+
+"""
+GPU 인식 테스트 스크립트
+"""
+
+import tensorflow as tf
+import numpy as np
+import time
+
+def test_gpu():
+    """GPU 인식 및 성능 테스트"""
+    print("=== GPU 인식 테스트 ===")
+    
+    # GPU 사용 가능 여부 확인
+    print(f"TensorFlow 버전: {tf.__version__}")
+    print(f"GPU 사용 가능: {tf.config.list_physical_devices('GPU')}")
+    print(f"CPU 사용 가능: {tf.config.list_physical_devices('CPU')}")
+    
+    # GPU 메모리 정보
+    if tf.config.list_physical_devices('GPU'):
+        gpu = tf.config.list_physical_devices('GPU')[0]
+        print(f"사용 중인 GPU: {gpu}")
+        
+        # GPU 메모리 증가 설정
+        try:
+            tf.config.experimental.set_memory_growth(gpu, True)
+            print("GPU 메모리 증가 설정 완료")
+        except RuntimeError as e:
+            print(f"GPU 메모리 설정 오류: {e}")
+    
+    # 간단한 GPU 연산 테스트
+    print("\n=== GPU 연산 테스트 ===")
+    
+    # 큰 행렬 생성
+    size = 5000
+    print(f"{size}x{size} 행렬 연산 테스트...")
+    
+    # CPU 연산 시간 측정
+    start_time = time.time()
+    with tf.device('/CPU:0'):
+        a_cpu = tf.random.normal([size, size])
+        b_cpu = tf.random.normal([size, size])
+        c_cpu = tf.matmul(a_cpu, b_cpu)
+        _ = c_cpu.numpy()
+    cpu_time = time.time() - start_time
+    print(f"CPU 연산 시간: {cpu_time:.4f}초")
+    
+    # GPU 연산 시간 측정 (GPU가 있는 경우)
+    if tf.config.list_physical_devices('GPU'):
+        start_time = time.time()
+        with tf.device('/GPU:0'):
+            a_gpu = tf.random.normal([size, size])
+            b_gpu = tf.random.normal([size, size])
+            c_gpu = tf.matmul(a_gpu, b_gpu)
+            _ = c_gpu.numpy()
+        gpu_time = time.time() - start_time
+        print(f"GPU 연산 시간: {gpu_time:.4f}초")
+        print(f"GPU 가속 비율: {cpu_time/gpu_time:.2f}배")
+    else:
+        print("GPU를 사용할 수 없습니다.")
+    
+    # 딥러닝 모델 테스트
+    print("\n=== 딥러닝 모델 테스트 ===")
+    
+    # 간단한 신경망 생성
+    model = tf.keras.Sequential([
+        tf.keras.layers.Dense(128, activation='relu', input_shape=(100,)),
+        tf.keras.layers.Dropout(0.2),
+        tf.keras.layers.Dense(64, activation='relu'),
+        tf.keras.layers.Dropout(0.2),
+        tf.keras.layers.Dense(32, activation='relu'),
+        tf.keras.layers.Dense(1, activation='linear')
+    ])
+    
+    model.compile(optimizer='adam', loss='mse')
+    
+    # 테스트 데이터 생성
+    X = tf.random.normal([1000, 100])
+    y = tf.random.normal([1000, 1])
+    
+    print("모델 학습 시작...")
+    start_time = time.time()
+    
+    # 모델 학습
+    history = model.fit(X, y, epochs=10, batch_size=32, verbose=1)
+    
+    training_time = time.time() - start_time
+    print(f"모델 학습 완료 시간: {training_time:.4f}초")
+    
+    # 예측 테스트
+    test_X = tf.random.normal([100, 100])
+    predictions = model.predict(test_X, verbose=0)
+    print(f"예측 완료: {predictions.shape}")
+    
+    print("\n=== 테스트 완료 ===")
+
+if __name__ == "__main__":
+    test_gpu()
+

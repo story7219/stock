@@ -1,0 +1,63 @@
+# us_realtime_derivatives.py - Test 모듈
+# 역할: Test 관련 기능 제공
+
+```python
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+🇺🇸 미국 주식 파생상품 실시간 데이터 수집 시스템
+===========================================
+실시간 옵션/선물 데이터 스트리밍 및 분석
+"""
+
+import asyncio
+import json
+import logging
+import os
+import time
+from dataclasses import dataclass, field
+from datetime import datetime, timedelta
+from typing import Dict, List, Optional, Callable, Any
+import aiohttp
+import websockets
+import yfinance as yf
+from dotenv import load_dotenv
+import pandas as pd
+import numpy as np
+
+# 환경 변수 로드
+load_dotenv()
+
+logger = logging.getLogger(__name__)
+
+@dataclass
+class USDerivativeData:
+    """미국 파생상품 데이터 구조"""
+    # ... (이전 코드 동일)
+
+@dataclass
+class RealTimeConfig:
+    """실시간 데이터 설정"""
+    polygon_api_key: str
+    alpha_vantage_api_key: str
+    finnhub_api_key: str
+    tradier_token: str
+    max_connections: int = 5
+    reconnect_delay: int = 5
+    heartbeat_interval: int = 30
+    
+    @classmethod
+    def from_env(cls) -> "RealTimeConfig":
+        """환경 변수에서 설정 로드"""
+        return cls(
+            polygon_api_key=os.getenv('POLYGON_API_KEY', ''),
+            alpha_vantage_api_key=os.getenv('ALPHA_VANTAGE_API_KEY', ''),
+            finnhub_api_key=os.getenv('FINNHUB_API_KEY', ''),
+            tradier_token=os.getenv('TRADIER_TOKEN', ''),
+            max_connections=int(os.getenv('MAX_WS_CONNECTIONS', '5')),
+            reconnect_delay=int(os.getenv('WS_RECONNECT_DELAY', '5')),
+            heartbeat_interval=int(os.getenv('WS_HEARTBEAT_INTERVAL', '30'))
+        )
+
+# ... (나머지 코드 동일)
+```

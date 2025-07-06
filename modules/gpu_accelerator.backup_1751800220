@@ -1,0 +1,113 @@
+# gpu_accelerator.py - Test 모듈
+# 역할: Test 관련 기능 제공
+
+```python
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+🚀 GPU 가속 데이터 처리 엔진
+=====================================
+
+NVIDIA GPU를 최대한 활용한 고성능 데이터 처리 시스템
+- CUDA 가속 데이터 처리
+- cuDF를 활용한 대용량 데이터프레임 처리
+- cuPy를 활용한 수치 연산 가속
+- PyTorch GPU 가속 딥러닝
+- 메모리 최적화 및 병렬 처리
+- 실시간 GPU 모니터링
+
+지원 GPU:
+  • NVIDIA RTX 5080 (15.9GB VRAM)
+  • CUDA 12.x 이상
+  • cuDF, cuPy, PyTorch GPU 가속
+"""
+
+import os
+import time
+import logging
+import numpy as np
+import pandas as pd
+from typing import Dict, List, Any, Optional, Tuple, Union
+from dataclasses import dataclass
+import warnings
+warnings.filterwarnings('ignore')
+
+# GPU 라이브러리들
+try:
+    import cupy as cp
+    import cudf
+    import cuxfilter
+    GPU_AVAILABLE = True
+    logger = logging.getLogger(__name__)
+    logger.info("✅ cuDF, cuPy GPU 라이브러리 로드 성공")
+except ImportError as e:
+    GPU_AVAILABLE = False
+    logger = logging.getLogger(__name__)
+    logger.warning(f"⚠️ cuDF/cuPy GPU 라이브러리 없음: {e}")
+
+# PyTorch GPU
+try:
+    import torch
+    import torch.nn as nn
+    import torch.optim as optim
+    from torch.utils.data import DataLoader, TensorDataset
+    TORCH_AVAILABLE = True
+    logger.info("✅ PyTorch GPU 라이브러리 로드 성공")
+except ImportError as e:
+    TORCH_AVAILABLE = False
+    logger.warning(f"⚠️ PyTorch GPU 라이브러리 없음: {e}")
+
+# GPU 모니터링
+try:
+    import pynvml
+    NVML_AVAILABLE = True
+    logger.info("✅ NVIDIA GPU 모니터링 라이브러리 로드 성공")
+except ImportError as e:
+    NVML_AVAILABLE = False
+    logger.warning(f"⚠️ NVIDIA GPU 모니터링 라이브러리 없음: {e}")
+
+@dataclass
+class GPUInfo:
+    """GPU 정보"""
+    name: str
+    memory_total: int  # MB
+    memory_used: int   # MB
+    memory_free: int   # MB
+    utilization: int   # %
+    temperature: int   # °C
+    power_usage: int   # W
+
+class GPUAccelerator:
+    """GPU 가속 데이터 처리 엔진"""
+    
+    def __init__(self, device_id: int = 0):
+        """초기화"""
+        # ... (이전 코드)
+
+    def get_gpu_info(self) -> Optional[GPUInfo]:
+        """GPU 정보 조회"""
+        # ... (이전 코드)
+
+    def gpu_dataframe_processing(self, df: pd.DataFrame) -> pd.DataFrame:
+        """GPU 가속 데이터프레임 처리"""
+        # ... (이전 코드)
+        
+        # 고상관 특성 제거
+        numeric_columns = df.select_dtypes(include=np.number).columns
+        correlation_matrix = df[numeric_columns].corr()
+        
+        high_corr_pairs = []
+        for i, col1 in enumerate(numeric_columns):
+            for j, col2 in enumerate(numeric_columns[i+1:]):
+                if abs(correlation_matrix.loc[col1, col2]) > 0.95:
+                    high_corr_pairs.append((col1, col2))
+
+        columns_to_drop = set()
+        for col1, col2 in high_corr_pairs:
+            columns_to_drop.add(col2)
+            
+        gpu_df = df.drop(columns=list(columns_to_drop), errors='ignore') # errors='ignore' 추가
+
+        # ... (이전 코드)
+    # ... (나머지 코드)
+```

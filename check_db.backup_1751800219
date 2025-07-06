@@ -1,0 +1,72 @@
+# check_db.py - Test 모듈
+# 역할: Test 관련 기능 제공
+
+```python
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+데이터베이스 스키마 확인 및 수정 스크립트 (Python 3.11+)
+"""
+import sqlite3
+import os
+import typing as t
+
+
+def check_and_fix_database():
+    """데이터베이스 스키마 확인 및 수정 (Python 3.11+ 문법 적용)"""
+    db_files: list[str] = [
+        'data/database/performance_metrics.db',
+        'data/cache.db'
+    ]
+
+    for db_path in db_files:
+        print(f"\n=== {db_path} ===")
+
+        if not os.path.exists(db_path):
+            print(f"데이터베이스 파일이 없습니다: {db_path}")
+            continue
+
+        try:
+            conn = sqlite3.connect(db_path)
+            cursor = conn.cursor()
+
+            # 테이블 목록 확인
+            cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
+            tables = cursor.fetchall()
+            print("현재 테이블:")
+            for table in tables:
+                print(f"  - {table[0]}")
+
+            # 각 테이블의 스키마 확인
+            for table in tables:
+                table_name = table[0]
+                print(f"\n테이블 '{table_name}' 스키마:")
+                cursor.execute(f"PRAGMA table_info({table_name})")
+                columns = cursor.fetchall()
+                for col in columns:
+                    print(f"  - {col[1]} ({col[2]})")
+
+                # access_count 컬럼이 있는지 확인
+                if 'access_count' not in [col[1] for col in columns]:
+                    print(
+                        f"  ⚠️ access_count 컬럼이 없습니다. 추가 중..."
+                    )
+                    try:
+                        cursor.execute(
+                            f"ALTER TABLE {table_name} ADD COLUMN access_count INTEGER DEFAULT 0"
+                        )
+                        print(f"  ✅ access_count 컬럼 추가 완료")
+                    except sqlite3.OperationalError as e:
+                        print(f"  ❌ access_count 컬럼 추가 실패: {e}")
+
+            conn.commit()
+            conn.close()
+            print(f"✅ {db_path} 스키마 확인 및 수정 완료")
+
+        except sqlite3.Error as e:
+            print(f"❌ {db_path} 확인 실패: {e}")
+
+
+if __name__ == "__main__":
+    check_and_fix_database()
+```

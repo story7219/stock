@@ -1,0 +1,115 @@
+# report_generator.py - Test 모듈
+# 역할: Test 관련 기능 제공
+
+```python
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+📊 AI 기반 투자 분석 시스템 - 리포트 생성기
+분석 결과를 다양한 형태로 시각화하고 리포트를 생성하는 모듈
+"""
+
+import os
+import json
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+import plotly.graph_objects as go
+import plotly.express as px
+from plotly.subplots import make_subplots
+from datetime import datetime, timedelta
+from typing import Dict, List, Any, Optional
+import base64
+from io import BytesIO
+import logging
+from dataclasses import dataclass
+from jinja2 import Template
+# pdfkit 임포트 예외 처리
+try:
+    import pdfkit
+    PDFKIT_AVAILABLE = True
+except ImportError:
+    PDFKIT_AVAILABLE = False
+from pathlib import Path
+
+# 로깅 설정
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+@dataclass
+class ReportData:
+    """리포트 데이터 구조"""
+    top5_selections: List[Dict[str, Any]]
+    market_analysis: Dict[str, Any]
+    strategy_weights: Dict[str, float]
+    timestamp: datetime
+    total_analyzed: int
+    analysis_duration: float
+    confidence_scores: Dict[str, float]
+
+class ReportGenerator:
+    """리포트 생성 클래스"""
+    
+    def __init__(self, output_dir: str = "reports"):
+        """
+        리포트 생성기 초기화
+        
+        Args:
+            output_dir: 리포트 출력 디렉토리
+        """
+        self.output_dir = Path(output_dir)
+        self.output_dir.mkdir(exist_ok=True)
+        
+        # 스타일 설정
+        plt.style.use('seaborn-v0_8')
+        sns.set_palette("husl")
+        
+        # 한글 폰트 설정
+        plt.rcParams['font.family'] = ['DejaVu Sans', 'Malgun Gothic', 'AppleGothic']
+        plt.rcParams['axes.unicode_minus'] = False
+        
+    def generate_comprehensive_report(
+        self, 
+        report_data: ReportData,
+        formats: List[str] = ["html", "json", "pdf"]
+    ) -> Dict[str, Path]:
+        """
+        종합 리포트 생성
+        
+        Args:
+            report_data: 리포트 데이터
+            formats: 생성할 리포트 형식 리스트
+            
+        Returns:
+            생성된 리포트 파일 경로들
+        """
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        report_files = {}
+        
+        try:
+            # HTML 리포트 생성
+            if "html" in formats:
+                html_path = self._generate_html_report(report_data, timestamp)
+                report_files["html"] = html_path
+                logger.info(f"HTML 리포트 생성 완료: {html_path}")
+            
+            # JSON 리포트 생성
+            if "json" in formats:
+                json_path = self._generate_json_report(report_data, timestamp)
+                report_files["json"] = json_path
+                logger.info(f"JSON 리포트 생성 완료: {json_path}")
+            
+            # PDF 리포트 생성 (pdfkit이 있을 때만)
+            if "pdf" in formats and PDFKIT_AVAILABLE:
+                pdf_path = self._generate_pdf_report(report_data, timestamp)
+                report_files["pdf"] = pdf_path
+                logger.info(f"PDF 리포트 생성 완료: {pdf_path}")
+            elif "pdf" in formats and not PDFKIT_AVAILABLE:
+                logger.warning("pdfkit이 설치되어 있지 않아 PDF 리포트는 생성되지 않습니다.")
+                
+        except Exception as e:
+            logger.error(f"리포트 생성 중 오류 발생: {e}")
+            
+        return report_files
+    # ... (나머지 코드 동일)
+```

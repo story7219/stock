@@ -1,0 +1,80 @@
+```python
+# 파일명: run_trading_system.py
+# 파일 역할: 실전매매 시스템 실행 메인 스크립트
+
+import asyncio
+import logging
+import sys
+import os
+import signal
+import argparse
+from datetime import datetime
+from pathlib import Path
+from typing import Optional, List
+
+# 프로젝트 루트를 Python 경로에 추가
+sys.path.append(str(Path(__file__).parent))
+
+from real_time_trading_system import RealTimeTradingSystem
+from backtesting_engine import BacktestingEngine
+
+# 로깅 설정
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler('logs/trading_system.log'),
+        logging.StreamHandler()
+    ]
+)
+logger = logging.getLogger(__name__)
+
+class TradingSystemManager:
+    """매매 시스템 관리자 클래스"""
+    
+    def __init__(self):
+        self.trading_system: Optional[RealTimeTradingSystem] = None
+        self.backtesting_engine: Optional[BacktestingEngine] = None
+        self.is_running = False
+        
+        # 시그널 핸들러 설정
+        signal.signal(signal.SIGINT, self._signal_handler)
+        signal.signal(signal.SIGTERM, self._signal_handler)
+        
+        logger.info("매매 시스템 관리자 초기화 완료")
+    
+    # ... (기타 함수 생략)
+
+    async def _evaluate_parameters(self, symbols: List[str], start_date: str, end_date: str,
+                                 rsi_oversold: int, rsi_overbought: int,
+                                 ma_short: int, ma_long: int,
+                                 stop_loss: float, take_profit: float) -> float:
+        """파라미터 평가"""
+        try:
+            total_score = 0.0
+            count = 0
+            
+            for symbol in symbols:
+                # 백테스트 실행
+                data = self.backtesting_engine.load_historical_data(symbol, start_date, end_date)
+                signals = self.backtesting_engine.generate_signals(data, rsi_oversold, rsi_overbought, ma_short, ma_long, stop_loss, take_profit) # 파라미터 추가
+                result = self.backtesting_engine.run_backtest(signals)
+                
+                # 점수 계산 (샤프 비율 + 승률 + 수익률)
+                score = (
+                    result.sharpe_ratio * 0.4 +
+                    result.win_rate * 0.3 +
+                    result.total_profit_loss_pct * 0.3
+                )
+                
+                total_score += score
+                count += 1
+            
+            return total_score / count if count > 0 else 0.0
+            
+        except Exception as e:
+            logger.error(f"파라미터 평가 오류: {e}")
+            return 0.0
+
+    # ... (기타 함수 생략)
+```

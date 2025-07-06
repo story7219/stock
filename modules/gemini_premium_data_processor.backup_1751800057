@@ -1,0 +1,87 @@
+```python
+"""
+Gemini AI 프리미엄 데이터 처리 시스템
+실시간 뉴스 + 차트 이미지 + 고품질 데이터를 Gemini AI가 100% 이해할 수 있도록 가공
+"""
+import os
+import json
+import asyncio
+import aiohttp
+import requests
+from typing import Dict, List, Optional, Any, Tuple
+from dataclasses import dataclass
+from datetime import datetime, timedelta
+import pandas as pd
+import numpy as np
+from loguru import logger
+import google.generativeai as genai
+from PIL import Image, ImageDraw, ImageFont
+import matplotlib.pyplot as plt
+import matplotlib.font_manager as fm
+import seaborn as sns
+import yfinance as yf
+import feedparser
+from bs4 import BeautifulSoup
+import io
+import base64
+import re
+from concurrent.futures import ThreadPoolExecutor, as_completed
+import time
+
+@dataclass
+class NewsData:
+    """뉴스 데이터 클래스"""
+    title: str
+    content: str
+    source: str
+    published_time: datetime
+    url: str
+    sentiment: float
+    relevance_score: float
+    keywords: List[str]
+
+@dataclass 
+class ChartData:
+    """차트 데이터 클래스"""
+    symbol: str
+    image_base64: str
+    technical_indicators: Dict[str, float]
+    price_data: Dict[str, float]
+    volume_data: Dict[str, float]
+    chart_analysis: str
+
+@dataclass
+class ProcessedData:
+    """처리된 데이터 클래스"""
+    symbol: str
+    news_summary: str
+    chart_analysis: str
+    technical_data: Dict[str, Any]
+    market_sentiment: str
+    risk_factors: List[str]
+    opportunities: List[str]
+    gemini_prompt: str
+
+class GeminiPremiumDataProcessor:
+    """Gemini AI 프리미엄 데이터 처리기"""
+    
+    def __init__(self):
+        """초기화"""
+        self.gemini_api_key = os.getenv('GEMINI_API_KEY')
+        self.is_mock = os.getenv('IS_MOCK', 'false').lower() == 'true'
+        self._setup_gemini()
+        self._setup_matplotlib()
+        # ... (나머지 코드 동일)
+    
+    async def process_stock_data(self, symbol: str) -> ProcessedData:
+        """주식 데이터 종합 처리"""
+        try:
+            logger.info(f"{symbol} 프리미엄 데이터 처리 시작")
+            # ... (나머지 코드 동일)
+            return processed_data
+        except Exception as e:
+            # ... (나머지 코드 동일)
+
+
+    # ... (나머지 코드 동일)
+```

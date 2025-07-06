@@ -1,0 +1,37 @@
+# __init__.py - Test 모듈
+# 역할: Test 관련 기능 제공
+
+```python
+"""
+투자 전략 패키지 (Investment Strategies Package)
+===============================================
+
+세계적인 투자 대가들의 투자 전략을 구현한 모듈들을 포함합니다.
+각 전략은 해당 투자자의 철학과 방법론을 기반으로 구현되었습니다.
+
+주요 구성 요소:
+1. base_strategy.py: 모든 전략의 기본 클래스 및 공통 기능
+2. strategy_manager.py: 전략 관리자 - 여러 전략을 통합 관리
+3. druckenmiller_strategy.py: 스탠리 드러켄밀러 전략 구현
+
+구현된 투자 전략 (총 15개):
+- 워런 버핏 (Warren Buffett): 가치 투자의 대가
+- 벤저민 그레이엄 (Benjamin Graham): 가치 투자의 아버지
+- 피터 린치 (Peter Lynch): 성장주 투자 전문가
+- 조지 소로스 (George Soros): 거시경제 기반 투자
+- 제임스 사이먼스 (James Simons): 수학적 모델 기반 투자
+- 레이 달리오 (Ray Dalio): 분산 투자 및 리스크 패리티
+- 조엘 그린블랫 (Joel Greenblatt): 마법 공식 투자
+- 윌리엄 오닐 (William O'Neil): CAN SLIM 전략
+- 제시 리버모어 (Jesse Livermore): 추세 추종 투자
+- 폴 튜더 존스 (Paul Tudor Jones): 매크로 투자
+- 리처드 데니스 (Richard Dennis): 터틀 트레이딩
+- 에드 세이코타 (Ed Seykota): 추세 추종
+- 래리 윌리엄스 (Larry Williams): 기술적 분석
+- 마틴 슈바르츠 (Martin Schwartz): 단기 트레이딩
+- 스탠리 드러켄밀러 (Stanley Druckenmiller): 거시경제 투자
+
+각 전략은 독립적으로 점수를 산출하며, 
+AI 분석기가 이를 종합하여 최종 투자 추천을 생성합니다.
+"""
+```

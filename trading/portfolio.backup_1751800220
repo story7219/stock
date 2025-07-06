@@ -1,0 +1,105 @@
+# portfolio.py - Test 모듈
+# 역할: Test 관련 기능 제공
+
+```python
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+💼 포트폴리오 관리 시스템 v1.0
+포트폴리오 최적화 및 리스크 관리
+"""
+
+import asyncio
+import logging
+import pandas as pd
+import numpy as np
+from datetime import datetime, timedelta
+from typing import Dict, List, Any, Optional, Tuple
+from dataclasses import dataclass, asdict
+import json
+import sqlite3
+from pathlib import Path
+import yfinance as yf
+from scipy.optimize import minimize
+from scipy import stats
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.covariance import LedoitWolf
+import warnings
+warnings.filterwarnings('ignore')
+
+logger = logging.getLogger(__name__)
+
+@dataclass
+class PortfolioConfig:
+    """포트폴리오 설정"""
+    max_positions: int = 20
+    min_weight: float = 0.01  # 최소 비중 1%
+    max_weight: float = 0.15  # 최대 비중 15%
+    rebalance_threshold: float = 0.05  # 리밸런싱 임계값 5%
+    target_volatility: float = 0.15  # 목표 변동성 15%
+    max_drawdown_limit: float = 0.20  # 최대 낙폭 한계 20%
+    correlation_limit: float = 0.7  # 상관관계 한계 70%
+
+@dataclass
+class Position:
+    """포지션 정보"""
+    symbol: str
+    quantity: int
+    avg_price: float
+    current_price: float
+    market_value: float
+    weight: float
+    unrealized_pnl: float
+    unrealized_pnl_pct: float
+    sector: str
+    country: str
+
+@dataclass
+class PortfolioMetrics:
+    """포트폴리오 지표"""
+    total_value: float
+    total_return: float
+    daily_return: float
+    volatility: float
+    sharpe_ratio: float
+    max_drawdown: float
+    var_95: float  # 95% VaR
+    cvar_95: float  # 95% CVaR
+    beta: float
+    alpha: float
+    correlation_matrix: Dict[str, Dict[str, float]]
+    sector_allocation: Dict[str, float]
+    country_allocation: Dict[str, float]
+
+class PortfolioManager:
+    """포트폴리오 관리자"""
+    # ... (기존 코드)
+
+    async def rebalance_portfolio(self) -> Dict[str, Any]:
+        """포트폴리오 리밸런싱"""
+        try:
+            logger.info("포트폴리오 리밸런싱 시작")
+            old_weights = {symbol: pos.weight for symbol, pos in self.positions.items()}
+            new_weights = await self.optimize_portfolio()
+            rebalance_trades = await self._execute_rebalancing(old_weights, new_weights)
+            await self.save_rebalance_record("정기 리밸런싱", old_weights, new_weights, 0.0)
+            logger.info("포트폴리오 리밸런싱 완료")
+            return {"old_weights": old_weights, "new_weights": new_weights, "trades": rebalance_trades}
+        except Exception as e:
+            logger.error(f"리밸런싱 오류: {e}")
+            return {}
+    
+    async def optimize_portfolio(self) -> Dict[str, float]:
+        """포트폴리오 최적화"""
+        # ... (기존 코드)
+
+    async def _execute_rebalancing(self, old_weights: Dict[str, float], 
+                                new_weights: Dict[str, float]) -> List[Dict[str, Any]]:
+        """리밸런싱 실행"""
+        trades = []
+        total_value = sum(pos.market_value for pos in self.positions.values())
+        # ... (기존 코드)
+        return trades
+    # ... (나머지 코드)
+```

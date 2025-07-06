@@ -1,0 +1,60 @@
+```python
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+🤖 Gemini AI 기반 투자 대가 전략 분석 시스템
+=============================================
+워런 버핏, 피터 린치, 벤저민 그레이엄 전략으로 Top5 종목 자동 선정
+"""
+
+import os
+import json
+import pandas as pd
+from datetime import datetime
+from typing import Dict, List, Optional, Tuple
+from dotenv import load_dotenv
+import google.generativeai as genai
+
+# 환경 변수 로드
+load_dotenv()
+
+class GeminiAIAnalyzer:
+    """Gemini AI 기반 투자 분석기"""
+    
+    def __init__(self):
+        # Gemini AI 설정
+        self.api_key = os.getenv('GEMINI_API_KEY', '')
+        if self.api_key:
+            genai.configure(api_key=self.api_key)
+            self.model = genai.GenerativeModel('gemini-pro')
+        else:
+            print("⚠️ GEMINI_API_KEY가 설정되지 않았습니다")
+            self.model = None
+        
+        # 투자 대가 전략 정의 (예시)
+        self.investment_strategies = {
+            'warren_buffett': {
+                'name': '워런 버핏 가치투자 전략',
+                'criteria': [
+                    'ROE 15% 이상',
+                    '부채비율 50% 이하', 
+                    'PER 15배 이하',
+                    '지속적인 매출 성장',
+                    '강력한 경쟁우위(해자)',
+                    '우수한 경영진'
+                ],
+                'weight': 0.4
+            }
+        }
+        
+        print("🤖 Gemini AI 초기화 완료")
+        print(f"🔑 API Key: {'설정됨' if self.api_key else '미설정'}")
+    
+    # ... (기존 코드) ...
+    
+def main():
+    # ... (기존 코드) ...
+    
+if __name__ == "__main__":
+    main()
+```

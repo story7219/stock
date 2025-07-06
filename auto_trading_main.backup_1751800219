@@ -1,0 +1,59 @@
+# auto_trading_main.py - Main Executable 모듈
+# 역할: Main Executable 관련 기능 제공
+
+```python
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+🚀 ML/DL/Gemini AI 상호보완 통합 자동매매 시스템 메인 실행 파일
+================================================================
+파일명: auto_trading_main.py
+역할: 통합 신호 생성 시스템을 포함한 자동매매 시스템의 메인 실행 파일
+- ML/DL/Gemini AI 상호보완 신호 생성
+- 실시간 자동매매 실행
+- 대시보드 및 모니터링
+- 백테스트 및 성능 분석
+"""
+
+import asyncio
+import logging
+import time
+import json
+import threading
+from datetime import datetime, timedelta
+from typing import Dict, List, Any, Optional, Union
+from pathlib import Path
+import yaml
+
+# 프로젝트 모듈 임포트
+try:
+    from modules.unified_signal_generator import (
+        UnifiedSignalGenerator, SignalResult, SignalWeights
+    )
+    from core.unified_core import (
+        UnifiedCore, SystemConfig, initialize_core, shutdown_core
+    )
+    from data.unified_data_processor import (
+        UnifiedDataProcessor, DataRequest, DataType, DataSource
+    )
+    from analysis.unified_analyzer import (
+        UnifiedAnalyzer, AnalysisRequest, AnalysisType
+    )
+except ImportError as e:
+    print(f"모듈 임포트 오류: {e}")
+    print("필요한 모듈을 설치하거나 경로를 확인해주세요.")
+
+# 로깅 설정
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s | %(levelname)-8s | %(name)-20s | %(message)s',
+    handlers=[
+        logging.FileHandler('logs/auto_trading.log', encoding='utf-8'),
+        logging.StreamHandler()
+    ]
+)
+logger = logging.getLogger(__name__)
+
+class AutoTradingSystem:
+    # ... (나머지 코드는 동일)
+```

@@ -1,0 +1,89 @@
+```python
+# 파일명: technical_analysis.py
+# 역할: 기술적 분석 지표 계산 및 신호 생성을 담당하는 모듈
+# - 이동평균, RSI, MACD, 볼린저 밴드 등 주요 기술적 지표 계산
+# - 매수/매도 신호 생성 및 트렌드 분석
+# - 최신 Python 문법 활용 및 성능 최적화
+
+"""
+기술적 분석 모듈 v2.0
+ITechnicalAnalyzer 인터페이스 구현 및 표준화된 데이터 구조 사용
+"""
+import pandas as pd
+import numpy as np
+from typing import Dict, List, Tuple, Optional, Any, Union
+import logging
+from datetime import datetime, timedelta
+import os
+
+# 상대 임포트 문제 해결
+try:
+    from ..core.base_interfaces import (
+        ITechnicalAnalyzer, StockData, TechnicalIndicators,
+        TechnicalSignals, TechnicalAnalysisResult, AnalysisError
+    )
+except ImportError:
+    try:
+        from core.base_interfaces import (
+            ITechnicalAnalyzer, StockData, TechnicalIndicators,
+            TechnicalSignals, TechnicalAnalysisResult, AnalysisError
+        )
+    except ImportError:
+        # 모듈이 없는 경우 None으로 설정
+        ITechnicalAnalyzer = None
+        StockData = None
+        TechnicalIndicators = None
+        TechnicalSignals = None
+        TechnicalAnalysisResult = None
+        AnalysisError = None
+
+# 로거 설정
+logger = logging.getLogger(__name__)
+
+class TechnicalAnalyzer(ITechnicalAnalyzer):
+    """기술적 분석기 - ITechnicalAnalyzer 인터페이스 구현"""
+
+    def __init__(self):
+        """기술적 분석기 초기화"""
+        self.indicators = {}
+        logger.info("TechnicalAnalyzer 초기화 완료")
+
+    async def analyze(self, data: StockData) -> TechnicalAnalysisResult:
+        """기술적 분석 수행"""
+        try:
+            if not isinstance(data, StockData):
+                raise TypeError("StockData 객체를 입력해야 합니다.")
+            
+            stock_data: StockData = data
+            
+            # 기술적 지표 계산 (줄 길이 조정)
+            indicators = self.calculate_indicators(
+                stock_data.historical_data
+            )
+            
+            # ... (기존 코드) ...
+            return TechnicalAnalysisResult(indicators=indicators, signals=None)  # 예시 반환 값
+        except TypeError as e:
+            logger.error(f"입력 데이터 형식 오류: {e}")
+            return TechnicalAnalysisResult(indicators={}, signals=[], error=e)
+        except Exception as e:
+            logger.error(f"기술적 분석 중 오류: {e}")
+            return TechnicalAnalysisResult(indicators={}, signals=[], error=e)
+    
+    def calculate_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
+        """주요 기술적 지표 계산"""
+        try:
+            df = df.copy()
+            # 이동평균선 (줄 길이 조정)
+            df['MA20'] = df['Close'].rolling(window=20).mean()
+            df['MA50'] = df['Close'].rolling(window=50).mean()
+            df['MA200'] = df['Close'].rolling(window=200).mean()
+            
+            # ... (기존 코드) ...
+            return df
+        except Exception as e:
+            logger.error(f"지표 계산 중 오류: {e}")
+            return pd.DataFrame()  # 에러 발생 시 빈 DataFrame 반환
+    
+    # ... (나머지 기존 코드) ...
+```

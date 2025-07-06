@@ -1,0 +1,95 @@
+```python
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+📈 파생상품 시장 분석기
+===========================
+
+파일명: modules/derivatives_analyzer.py
+역할: 선물/옵션 시장 데이터를 분석하여 시장 심리 및 방향성을 탐지합니다.
+- 풋/콜 비율 (Put/Call Ratio) 분석
+- 미결제약정 (Open Interest) 동향 분석
+- 변동성 지수 (VIX) 분석
+"""
+
+import logging
+from dataclasses import dataclass, field
+from typing import Dict, Any, Optional
+import numpy as np
+
+logger = logging.getLogger(__name__)
+
+@dataclass
+class DerivativesData:
+    """파생상품 시장 데이터"""
+    put_call_ratio: float = 1.0
+    total_open_interest: int = 0
+    futures_open_interest_change: int = 0
+    vix_index: float = 20.0
+    timestamp: Optional[int] = None  # 타입 명시
+
+
+@dataclass
+class DerivativesSignal:
+    """파생상품 분석 신호"""
+    sentiment: str = "NEUTRAL"  # "BULLISH", "BEARISH", "NEUTRAL"
+    sentiment_score: float = 0.0  # -1.0 (매우 비관적) ~ 1.0 (매우 낙관적)
+    market_pressure: str = "BALANCED" # "BUYING", "SELLING", "BALANCED"
+    volatility_level: str = "NORMAL" # "LOW", "NORMAL", "HIGH", "EXTREME"
+    reasoning: str = "N/A"
+
+
+class DerivativesAnalyzer:
+    """
+    파생상품 분석기 클래스.
+    실시간 파생 데이터를 기반으로 시장의 전반적인 심리를 분석하고,
+    매수/매도 압력, 변동성 수준을 평가하여 정량적인 신호를 생성합니다.
+    """
+    def __init__(self):
+        logging.basicConfig(level=logging.INFO)
+        logger.info("파생상품 분석기 초기화 완료")
+
+    def analyze(self, data: DerivativesData) -> DerivativesSignal:
+        """
+        입력된 파생 데이터를 종합적으로 분석하여 시장 신호를 생성합니다.
+
+        Args:
+            data (DerivativesData): 분석할 실시간 파생 데이터.
+
+        Returns:
+            DerivativesSignal: 분석 결과로 생성된 시장 신호.
+        """
+        if not data:
+            return DerivativesSignal(reasoning="데이터 없음")
+
+        # 각 지표별 점수 계산 (함수로 분리)
+        pcr_score = self._analyze_put_call_ratio(data.put_call_ratio)
+        oi_score = self._analyze_open_interest(data.futures_open_interest_change)
+        vix_score = self._analyze_vix(data.vix_index)
+
+        # ... (나머지 함수는 동일)
+
+    def _analyze_put_call_ratio(self, pcr: float) -> float:
+        # ... (기존 함수 내용)
+        return 0.0  # 예시
+
+    def _analyze_open_interest(self, oi_change: int) -> float:
+        # ... (기존 함수 내용)
+        return 0.0  # 예시
+
+    def _analyze_vix(self, vix: float) -> float:
+        # ... (기존 함수 내용)
+        return 0.0  # 예시
+
+    def _get_sentiment(self, score: float) -> str:
+        # ... (기존 함수 내용)
+        return "NEUTRAL"  # 예시
+
+    def _get_market_pressure(self, oi_score: float, pcr_score: float) -> str:
+        # ... (기존 함수 내용)
+        return "BALANCED"  # 예시
+
+    def _get_volatility_level(self, vix: float) -> str:
+        # ... (기존 함수 내용)
+        return "NORMAL"  # 예시
+```

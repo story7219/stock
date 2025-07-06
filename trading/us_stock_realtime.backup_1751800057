@@ -1,0 +1,28 @@
+```python
+# 실전 해외주식 실시간 데이터(시세, 호가, 체결, 주문, 잔고 등) 통합 수집/관리 모듈
+# 아래 전체 코드는 의심/src/modules/market_specific/us_stock_module.py의 실제 구현 전체를 복사/이식한 것입니다.
+
+# ... (이하 의심/src/modules/market_specific/us_stock_module.py 전체 코드 복사) ...
+# 추가 코드 예시 (가정):
+import requests
+import json
+
+def fetch_us_stock_data(ticker: str) -> dict | None:
+    """
+    해당 종목의 실시간 주식 데이터를 가져옵니다.
+    """
+    try:
+        url = f"https://api.example.com/stocks/{ticker}/realtime"
+        response = requests.get(url)
+        response.raise_for_status()  # HTTP 에러 처리
+        data = response.json()
+        return data
+    except requests.exceptions.RequestException as e:
+        print(f"데이터 수집 중 오류 발생: {e}")
+        return None
+    except json.JSONDecodeError as e:
+        print(f"JSON 디코딩 오류: {e}")
+        return None
+
+# ... (이하 코드) ...
+```

@@ -1,0 +1,113 @@
+# collectors.py - Data Processor 모듈
+# 역할: Data Processor 관련 기능 제공
+
+```python
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+📊 고성능 데이터 수집기 모듈
+==========================
+"""
+import asyncio
+import logging
+import time
+from typing import Dict, List, Optional, Any, Union, Callable
+from datetime import datetime, timedelta
+import pandas as pd
+import yfinance as yf
+import aiohttp
+from concurrent.futures import ThreadPoolExecutor
+from dataclasses import dataclass, field
+import json
+from pathlib import Path
+from abc import ABC, abstractmethod
+import numpy as np
+
+# 상대 임포트 문제 해결
+try:
+    from ..core.cache_manager import CacheManager
+    from ..core.connection_pool import HTTPConnectionPool
+    from ..core.async_executor import AsyncExecutor
+    from ..core.memory_optimizer import MemoryOptimizer
+    from .models import StockData, MarketData, MarketType, DataStatus, TechnicalIndicators
+except ImportError:
+    # 상대 임포트 실패 시 절대 임포트 시도
+    try:
+        from core.cache_manager import CacheManager
+        from core.connection_pool import HTTPConnectionPool
+        from core.async_executor import AsyncExecutor
+        from core.memory_optimizer import MemoryOptimizer
+        from data.models import StockData, MarketData, MarketType, DataStatus, TechnicalIndicators
+    except ImportError:
+        # 모듈이 없는 경우 None으로 설정
+        CacheManager = None
+        HTTPConnectionPool = None
+        AsyncExecutor = None
+        MemoryOptimizer = None
+        StockData = None
+        MarketData = None
+        MarketType = None
+        DataStatus = None
+        TechnicalIndicators = None
+
+logger = logging.getLogger(__name__)
+
+
+@dataclass
+class CollectionConfig:
+    """Data collection configuration."""
+    batch_size: int = 50
+    max_concurrent: int = 20
+    timeout: int = 30
+    retry_attempts: int = 3
+    retry_delay: float = 1.0
+    cache_ttl: int = 300  # 5 minutes
+    enable_caching: bool = True
+    enable_memory_optimization: bool = True
+    min_request_interval: float = 0.1
+
+
+class BaseDataCollector(ABC):
+    # ... (rest of the code)
+
+    @abstractmethod
+    async def collect_historical(self, symbol: str,
+                                 start_date: datetime,
+                                 end_date: datetime) -> Optional[pd.DataFrame]:
+        """과거 데이터 수집 (하위 클래스에서 구현)"""
+        pass
+
+
+# ... (rest of the code)
+
+
+class AsyncDataCollector(BaseDataCollector):
+    # ... (rest of the code)
+
+    async def collect_historical(self, symbol: str,
+                                 start_date: datetime,
+                                 end_date: datetime) -> Optional[pd.DataFrame]:
+        """
+        과거 데이터 수집
+
+        Args:
+            symbol: 종목 코드
+            start_date: 시작 날짜
+            end_date: 종료 날짜
+
+        Returns:
+            과거 가격 데이터, 데이터가 없으면 None
+        """
+        try:
+            # 실제 구현에서는 KIS API의 과거 데이터 엔드포인트 호출
+            # 여기서는 더미 데이터 생성
+            return await self._fetch_historical_data(symbol, start_date, end_date)
+        except Exception as e:
+            logger.error(f"과거 데이터 수집 오류 ({symbol}): {e}")
+            return None
+
+    async def _fetch_historical_data(self, symbol: str, start_date: datetime, end_date: datetime) -> Optional[pd.DataFrame]:
+        # ... (your implementation)
+        #  Return None if no data found
+        return None
+```

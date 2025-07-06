@@ -1,0 +1,48 @@
+# advanced_ai_reviewer.py - Test 모듈
+# 역할: Test 관련 기능 제공
+
+```python
+#!/usr/bin/env python3
+"""
+🤖 고급 AI 코드 리뷰어
+Gemini AI를 활용한 투자 시스템 전용 고급 코드 리뷰 도구
+"""
+
+from collections import Counter
+from datetime import datetime
+from pathlib import Path
+from typing import Dict, List, Any, Optional
+import aiohttp
+import argparse
+import ast
+import asyncio
+import json
+import logging
+import os
+import re
+import sys
+
+# 로깅 설정
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
+
+class AdvancedAIReviewer:
+    """고급 AI 코드 리뷰어"""
+
+    def __init__(self, project_root: str = "."):
+        self.project_root = Path(project_root)
+        self.gemini_api_key = os.getenv('GEMINI_API_KEY')
+        self.review_results = []
+        self.analysis_stats = {
+            'files_reviewed': 0,
+            'issues_found': 0,
+            'suggestions_made': 0,
+            'security_issues': 0,
+            'performance_issues': 0,
+            'investment_logic_issues': 0
+        }
+        # ... (나머지 코드는 동일)
+```

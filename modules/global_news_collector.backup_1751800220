@@ -1,0 +1,58 @@
+# global_news_collector.py - Data Processor 모듈
+# 역할: Data Processor 관련 기능 제공
+
+```python
+# 글로벌 뉴스 수집 및 감성분석 모듈
+# Global News Collection and Sentiment Analysis Module
+
+import requests
+import pandas as pd
+import numpy as np
+from typing import Dict, List, Tuple, Optional
+from datetime import datetime, timedelta
+import asyncio
+import aiohttp
+import json
+import re
+from bs4 import BeautifulSoup
+import feedparser
+from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+from textblob import TextBlob
+import warnings
+
+warnings.filterwarnings('ignore')
+
+
+class GlobalNewsCollector:
+    """글로벌 뉴스 수집 및 감성분석 클래스"""
+
+    def __init__(self):
+        """글로벌 뉴스 수집기 초기화"""
+        self.session = None
+        self.sentiment_analyzer = SentimentIntensityAnalyzer()
+        self.news_sources = {
+            'reuters': 'https://feeds.reuters.com/reuters/businessNews',
+            'bloomberg': 'https://feeds.bloomberg.com/markets/news.rss',
+            'cnbc': 'https://www.cnbc.com/id/100003114/device/rss/rss.html',
+            'yahoo_finance': 'https://feeds.finance.yahoo.com/rss/2.0/headline',
+            'marketwatch': 'https://feeds.marketwatch.com/marketwatch/topstories/',
+            'investing': 'https://www.investing.com/rss/news_301.rss',
+            'seeking_alpha': 'https://seekingalpha.com/feed.xml'
+        }
+        # 키워드 필터링
+        self.financial_keywords = [
+            'stock', 'market', 'trading', 'investment', 'finance', 'economy',
+            'earnings', 'revenue', 'profit', 'loss', 'dividend', 'buyback',
+            'merger', 'acquisition', 'ipo', 'federal reserve', 'interest rate',
+            'inflation', 'gdp', 'unemployment', 'oil', 'gold', 'silver',
+            'bitcoin', 'crypto', 'etf', 'options', 'futures', 'forex'
+        ]
+        self.korean_keywords = [
+            '주식', '주가', '증시', '투자', '금융', '경제', '수익', '손실',
+            '배당', '자사주매입', '합병', '인수', '상장', '한국은행', '금리',
+            '인플레이션', '국내총생산', '실업률', '원유', '금', '은',
+            '비트코인', '암호화폐', '상장지수펀드', '옵션', '선물', '환율'
+        ]
+
+    # ... (나머지 함수들) ...
+```

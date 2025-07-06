@@ -1,0 +1,95 @@
+# ai_reviewer.py - Test 모듈
+# 역할: Test 관련 기능 제공
+
+```python
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+🤖 투자 분석 시스템 AI 코드 리뷰어
+=================================
+
+GitHub Actions에서 실행되는 AI 기반 코드 리뷰 시스템입니다.
+투자 분석 시스템의 코드 품질, 보안, 성능을 자동으로 검토합니다.
+
+주요 기능:
+1. 코드 품질 검사
+2. 보안 취약점 검사
+3. 성능 최적화 제안
+4. 투자 전략 로직 검증
+5. API 사용량 최적화 검토
+"""
+
+import os
+import sys
+import json
+import asyncio
+import logging
+from typing import Dict, List, Any, Optional
+from pathlib import Path
+from dataclasses import dataclass
+import subprocess
+import re
+
+# 로깅 설정
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
+
+
+@dataclass
+class ReviewResult:
+    """리뷰 결과 데이터 클래스"""
+    file_path: str
+    issues: List[Dict[str, Any]]
+    score: float
+    suggestions: List[str]
+    security_issues: List[str] = None
+    performance_issues: List[str] = None
+
+
+class InvestmentSystemReviewer:
+    """투자 분석 시스템 전용 AI 리뷰어"""
+    
+    def __init__(self):
+        self.project_root = Path(__file__).parent.parent.parent
+        self.src_path = self.project_root / "src"
+        self.config_path = self.project_root / "config"
+        
+        # 투자 시스템 특화 검사 규칙
+        self.investment_rules = {
+            # ... (이전 코드)
+        }
+        
+        # 성능 최적화 패턴
+        self.performance_patterns = {
+            # ... (이전 코드)
+        }
+    
+    # ... (이전 코드)
+    
+    def _generate_suggestions(self, content: str, file_path: str) -> List[str]:
+        """개선 제안사항 생성"""
+        suggestions = []
+        
+        # 캐싱 제안
+        if 'def get_' in content and 'cache' not in content.lower():
+            suggestions.append("🚀 데이터 조회 함수에 캐싱을 추가하면 성능이 향상됩니다.")
+        
+        # 비동기 처리 제안
+        if 'requests.' in content and 'async def' not in content:
+            suggestions.append("⚡ HTTP 요청 함수를 비동기로 변경하면 성능이 향상됩니다.")
+        
+        # 로깅 제안
+        if 'print(' in content:
+            suggestions.append("📝 print() 대신 logging을 사용하는 것을 권장합니다.")
+        
+        # 타입 힌트 제안
+        if 'def ' in content and '->' not in content and not content.startswith("class"):
+            suggestions.append("🔍 함수에 타입 힌트를 추가하면 코드 품질이 향상됩니다.")
+        
+        return suggestions
+    
+    # ... (이전 코드)
+```

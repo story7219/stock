@@ -1,0 +1,124 @@
+```python
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+🚀 Premium Stock Analysis System - 통합 런처
+=========================================
+코스피200·나스닥100·S&P500 전체 종목 분석
+투자 대가 전략 + Gemini AI 자동 선정 시스템
+
+실행 옵션:
+1. 완전 자동화 모드 (24시간 무인 운영)
+2. 즉시 분석 모드 (한 번만 실행)
+3. 시스템 상태 체크
+4. 성능 최적화 모드
+"""
+
+import os
+import sys
+import subprocess
+from datetime import datetime
+import colorama
+from colorama import Fore, Style
+
+colorama.init()
+
+def print_banner():
+    """시스템 배너 출력"""
+    print(f"""
+{Fore.CYAN}
+╔══════════════════════════════════════════════════════════════╗
+║              🚀 Premium Stock Analysis System               ║
+║                                                              ║
+║  📊 코스피200 · 나스닥100 · S&P500 전체 종목 분석             ║
+║  🧠 투자 대가 전략 + Gemini AI 자동 선정                      ║
+║  ⚡ 시스템 최적화 (RAM 16GB, i5-4460)                        ║
+║                                                              ║
+╚══════════════════════════════════════════════════════════════╝
+{Style.RESET_ALL}
+""")
+
+def show_menu():
+    """메인 메뉴 표시"""
+    print(f"""
+{Fore.GREEN}🎯 실행 옵션을 선택하세요:{Style.RESET_ALL}
+
+{Fore.YELLOW}1.{Style.RESET_ALL} 🤖 완전 자동화 모드 (24시간 무인 운영)
+{Fore.YELLOW}2.{Style.RESET_ALL} ⚡ 즉시 분석 모드 (한 번만 실행)  
+{Fore.YELLOW}3.{Style.RESET_ALL} 📊 시스템 상태 체크
+{Fore.YELLOW}4.{Style.RESET_ALL} 🔧 성능 최적화 모드
+{Fore.YELLOW}5.{Style.RESET_ALL} 📋 테스트 모드 (간단 분석)
+{Fore.YELLOW}6.{Style.RESET_ALL} 🚪 종료
+
+""")
+
+def run_automation():
+    """완전 자동화 모드 실행"""
+    print(f"{Fore.GREEN}🤖 완전 자동화 모드를 시작합니다...{Style.RESET_ALL}")
+    try:
+        subprocess.run([sys.executable, "app.py", "--mode", "auto"],
+                       check=True,
+                       capture_output=True,
+                       text=True)
+    except subprocess.CalledProcessError as e:
+        print(f"{Fore.RED}❌ 자동화 모드 실행 실패: {e.stderr}{Style.RESET_ALL}")
+
+
+def run_single_analysis():
+    # ... (기존 함수)
+    pass
+
+def check_system():
+    # ... (기존 함수)
+    pass
+
+def run_optimization():
+    # ... (기존 함수)
+    pass
+
+def run_test_mode():
+    """테스트 모드 (간단 분석)"""
+    print(f"{Fore.GREEN}📋 테스트 모드를 시작합니다...{Style.RESET_ALL}")
+    try:
+        subprocess.run([sys.executable,
+                        "backup_old_files/simple_run.py"],
+                       check=True,
+                       capture_output=True,
+                       text=True)
+    except subprocess.CalledProcessError as e:
+        print(f"{Fore.RED}❌ 테스트 모드 실행 실패: {e.stderr}{Style.RESET_ALL}")
+
+
+def main():
+    """메인 함수"""
+    print_banner()
+    while True:
+        show_menu()
+        try:
+            choice = input(
+                f"{Fore.CYAN}선택 (1-6): {Style.RESET_ALL}").strip()
+            if choice == "1":
+                run_automation()
+            elif choice == "2":
+                run_single_analysis()
+            elif choice == "3":
+                check_system()
+            elif choice == "4":
+                run_optimization()
+            elif choice == "5":
+                run_test_mode()
+            elif choice == "6":
+                print(f"{Fore.GREEN}👋 프로그램을 종료합니다. 감사합니다!{Style.RESET_ALL}")
+                break
+            else:
+                print(f"{Fore.RED}❌ 잘못된 선택입니다. 1-6 중에서 선택해주세요.{Style.RESET_ALL}")
+        except KeyboardInterrupt:
+            print(f"\n{Fore.YELLOW}⚠️ 사용자가 중단했습니다.{Style.RESET_ALL}")
+            break
+        except Exception as e:
+            print(f"{Fore.RED}❌ 오류 발생: {e}{Style.RESET_ALL}")
+
+
+if __name__ == "__main__":
+    main()
+```

@@ -1,0 +1,68 @@
+# test_high_performance.py - Test 모듈
+# 역할: Test 관련 기능 제공
+
+```python
+"""
+실제 고성능 학습 테스트 스크립트
+=====================================
+
+이 스크립트는 mlengine.py가 실제로 고성능 학습을 수행하는지 확인합니다.
+CPU/GPU 사용량을 실시간으로 모니터링하고 실제 학습 과정을 보여줍니다.
+"""
+import os
+import sys
+import time
+import psutil
+import numpy as np
+import pandas as pd
+from datetime import datetime
+import warnings
+
+warnings.filterwarnings('ignore')
+
+# mlengine 임포트
+try:
+    from mlengine import MLSystem
+except ModuleNotFoundError as e:
+    print(f"오류: mlengine 모듈을 찾을 수 없습니다. ({e})")
+    sys.exit(1)
+
+def monitor_system_resources():
+    """시스템 리소스 모니터링"""
+    cpu = psutil.cpu_percent(interval=1)
+    ram = psutil.virtual_memory().percent
+    disk = psutil.disk_usage('/').percent
+    print(f"🖥️  CPU: {cpu}% | 💾 RAM: {ram}% | 💿 Disk: {disk}%")
+    return cpu, ram, disk
+
+def generate_large_dataset(samples: int = 100000, features: int = 50) -> pd.DataFrame:
+    """대용량 테스트 데이터셋 생성"""
+    print(f"📊 대용량 데이터셋 생성 중... ({samples:,}개 샘플, {features}개 특성)")
+    np.random.seed(42)
+    data = np.random.rand(samples, features)
+    df = pd.DataFrame(data)
+    return df
+
+def test_high_performance_training(df: pd.DataFrame):
+    # ... (기존 코드 동일)
+    # 예시: 학습 진행 로직
+    model = MLSystem()
+    model.train(df)
+
+def continuous_monitoring(duration_seconds: int = 300):
+    # ... (기존 코드 동일)
+    start_time = time.time()
+    end_time = start_time + duration_seconds
+    while time.time() < end_time:
+        monitor_system_resources()
+        time.sleep(1)
+
+if __name__ == "__main__":
+    # 데이터셋 생성
+    try:
+        df = generate_large_dataset()
+        test_high_performance_training(df)
+        continuous_monitoring()
+    except Exception as e:
+        print(f"오류 발생: {e}")
+```

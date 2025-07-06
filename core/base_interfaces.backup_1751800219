@@ -1,0 +1,81 @@
+# base_interfaces.py - Test 모듈
+# 역할: Test 관련 기능 제공
+
+```python
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+📋 기본 인터페이스 및 공통 데이터 클래스 정의 (Base Interfaces)
+===========================================================
+
+투자 분석 시스템의 핵심 인터페이스와 데이터 구조를 정의합니다.
+모든 모듈에서 공통으로 사용하는 표준 인터페이스와 데이터 클래스를 제공합니다.
+
+주요 구성 요소:
+1. 열거형 (Enums):
+   - MarketType: 지원하는 시장 유형 (코스피200, 나스닥100, S&P500)
+   - StrategyType: 투자 전략 유형 (워런 버핏, 벤저민 그레이엄 등)
+   - RiskLevel: 위험도 수준 (낮음, 보통, 높음)
+   - InvestmentPeriod: 투자 기간 (단기, 중기, 장기)
+
+2. 데이터 클래스 (Data Classes):
+   - StockData: 주식 기본 정보 및 가격 데이터
+   - TechnicalIndicators: 기술적 지표 (RSI, MACD, 볼린저밴드 등)
+   - TechnicalSignals: 기술적 신호 (매수/매도/중립)
+   - TechnicalAnalysisResult: 기술적 분석 종합 결과
+   - StrategyScore: 투자 전략별 점수 및 근거
+   - InvestmentRecommendation: 최종 투자 추천 결과
+   - MarketData: 시장 데이터 표준 클래스
+
+3. 인터페이스 (Interfaces):
+   - IDataCollector: 데이터 수집기 인터페이스
+   - ITechnicalAnalyzer: 기술적 분석기 인터페이스
+   - IInvestmentStrategy: 투자 전략 인터페이스
+   - IAIAnalyzer: AI 분석기 인터페이스
+   - IReportGenerator: 리포트 생성기 인터페이스
+
+4. 예외 클래스 (Exceptions):
+   - AnalysisError: 분석 관련 오류
+   - DataCollectionError: 데이터 수집 오류
+   - StrategyError: 전략 실행 오류
+   - AIAnalysisError: AI 분석 오류
+
+5. 유틸리티 함수:
+   - validate_stock_data: 주식 데이터 유효성 검증
+   - calculate_expected_return: 기대 수익률 계산
+   - determine_position_size: 포지션 크기 결정
+
+이 모듈은 시스템 전체의 표준을 정의하며, 모든 다른 모듈들이 
+이 인터페이스를 구현하거나 데이터 클래스를 사용합니다.
+"""
+from abc import ABC, abstractmethod
+from dataclasses import dataclass, field
+from typing import Dict, List, Any, Optional, Union, Tuple
+from datetime import datetime
+import pandas as pd
+from enum import Enum
+
+
+# ... (이전 코드 생략)
+
+class ITechnicalAnalyzer(ABC):
+    """기술적 분석기 인터페이스"""
+    
+    @abstractmethod
+    def analyze(self, stock_data: "StockData") -> "TechnicalAnalysisResult":
+        """기술적 분석 수행"""
+        pass
+    
+    @abstractmethod
+    def calculate_indicators(self, price_data: pd.DataFrame) -> "TechnicalIndicators":
+        """기술적 지표 계산"""
+        pass
+    
+    @abstractmethod
+    def generate_signals(self, indicators: "TechnicalIndicators", current_price: float) -> "TechnicalSignals":
+        """기술적 신호 생성"""
+        pass
+
+
+# ... (나머지 코드)
+```

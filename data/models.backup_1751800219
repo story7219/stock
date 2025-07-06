@@ -1,0 +1,175 @@
+# models.py - Test 모듈
+# 역할: Test 관련 기능 제공
+
+```python
+# 파일명: models.py
+# 역할: 데이터 모델 정의 모듈
+# - 주식 데이터, 기술적 지표, 뉴스 등 각종 데이터 모델 정의
+# - 타입 안정성을 위한 데이터 클래스 사용
+# - 데이터 검증 및 변환 기능 포함
+
+"""
+Data models for the investment system.
+"""
+
+import pandas as pd
+from dataclasses import dataclass, field
+from typing import Dict, List, Optional, Any, Union
+from datetime import datetime
+from enum import Enum, auto
+
+
+class MarketType(Enum):
+    """Market type enumeration."""
+    KOSPI = auto()
+    KOSDAQ = auto()
+    NYSE = auto()
+    NASDAQ = auto()
+
+
+class DataStatus(Enum):
+    """Data status enumeration."""
+    VALID = "valid"
+    INVALID = "invalid"
+    PARTIAL = "partial"
+    STALE = "stale"
+
+
+@dataclass
+class TechnicalIndicators:
+    """Technical indicators for a stock."""
+    # Moving averages
+    sma_20: Optional[float] = None
+    sma_50: Optional[float] = None
+    sma_200: Optional[float] = None
+    ema_12: Optional[float] = None
+    ema_26: Optional[float] = None
+    
+    # Momentum indicators
+    rsi: Optional[float] = None
+    macd: Optional[float] = None
+    macd_signal: Optional[float] = None
+    macd_histogram: Optional[float] = None
+    
+    # Volatility indicators
+    bollinger_upper: Optional[float] = None
+    bollinger_middle: Optional[float] = None
+    bollinger_lower: Optional[float] = None
+    atr: Optional[float] = None
+    
+    # Volume indicators
+    volume_sma: Optional[float] = None
+    obv: Optional[float] = None
+    
+    # Trend indicators
+    adx: Optional[float] = None
+    cci: Optional[float] = None
+    
+    # Support/Resistance
+    support_level: Optional[float] = None
+    resistance_level: Optional[float] = None
+    
+    # Custom indicators
+    momentum_score: Optional[float] = None
+    volatility_score: Optional[float] = None
+    trend_score: Optional[float] = None
+    
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert to dictionary."""
+        return {k: v for k, v in self.__dict__.items() if v is not None}
+    
+    def is_valid(self) -> bool:
+        """Check if indicators are valid."""
+        return any(v is not None for v in self.__dict__.values())
+
+
+@dataclass
+class StockData:
+    """Stock data container."""
+    symbol: str
+    name: str
+    market_type: MarketType
+    
+    # Price data
+    current_price: Optional[float] = None
+    open_price: Optional[float] = None
+    high_price: Optional[float] = None
+    low_price: Optional[float] = None
+    close_price: Optional[float] = None
+    previous_close: Optional[float] = None
+    
+    # Volume and market cap
+    volume: Optional[int] = None
+    avg_volume: Optional[int] = None
+    market_cap: Optional[float] = None
+    
+    # Price changes
+    change_amount: Optional[float] = None
+    change_percent: Optional[float] = None
+    
+    # Historical data
+    data: Optional[pd.DataFrame] = None
+    
+    # Technical indicators
+    technical_indicators: Optional[TechnicalIndicators] = None
+    
+    # Fundamental data (if needed)
+    info: Dict[str, Any] = field(default_factory=dict)
+    
+    # Metadata
+    last_updated: Optional[datetime] = None
+    data_status: DataStatus = DataStatus.VALID
+    error_message: Optional[str] = None
+    
+    def __post_init__(self):
+        # ... (rest of the method)
+    
+    def is_valid(self) -> bool:
+        # ... (rest of the method)
+    
+    def is_stale(self, max_age_minutes: int = 60) -> bool:
+        # ... (rest of the method)
+
+    # ... (rest of the method)
+    
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> 'StockData':
+        """Create from dictionary."""
+        # Extract technical indicators
+        technical_indicators = None
+        if 'technical_indicators' in data:
+            technical_indicators = TechnicalIndicators(**data['technical_indicators'])
+        
+        # Parse datetime
+        last_updated = None
+        if data.get('last_updated'):
+            try:
+                last_updated = datetime.fromisoformat(data['last_updated'])
+            except ValueError as e:
+                print(f"Error parsing datetime: {e}, data: {data}")
+                last_updated = None  # Handle invalid datetime format
+        
+        return cls(
+            symbol=data['symbol'],
+            name=data['name'],
+            market_type=MarketType(data['market_type']),
+            current_price=data.get('current_price'),
+            open_price=data.get('open_price'),
+            high_price=data.get('high_price'),
+            low_price=data.get('low_price'),
+            close_price=data.get('close_price'),
+            previous_close=data.get('previous_close'),
+            volume=data.get('volume'),
+            avg_volume=data.get('avg_volume'),
+            market_cap=data.get('market_cap'),
+            change_amount=data.get('change_amount'),
+            change_percent=data.get('change_percent'),
+            technical_indicators=technical_indicators,
+            info=data.get('info', {}),
+            last_updated=last_updated,
+            data_status=DataStatus(data.get('data_status', 'valid')),
+            error_message=data.get('error_message')
+        )
+
+
+```

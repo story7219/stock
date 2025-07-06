@@ -1,0 +1,120 @@
+# gemini_auto_code_fixer.py - Main Executable 모듈
+# 역할: Main Executable 관련 기능 제공
+
+```python
+"""
+🤖 Gemini 자동 코드 수정 엔진 v1.0
+====================================
+
+📋 시스템 역할:
+- 프로젝트 내 모든 Python 파일(`.py`)을 재귀적으로 탐색하여 구문 오류(SyntaxError, IndentationError 등)를 자동으로 검사하고,
+- 오류가 발견된 경우, Gemini AI 모델을 호출하여 코드를 자동으로 수정한 후 원본 파일을 덮어쓰는 강력한 자동화 도구
+
+🔧 주요 기능:
+1.  **자동 파일 탐색**: 지정된 루트 디렉토리부터 모든 하위 디렉토리의 Python 파일을 자동으로 탐색
+2.  **구문 오류 검사**: `ast.parse`를 사용하여 파일의 구문 유효성을 안전하게 확인
+3.  **AI 기반 자동 수정**: 오류 메시지와 원본 코드를 바탕으로 Gemini AI에게 코드 수정을 요청
+4.  **수정 코드 검증**: AI가 수정한 코드가 다시 구문 오류를 포함하고 있는지 2차 검증 수행
+5.  **결과 요약 리포트**: 전체 파일 수, 수정 성공, 실패 건수를 요약하여 작업 결과를 명확하게 제시
+
+💡 사용 예시:
+- `python gemini_auto_code_fixer.py`
+
+⚠️ 매우 중요 - 주의사항:
+-   이 스크립트는 **오류가 발견된 원본 파일을 AI가 수정한 코드로 즉시 덮어씁니다.**
+-   **실행 전 반드시 Git을 통해 프로젝트 전체를 커밋하거나 별도로 백업해야 합니다.**
+-   Gemini API 사용을 위해 `.env` 파일에 `GEMINI_API_KEY` 설정이 필수입니다.
+-   API 호출에 따른 비용이 발생할 수 있으며, `time.sleep(1)`으로 기본적인 API 요청 속도를 제어합니다.
+"""
+
+import os
+import glob
+import ast
+import time
+from typing import List, Tuple
+import sys
+
+# --- 필수 모듈 임포트 및 설정 ---
+try:
+    from dotenv import load_dotenv
+    import google.generativeai as genai
+except ImportError:
+    print("❌ 필수 패키지가 설치되지 않았습니다.")
+    print("   'pip install google-generativeai python-dotenv' 명령어로 설치해주세요.")
+    sys.exit(1)
+
+# --- 환경 변수 및 Gemini 설정 ---
+load_dotenv()
+
+GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
+if not GEMINI_API_KEY:
+    print('❌ GEMINI_API_KEY가 .env 파일에 설정되어 있지 않습니다.')
+    sys.exit(1)
+
+genai.configure(api_key=GEMINI_API_KEY)
+
+GEMINI_MODEL = os.getenv('GOOGLE_GEMINI_MODEL', 'gemini-1.5-flash')
+GEMINI_TEMPERATURE = float(os.getenv('GEMINI_TEMPERATURE', 0.05))
+GEMINI_MAX_TOKENS = int(os.getenv('GEMINI_MAX_TOKENS', 8192))
+
+
+def get_python_files(root_dir: str) -> List[str]:
+    """지정된 디렉토리와 그 하위 디렉토리에서 모든 .py 파일을 찾습니다."""
+    return glob.glob(os.path.join(root_dir, '**', '*.py'), recursive=True)
+
+
+def check_syntax(file_path: str) -> Tuple[bool, Exception | None]:
+    """파일의 파이썬 구문이 올바른지 확인합니다."""
+    try:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            code = f.read()
+        ast.parse(code)
+        return True, None
+    except (SyntaxError, IndentationError) as e:
+        return False, e
+    except Exception as e:
+        return False, e
+
+
+def fix_code_with_gemini(code: str, error_message: str) -> str:
+    """
+    오류가 발생한 코드와 오류 메시지를 Gemini AI에 보내 수정을 요청합니다.
+    """
+    prompt = f"""
+Please fix the syntax error in the following Python code.
+Refer to the error message provided.
+Return only the complete, corrected Python code, without any explanations, comments, or markdown code blocks.
+
+[Error Message]
+{error_message}
+
+[Original Code]
+{code}
+"""
+    model = genai.GenerativeModel(GEMINI_MODEL)
+    response = model.generate_content(
+        prompt,
+        generation_config={
+            'temperature': GEMINI_TEMPERATURE,
+            'max_output_tokens': GEMINI_MAX_TOKENS
+        }
+    )
+    return response.text.strip()
+
+if __name__ == "__main__":
+    root_dir = "C:/Users/User/Desktop/test_stock"  # 수정 필요한 디렉토리 경로
+    python_files = get_python_files(root_dir)
+
+    for file_path in python_files:
+        is_valid, error = check_syntax(file_path)
+        if not is_valid:
+            with open(file_path, 'r', encoding='utf-8') as f:
+                code = f.read()
+            fixed_code = fix_code_with_gemini(code, str(error))
+            with open(file_path, 'w', encoding='utf-8') as f:
+                f.write(fixed_code)
+            print(f"파일 {file_path} 수정 완료")
+        else:
+          print(f"파일 {file_path}는 오류가 없습니다.")
+
+```

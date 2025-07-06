@@ -1,0 +1,85 @@
+# strategy_manager.py - Analysis Engine 모듈
+# 역할: Analysis Engine 관련 기능 제공
+
+```python
+"""
+전략 관리자 - 다양한 투자 전략을 통합 관리
+"""
+
+import asyncio
+from typing import Dict, List, Any, Optional, Type
+import pandas as pd
+from dataclasses import dataclass, field
+from datetime import datetime
+import logging
+
+from .base_strategy import BaseStrategy, StrategyResult
+from .druckenmiller_strategy import DruckenmillerStrategy
+from ..data.models import StockData, MarketType
+from ..core.cache_manager import CacheManager
+from ..core.async_executor import AsyncExecutor
+
+logger = logging.getLogger(__name__)
+
+
+@dataclass
+class StrategyAnalysisResult:
+    """전략 분석 종합 결과"""
+    market_type: MarketType
+    analysis_time: datetime
+    strategy_results: Dict[str, List[StrategyResult]] = field(default_factory=dict)
+    top_picks: List[StrategyResult] = field(default_factory=list)
+    market_summary: Dict[str, Any] = field(default_factory=dict)
+    performance_metrics: Dict[str, float] = field(default_factory=dict)
+
+
+class StrategyManager:
+    """투자 전략 통합 관리자"""
+
+    def __init__(self, cache_manager: CacheManager, async_executor: AsyncExecutor):
+        self.cache_manager = cache_manager
+        self.async_executor = async_executor
+        self.strategies: Dict[str, BaseStrategy] = {}
+        self.logger = logging.getLogger(__name__)
+
+        # 기본 전략 등록
+        self._register_default_strategies()
+
+    def _register_default_strategies(self):
+        """기본 전략들 등록"""
+        try:
+            # 드러켄밀러 전략 등록
+            druckenmiller = DruckenmillerStrategy()
+            self.register_strategy(druckenmiller)
+
+            self.logger.info(f"등록된 전략: {list(self.strategies.keys())}")
+
+        except Exception as e:
+            self.logger.error(f"기본 전략 등록 실패: {e}")
+
+    def register_strategy(self, strategy: BaseStrategy):
+        """새로운 전략 등록"""
+        if not isinstance(strategy, BaseStrategy):
+            raise ValueError("전략은 BaseStrategy를 상속해야 합니다")
+
+        self.strategies[strategy.name] = strategy
+        self.logger.info(f"전략 등록 완료: {strategy.name}")
+
+    def get_strategy(self, strategy_name: str) -> Optional[BaseStrategy]:
+        """전략 인스턴스 반환"""
+        return self.strategies.get(strategy_name)
+
+    def list_strategies(self) -> List[str]:
+        """등록된 전략 목록 반환"""
+        return list(self.strategies.keys())
+
+    async def analyze_stocks_with_strategy(
+        self,
+        stocks_data: List[StockData],
+        strategy_name: str,
+        market_type: MarketType,
+        top_n: int = 5
+    ) -> StrategyAnalysisResult:
+        """특정 전략으로 종목들 분석"""
+        # ... (이하 코드 동일)
+```

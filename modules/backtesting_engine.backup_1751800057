@@ -1,0 +1,73 @@
+"""
+📈 백테스팅 엔진 v2.0
+투자 전략 백테스트 및 성과 분석
+"""
+
+import asyncio
+import logging
+import pandas as pd
+import numpy as np
+from datetime import datetime, timedelta
+from typing import Dict, List, Any, Optional, Tuple
+from dataclasses import dataclass, asdict
+import json
+import sqlite3
+from pathlib import Path
+import yfinance as yf
+import matplotlib.pyplot as plt
+import seaborn as sns
+from scipy import stats
+import warnings
+warnings.filterwarnings('ignore')
+
+logger = logging.getLogger(__name__)
+
+@dataclass
+class BacktestConfig:
+    """백테스트 설정"""
+    start_date: str
+    end_date: str
+    initial_capital: float = 10000000  # 초기 자본 1천만원
+    commission: float = 0.0015  # 수수료 0.15%
+    slippage: float = 0.001  # 슬리피지 0.1%
+    max_positions: int = 10  # 최대 보유 종목 수
+    rebalance_frequency: str = "weekly"  # daily, weekly, monthly
+    benchmark: str = "^KS11"  # 코스피 지수
+
+@dataclass
+class Trade:
+    """거래 기록"""
+    symbol: str
+    entry_date: datetime
+    exit_date: Optional[datetime]
+    entry_price: float
+    exit_price: Optional[float]
+    quantity: int
+    trade_type: str  # BUY, SELL
+    strategy: str
+    pnl: Optional[float] = None
+    pnl_pct: Optional[float] = None
+
+@dataclass
+class PerformanceMetrics:
+    """성과 지표"""
+    total_return: float
+    annual_return: float
+    volatility: float
+    sharpe_ratio: float
+    max_drawdown: float
+    win_rate: float
+    profit_factor: float
+    total_trades: int
+    avg_trade_return: float
+    best_trade: float
+    worst_trade: float
+    calmar_ratio: float
+    sortino_ratio: float
+    beta: float
+    alpha: float
+    information_ratio: float
+
+
+class BacktestingEngine:
+    # ... (rest of the code)

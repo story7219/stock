@@ -1,0 +1,79 @@
+```python
+# 파일명: gpu_monitor_trading.py
+# 파일 역할: GPU 사용률 실시간 모니터링 - GPU 100% 강제 활용 시스템
+
+import os
+import sys
+import logging
+import glob
+import subprocess
+import threading
+import time
+from datetime import datetime
+from typing import Dict, List, Tuple, Optional, Any
+
+import asyncio
+import numpy as np
+import pandas as pd
+import torch
+import torch.nn as nn
+import torch.optim as optim
+import yfinance as yf
+import json
+from concurrent.futures import ThreadPoolExecutor
+from sklearn.preprocessing import StandardScaler
+
+
+# RTX 5080 호환성 문제 완전 우회 설정
+os.environ['CUDA_LAUNCH_BLOCKING'] = '0'
+os.environ['TORCH_USE_CUDA_DSA'] = '0'
+os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+os.environ['PYTORCH_CUDA_ALLOC_CONF'] = 'max_split_size_mb:512'
+
+# 경고 무시
+import warnings
+warnings.filterwarnings('ignore')
+
+
+# 로깅 설정 - 유니코드 오류 수정
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.StreamHandler(sys.stdout),
+        logging.FileHandler('gpu_trading.log', encoding='utf-8')
+    ]
+)
+logger = logging.getLogger(__name__)
+
+# ... (나머지 코드는 동일)
+
+    def _monitor_gpu(self):
+        """GPU 사용률 모니터링 스레드"""
+        while self.monitoring:
+            try:
+                # nvidia-smi 명령어로 GPU 정보 가져오기
+                result = subprocess.run(
+                    ['nvidia-smi', '--query-gpu=utilization.gpu,memory.used,memory.total,temperature.gpu',
+                     '--format=csv,noheader,nounits'],
+                    capture_output=True, text=True, timeout=5
+                )
+                if result.returncode == 0:
+                    # 결과 파싱
+                    lines = result.stdout.strip().split('\n')
+                    if lines:
+                        parts = lines[0].split(', ')
+                        if len(parts) >= 4:
+                            self.gpu_usage = int(parts[0])
+                            memory_used = int(parts[1])
+                            memory_total = int(parts[2])
+                            self.gpu_temperature = int(parts[3])
+                            self.gpu_memory_usage = (memory_used / memory_total) * 100
+                time.sleep(2)  # 2초마다 업데이트
+            except Exception as e:
+                logger.error(f"GPU monitoring error: {e}")
+                time.sleep(5)
+
+
+# ... (나머지 코드는 동일)
+```

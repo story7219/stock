@@ -1,0 +1,125 @@
+```python
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+이 파일은 샘플 에러 로그, 성능 데이터, 반복 오류 패턴을 자동으로
+생성하는 스크립트입니다.
+
+- logs/fix_history.log: 다양한 에러 유형과 수정 이력 샘플 로그를
+생성합니다.
+- performance_data/error_fix_details_YYYYMMDD.csv: 에러 수정
+성능 데이터 샘플을 생성합니다.
+- 반복 오류 패턴: 특정 파일에 반복적으로 발생하는 에러 패턴을
+추가하여, 시스템의 패턴 인식 및 최적화 테스트에 활용할 수
+있습니다.
+
+테스트 및 최적화, AI 분석 시스템의 로그 기반 기능 검증 등에
+사용할 수 있습니다.
+
+실행 예시:
+    python generate_sample_logs.py
+"""
+import json
+import csv
+import random
+from datetime import datetime, timedelta
+from pathlib import Path
+
+# 프로젝트 루트 경로 설정
+project_root = Path(__file__).resolve().parent
+
+
+def generate_sample_logs():
+    """
+    샘플 로그 데이터 및 성능 데이터, 반복 오류 패턴을 생성하는
+    함수
+    """
+
+    # logs 디렉토리 생성 (존재하지 않으면 생성)
+    log_dir = project_root / 'logs'
+    log_dir.mkdir(parents=True, exist_ok=True)
+
+    # performance_data 디렉토리 생성 (존재하지 않으면 생성)
+    perf_dir = project_root / 'performance_data'
+    perf_dir.mkdir(parents=True, exist_ok=True)
+
+    # 1. fix_history.log 생성
+    fix_history_file = log_dir / 'fix_history.log'
+
+    error_types = ['SyntaxError', 'IndentationError',
+                   'ImportError', 'AttributeError', 'TypeError']
+    actions = ['fix_syntax_error', 'fix_indentation_error',
+               'add_import', 'add_none_check', 'type_conversion']
+    files = ['main.py', 'utils.py', 'analyzer.py',
+             'processor.py', 'config.py']
+
+    with open(fix_history_file, 'w', encoding='utf-8') as f:
+        for i in range(200):
+            timestamp = datetime.now() - timedelta(
+                days=random.randint(0, 30))
+            error_type = random.choice(error_types)
+            action = random.choice(actions)
+            success = random.random() > 0.3
+            record = {
+                'timestamp': timestamp.isoformat(),
+                'file_path': random.choice(files),
+                'error_type': error_type,
+                'error_line': random.randint(1, 100),
+                'error_message': f'Sample {error_type} message',
+                'action': action,
+                'success': success,
+                'code_changed': success
+            }
+            f.write(f"[{timestamp}] {json.dumps(record)}\n")
+    print(f"✅ {fix_history_file} 생성 완료")
+
+    # 2. 성능 데이터 CSV 생성
+    csv_file = perf_dir / f'error_fix_details_{datetime.now().strftime("%Y%m%d")}.csv'
+    with open(csv_file, 'w', newline='', encoding='utf-8') as f:
+        headers = [
+            'session_id', 'timestamp', 'file_path', 'file_size',
+            'error_type', 'error_message', 'error_line', 'fix_method',
+            'success', 'processing_time', 'api_used', 'retry_count',
+            'complexity_level', 'confidence_score'
+        ]
+        writer = csv.writer(f)
+        writer.writerow(headers)
+        methods = ['local', 'api', 'batch']
+        complexity_levels = ['low', 'medium', 'high']
+        for i in range(300):
+            method = random.choice(methods)
+            success = random.random() > 0.2
+            processing_time = (
+                random.uniform(0.1, 0.5) if method == 'local'
+                else random.uniform(1.0, 3.0) if method == 'api'
+                else random.uniform(0.5, 2.0)
+            )
+            row = [
+                'session_001',
+                timestamp.isoformat(),
+                random.choice(files),
+                random.randint(1000, 50000),
+                random.choice(error_types),
+                'Sample error message',
+                random.randint(1, 200),
+                method,
+                success,
+                round(processing_time, 3),
+                method == 'api',
+                random.randint(0, 2),
+                random.choice(complexity_levels),
+                round(random.uniform(0.5, 1.0), 2)
+            ]
+            writer.writerow(row)
+    print(f"✅ {csv_file} 생성 완료")
+
+    # 3. 반복 오류 패턴 추가
+    # ... (나머지 코드)
+
+    print("\n📊 샘플 로그 데이터 생성 완료!")
+    print("   이제 log_based_optimizer.py를 실행하여 최적화를 수행할 수 있습니다.")
+
+
+if __name__ == "__main__":
+    generate_sample_logs()
+```

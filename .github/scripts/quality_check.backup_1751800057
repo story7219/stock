@@ -1,0 +1,80 @@
+```python
+import logging
+import sys
+import os
+import re
+import time
+import json
+import subprocess
+from pathlib import Path
+from typing import List, Dict, Any, Optional
+from dataclasses import dataclass, field
+from concurrent.futures import ThreadPoolExecutor
+import asyncio
+
+# 로깅 설정
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
+
+@dataclass
+class QualityResult:
+    """품질 검사 결과"""
+    tool_name: str
+    passed: bool
+    score: float
+    issues: List[Dict[str, Any]] = field(default_factory=list)
+    warnings: List[str] = field(default_factory=list)
+    execution_time: float = 0.0
+    output: str = ""
+
+
+@dataclass
+class QualityReport:
+    """전체 품질 리포트"""
+    overall_score: float
+    passed: bool
+    results: List[QualityResult] = field(default_factory=list)
+    summary: Dict[str, Any] = field(default_factory=dict)
+    recommendations: List[str] = field(default_factory=list)
+    execution_time: float = 0.0
+
+
+class InvestmentSystemQualityChecker:
+    """투자 분석 시스템 품질 검사기"""
+    def __init__(self, project_root: Optional[Path] = None):
+        self.project_root = project_root or Path(__file__).parent.parent.parent
+        self.src_path = self.project_root / "src"
+        self.config_path = self.project_root / "config"
+        self.quality_standards = {
+            'pylint_min_score': 8.0,
+            'coverage_min_percent': 80.0,
+            'complexity_max': 10,
+            'line_length_max': 88,
+            'function_length_max': 50,
+            'class_length_max': 200
+        }
+        self.python_files = self._get_python_files()
+        self.investment_rules = {
+            'required_modules': ['yfinance', 'pandas', 'numpy', 'ta',
+                                 'google-generativeai', 'aiohttp'],
+            'required_functions': {
+                'strategy': ['analyze', 'get_strategy_type'],
+                'data_collector': ['collect_market_data', 'get_stock_data'],
+                'ai_analyzer': ['analyze_recommendations'],
+            },
+            'security_patterns': [
+                r'api_key\s*=\s*["\"][^"\"]+["\"]',
+                r'password\s*=\s*["\"][^"\"]+["\"]',
+                r'secret\s*=\s*["\"][^"\"]+["\"]'
+            ]
+        }
+
+    def _get_python_files(self) -> List[Path]:
+        """프로젝트 디렉토리 내의 Python 파일 목록을 반환합니다."""
+        python_files = []
+        for path in self.src_path.rglob('*.py'):
+            python_files.append(path)
+        return python_files
+
+    # ... (나머지 코드 생략)
+```

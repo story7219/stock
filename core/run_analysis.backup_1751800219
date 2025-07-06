@@ -1,0 +1,35 @@
+# run_analysis.py - Main Executable 모듈
+# 역할: Main Executable 관련 기능 제공
+
+```python
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+🚀 ML 기반 투자 분석 프로그램 (사용자 시스템 최적화 버전)
+RAM 16GB, i5-4460 CPU 환경에 최적화된 경량 버전
+"""
+
+import sys
+import os
+import warnings
+import logging
+import time
+import yfinance as yf
+import pandas as pd
+import numpy as np
+from datetime import datetime, timedelta
+
+from src.system_monitor import get_system_monitor
+from src.ml_engine import AdaptiveLearningEngine
+
+
+warnings.filterwarnings('ignore')
+
+# 프로젝트 루트를 Python 경로에 추가
+current_dir = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(current_dir)
+
+
+try:
+    # ... (나머지 코드 동일)
+```

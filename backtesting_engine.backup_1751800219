@@ -1,0 +1,56 @@
+# backtesting_engine.py - Test 모듈
+# 역할: Test 관련 기능 제공
+
+```python
+# 파일명: backtesting_engine.py
+# 파일 역할: 실전매매 전 백테스팅을 위한 고성능 엔진
+
+import asyncio
+import logging
+import sqlite3
+import json
+import time
+from datetime import datetime, timedelta
+from typing import Dict, List, Tuple, Optional, Any
+from dataclasses import dataclass
+from concurrent.futures import ThreadPoolExecutor
+import numpy as np
+import pandas as pd
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+import matplotlib.pyplot as plt
+import seaborn as sns
+from pathlib import Path
+import os
+
+# 로깅 설정
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler('logs/backtesting.log'),
+        logging.StreamHandler()
+    ]
+)
+logger = logging.getLogger(__name__)
+
+@dataclass
+class Trade:
+    """거래 데이터 클래스"""
+    entry_time: datetime
+    exit_time: datetime
+    symbol: str
+    entry_price: float
+    exit_price: float
+    quantity: int
+    trade_type: str  # 'buy', 'sell'
+    profit_loss: float
+    profit_loss_pct: float
+    signal_confidence: float
+    market_condition: str
+
+
+@dataclass
+class BacktestResult:
+    """백테스트 결과 데이터 클래스"""
+    # ... (이전 코드 동일)
+```

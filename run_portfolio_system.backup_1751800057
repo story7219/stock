@@ -1,0 +1,131 @@
+```python
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+🚀 포트폴리오 자동매매 시스템 실행 스크립트
+==========================================
+
+파일명: run_portfolio_system.py
+역할: 자본금 5억 국내/해외 반분할 자동매매 시스템 실행
+- 환경 설정 및 초기화
+- 로그 디렉토리 생성
+- 시스템 실행 및 모니터링
+- 에러 처리 및 복구
+"""
+
+import asyncio
+import logging
+import os
+import sys
+from pathlib import Path
+from datetime import datetime
+import traceback
+
+# 프로젝트 루트를 Python 경로에 추가
+project_root = Path(__file__).parent
+sys.path.insert(0, str(project_root))
+
+try:
+    from auto_trading_portfolio_system import PortfolioTradingSystem
+except ImportError as e:
+    print(f"❌ 모듈 임포트 실패: {e}")
+    print("필요한 모듈을 설치하거나 경로를 확인해주세요.")
+    sys.exit(1)
+
+def setup_environment():
+    """환경 설정"""
+    print("🔧 환경 설정 시작...")
+    
+    # 로그 디렉토리 생성
+    log_dir = Path("logs")
+    log_dir.mkdir(exist_ok=True)
+    print(f"✅ 로그 디렉토리 생성: {log_dir}")
+    
+    # 데이터 디렉토리 생성
+    data_dir = Path("data")
+    data_dir.mkdir(exist_ok=True)
+    print(f"✅ 데이터 디렉토리 생성: {data_dir}")
+    
+    # 환경변수 확인
+    required_env_vars = [
+        'LIVE_KIS_APP_KEY',
+        'LIVE_KIS_APP_SECRET',
+        'LIVE_KIS_ACCOUNT_NUMBER',
+        'GEMINI_API_KEY'
+    ]
+    
+    missing_vars = [var for var in required_env_vars if not os.getenv(var)]
+    
+    if missing_vars:
+        print(f"⚠️ 누락된 환경변수: {', '.join(missing_vars)}")
+        print("env.example 파일을 참고하여 .env 파일을 설정해주세요.")
+        return False
+    
+    print("✅ 환경 설정 완료")
+    return True
+
+def setup_logging():
+    """로깅 설정"""
+    log_file = f"logs/portfolio_system_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
+    
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        handlers=[
+            logging.FileHandler(log_file, encoding='utf-8'),
+            logging.StreamHandler()
+        ]
+    )
+    
+    logger = logging.getLogger(__name__)
+    logger.info("🚀 포트폴리오 자동매매 시스템 시작")
+    logger.info(f"📝 로그 파일: {log_file}")
+    
+    return logger
+
+async def run_system():
+    """시스템 실행"""
+    logger = logging.getLogger(__name__)
+    try:
+        # ... (중략) 실제 시스템 로직 추가될 위치
+        pass
+    except KeyboardInterrupt:
+        logger.info("⏹️ 사용자에 의해 시스템 중단")
+    except Exception as e:
+        logger.error(f"❌ 시스템 실행 중 오류 발생: {e}")
+        logger.error(f"상세 오류: {traceback.format_exc()}")
+        raise
+
+async def main():
+    """메인 함수"""
+    print("=" * 60)
+    print("🚀 자본금 5억 국내/해외 반분할 자동매매 시스템")
+    print("=" * 60)
+    
+    # 환경 설정
+    if not setup_environment():
+        print("❌ 환경 설정 실패")
+        return
+    
+    # 로깅 설정
+    logger = setup_logging()
+    
+    try:
+        # 시스템 실행
+        await run_system()
+    except Exception as e:
+        logger.error(f"❌ 시스템 실행 실패: {e}")
+        print(f"❌ 시스템 실행 실패: {e}")
+    finally:
+        logger.info("🏁 시스템 종료")
+        print("🏁 시스템 종료")
+
+if __name__ == "__main__":
+    try:
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        print("\n⏹️ 사용자에 의해 프로그램 중단")
+    except Exception as e:
+        print(f"❌ 프로그램 실행 실패: {e}")
+        sys.exit(1)
+```

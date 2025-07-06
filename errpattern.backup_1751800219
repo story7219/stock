@@ -1,0 +1,53 @@
+# errpattern.py - Test 모듈
+# 역할: Test 관련 기능 제공
+
+```python
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+이 파일은 로그 파일(예: ai_automation.log)을 분석하여 다양한 오류
+패턴을 자동으로 식별하고, 통계 리포트를 생성하는 스크립트입니다.
+
+- 로그 파일에서 모든 오류 메시지를 추출하여 총 발생 횟수와
+  고유 패턴 수를 계산합니다.
+- 오류를 유형별(구문, 들여쓰기, 괄호, 임포트, 속성, 타입 등)로
+  자동 분류하고, 분포를 시각화합니다.
+- 가장 빈번하게 발생하는 상위 오류 패턴, 오류가 많은 코드 라인,
+  파일, 시간대를 분석하여 리포트합니다.
+- 분석 결과를 JSON 파일로 저장하고, 패턴 기반의 개선 방안
+  (예: 들여쓰기 수정 강화, 코드 검증 추가 등)을 제안합니다.
+- 데이터 품질(충분성, 다양성, 분포 등)을 평가하여 분석 결과의
+  신뢰도를 제공합니다.
+
+시스템의 취약점을 파악하고, 우선적으로 개선할 영역을 찾는 데
+활용할 수 있습니다.
+
+실행 예시:
+    python analyze_error_patterns.py
+"""
+
+import re
+import json
+from collections import Counter
+from datetime import datetime
+import os
+
+
+def analyze_error_patterns(log_file='ai_automation.log'):
+    """로그 파일에서 오류 패턴 분석"""
+
+    print("🔍 오류 패턴 분석 시작...")
+
+    # 로그 파일 읽기
+    try:
+        with open(log_file, 'r', encoding='utf-8') as f:
+            content = f.read()
+    except FileNotFoundError as e:
+        print(f"❌ 로그 파일({log_file})을 찾을 수 없습니다.")
+        return
+    except Exception as e:
+        print(f"❌ 로그 파일 읽기 실패: {e}")
+        return
+
+    # ... (나머지 코드는 동일)
+```

@@ -1,0 +1,94 @@
+```python
+# unified_signal_generator.py
+# ML, DL, Gemini AI 신호를 상호보완으로 결합하여 실전매매 신호를 생성하는 모듈
+# 각 AI의 장점만을 활용하여 효율적이고 안전한 매매 신호 생성
+
+import asyncio
+import logging
+from typing import Dict, List, Any, Optional, Tuple, Union, Callable
+from dataclasses import dataclass, field
+from datetime import datetime
+import json
+from pathlib import Path
+import pickle
+import numpy as np
+from concurrent.futures import ThreadPoolExecutor
+import time
+
+logger = logging.getLogger(__name__)
+
+@dataclass
+class SignalResult:
+    """신호 결과 데이터 클래스"""
+    symbol: str
+    timestamp: datetime
+    ml_signal: float = 0.0
+    dl_signal: float = 0.0
+    gemini_signal: float = 0.0
+    combined_signal: float = 0.0
+    decision: str = "관망"
+    confidence: float = 0.0
+    features: Dict[str, Any] = field(default_factory=dict)
+    metadata: Dict[str, Any] = field(default_factory=dict)
+
+@dataclass
+class SignalWeights:
+    """신호 가중치 설정"""
+    ml_weight: float = 0.4      # ML: 수치 데이터 기반 예측
+    dl_weight: float = 0.3      # DL: 뉴스/이미지/복잡 패턴
+    gemini_weight: float = 0.3  # Gemini: 뉴스/공시/시장심리
+    threshold: float = 0.6      # 매수 임계값
+    min_confidence: float = 0.5 # 최소 신뢰도
+
+
+# ... (이전 코드 생략)
+
+
+    async def generate_unified_signal(
+        self,
+        symbol: str,
+        technical_data: Dict[str, Any],
+        news: List[str],
+        financial_data: Dict[str, Any],
+        images: Optional[List[str]] = None
+    ) -> SignalResult:
+        """
+        통합 신호 생성 (메인 함수)
+        입력: 종목명, 기술적 데이터, 뉴스, 재무 데이터, 이미지(선택)
+        출력: SignalResult 객체
+        예외: 모든 오류 상황에 대해 안전한 기본값 반환
+        """
+        try:
+            # ... (중간 코드 생략)
+            start_time = time.time()
+            # ... (중간 코드 생략)
+
+            result = SignalResult(
+                symbol=symbol,
+                timestamp=datetime.now(),
+                ml_signal=ml_signal,
+                dl_signal=dl_signal,
+                gemini_signal=gemini_signal,
+                combined_signal=combined_signal,
+                decision=decision,
+                confidence=confidence,
+                features={
+                    'technical': technical_data,
+                    'news_count': len(news),
+                    'financial': financial_data
+                },
+                metadata={
+                    'processing_time': time.time() - start_time,
+                    'weights': {
+                        'ml': self.weights.ml_weight,
+                        'dl': self.weights.dl_weight,
+                        'gemini': self.weights.gemini_weight
+                    }
+                }
+            )
+            # ... (나머지 코드 생략)
+        except Exception as e:
+            # ... (에러 처리 코드 생략)
+            logger.error(f"Error generating signal: {e}")
+            return SignalResult(symbol=symbol, timestamp=datetime.now(), ml_signal=0.0, dl_signal=0.0, gemini_signal=0.0, combined_signal=0.0, decision="error", confidence=0.0)
+```

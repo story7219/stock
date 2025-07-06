@@ -1,0 +1,81 @@
+# schedule.py - Test 모듈
+# 역할: Test 관련 기능 제공
+
+```python
+# 파일명: schedule.py
+# 역할: 자동 스케줄러 시스템 모듈
+# - 시간 기반 투자 분석, 학습, 시스템 진화 자동 실행
+# - 지능형 작업 관리 및 적응형 스케줄링
+# - 모니터링 및 로깅 시스템
+
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+⏰ 자동 스케줄러 시스템 (Automatic Scheduler System)
+=================================================
+
+시간 기반으로 투자 분석, 학습, 시스템 진화를 자동 실행하는 지능형 스케줄러입니다.
+사용자의 개입 없이 시스템이 자동으로 운영되도록 설계되었습니다.
+
+주요 기능:
+1. 시간 기반 자동 실행 (Time-based Automation)
+   - 매일 장 시작 전 분석 (09:00)
+   - 시간당 실시간 모니터링 (평일 09:00-18:00)
+   - 주간 모델 재학습 (일요일 02:00)
+   - 매일 성능 진화 체크 (22:00)
+   - 5분마다 시스템 헬스 체크
+
+2. 지능형 작업 관리 (Intelligent Task Management)
+   - 시스템 리소스 상태 확인 후 실행
+   - 작업 우선순위 및 의존성 관리
+   - 동시 실행 작업 수 제한
+   - 작업 타임아웃 및 실패 처리
+
+3. 적응형 스케줄링 (Adaptive Scheduling)
+   - 시장 상황에 따른 분석 빈도 조정
+   - 성능 저하 시 자동 복구 작업 실행
+   - 리소스 사용량에 따른 작업 지연/가속
+   - 사용자 설정에 따른 커스텀 스케줄
+
+4. 모니터링 및 로깅 (Monitoring & Logging)
+   - 모든 작업 실행 이력 추적
+   - 성공/실패 통계 관리
+   - 시스템 상태 실시간 모니터링
+   - 자동 오류 복구 시도
+
+5. 설정 관리 (Configuration Management)
+   - JSON 기반 스케줄 설정 저장/로드
+   - 동적 작업 추가/제거/수정
+   - 작업 활성화/비활성화 제어
+   - 실행 시간 및 매개변수 조정
+
+스케줄 유형:
+- daily: 매일 특정 시간 실행
+- weekly: 매주 특정 요일/시간 실행
+- hourly: 매시간 또는 특정 시간대 실행
+- interval: 지정된 분 간격으로 실행
+
+주요 자동 작업:
+1. 일일 시장 분석: 전체 시장 종합 분석
+2. 실시간 모니터링: 급변하는 시장 상황 감지
+3. 주간 모델 재학습: ML 모델 성능 개선
+4. 진화 체크: 시스템 자동 개선 기회 탐지
+5. 헬스 체크: 시스템 안정성 모니터링
+
+이 스케줄러는 투자 분석 시스템을 24/7 자동 운영하여
+사용자가 항상 최신의 분석 결과를 받을 수 있도록 합니다.
+"""
+
+import asyncio
+import logging
+import time
+import threading
+from datetime import datetime, timedelta
+from typing import Dict, List, Any, Optional, Callable
+from dataclasses import dataclass
+import json
+import os
+
+
+# ... (나머지 코드는 동일)
+```

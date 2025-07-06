@@ -1,0 +1,74 @@
+# portfolio_manager.py - Test 모듈
+# 역할: Test 관련 기능 제공
+
+```python
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+# 파일명: portfolio_manager.py
+# 역할: 포트폴리오 관리 및 리스크 분석을 담당하는 모듈
+# - 포트폴리오 구성, 자산 배분, 리스크 측정
+# - 실시간 포지션 추적 및 성과 분석
+# - 리밸런싱 및 최적화 기능
+
+"""
+💼 포트폴리오 관리 시스템 v1.0
+포트폴리오 최적화 및 리스크 관리
+"""
+
+import asyncio
+import logging
+import pandas as pd
+import numpy as np
+from datetime import datetime, timedelta
+from typing import Dict, List, Any, Optional, Tuple
+from dataclasses import dataclass, asdict, field
+import json
+import sqlite3
+from pathlib import Path
+from scipy.optimize import minimize
+from scipy import stats
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.covariance import LedoitWolf
+import warnings
+import yfinance as yf  # 추가
+warnings.filterwarnings('ignore')
+
+logger = logging.getLogger(__name__)
+
+# ... (이전 코드)
+
+    async def _execute_rebalancing(self, old_weights: Dict[str, float], 
+                                 new_weights: Dict[str, float]) -> List[Dict[str, Any]]:
+        """리밸런싱 실행"""
+        trades = []
+        total_value = sum(pos.market_value for pos in self.positions.values())
+        
+        for symbol, new_weight in new_weights.items():
+            if symbol in old_weights:
+                old_weight = old_weights[symbol]
+                weight_diff = new_weight - old_weight
+                
+                if abs(weight_diff) > self.config['rebalance_threshold']:
+                    target_value = new_weight * total_value
+                    current_value = self.positions[symbol].market_value
+                    trade_value = target_value - current_value
+                    
+                    if trade_value > 0:
+                        action = "BUY"
+                        quantity = int(trade_value / self.positions[symbol].current_price)
+                    else:
+                        action = "SELL"
+                        quantity = int(abs(trade_value) / self.positions[symbol].current_price)
+                    
+                    trades.append({
+                        "symbol": symbol,
+                        "action": action,
+                        "quantity": quantity,
+                        "price": self.positions[symbol].current_price,
+                        "value": trade_value
+                    })
+        
+        return trades
+# ... (나머지 코드)
+```

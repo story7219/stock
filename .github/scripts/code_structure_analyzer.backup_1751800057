@@ -1,0 +1,108 @@
+```python
+"""
+🏗️ 코드 구조 분석기
+프로젝트의 코드 구조를 분석하고 아키텍처 품질을 평가하는 도구
+"""
+
+import os
+import sys
+import json
+import ast
+import logging
+from pathlib import Path
+from typing import Dict, List, Any, Set, Tuple
+from datetime import datetime
+from collections import defaultdict, Counter
+import re
+
+# 로깅 설정
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
+
+class CodeStructureAnalyzer:
+    """코드 구조 분석기"""
+    
+    def __init__(self, project_root: str = "."):
+        self.project_root = Path(project_root)
+        self.analysis_result = {
+            'timestamp': datetime.now().isoformat(),
+            'project_root': str(self.project_root),
+            'modules': {},
+            'dependencies': {},
+            'metrics': {},
+            'issues': [],
+            'recommendations': []
+        }
+        
+        logger.info(f"🏗️ 코드 구조 분석기 초기화 (프로젝트: {self.project_root})")
+    
+    def analyze_file_structure(self) -> Dict[str, Any]:
+        """파일 구조 분석"""
+        logger.info("📁 파일 구조 분석 중...")
+        
+        structure = {
+            'total_files': 0,
+            'python_files': 0,
+            'test_files': 0,
+            'config_files': 0,
+            'documentation_files': 0,
+            'directories': [],
+            'file_types': Counter(),
+            'largest_files': [],
+            'empty_files': []
+        }
+        
+        for file_path in self.project_root.rglob('*'):
+            if file_path.is_file():
+                structure['total_files'] += 1
+                
+                suffix = file_path.suffix.lower()
+                structure['file_types'][suffix] += 1
+                
+                file_size = file_path.stat().st_size
+                
+                if suffix == '.py':
+                    structure['python_files'] += 1
+                    if 'test' in file_path.name.lower() or \
+                       file_path.parent.name == 'tests':
+                        structure['test_files'] += 1
+                    if file_size == 0:
+                        structure['empty_files'].append(
+                            str(file_path.relative_to(self.project_root))
+                        )
+                    structure['largest_files'].append({
+                        'file': str(file_path.relative_to(self.project_root)),
+                        'size': file_size,
+                        'lines': self._count_lines(file_path)
+                    })
+                elif suffix in ['.ini', '.conf', '.cfg', '.json', '.yaml',
+                               '.yml', '.toml']:
+                    structure['config_files'] += 1
+                elif suffix in ['.md', '.rst', '.txt']:
+                    structure['documentation_files'] += 1
+            elif file_path.is_dir():
+                structure['directories'].append(
+                    str(file_path.relative_to(self.project_root))
+                )
+        
+        structure['largest_files'] = sorted(
+            structure['largest_files'],
+            key=lambda x: x['size'],
+            reverse=True
+        )[:10]
+        
+        return structure
+    
+    def _count_lines(self, file_path: Path) -> int:
+        """파일의 라인 수 계산"""
+        try:
+            with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+                return len(f.readlines())
+        except Exception as e:
+            logger.error(f"파일 읽기 오류: {file_path}, 에러: {e}")
+            return 0
+    # ... (나머지 코드 생략)
+```

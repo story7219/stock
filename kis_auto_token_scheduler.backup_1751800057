@@ -1,0 +1,67 @@
+```python
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+🕰️ KIS API 토큰 자동 스케줄러 v1.0
+=====================================
+
+매일 아침 7시에 자동으로 토큰 발급 및 갱신
+- 토큰 만료 시간 추적
+- 자동 갱신 스케줄링
+- 실패 시 재시도 로직
+- 텔레그램 알림
+- 24시간 모니터링
+"""
+
+import os
+import json
+import time
+import logging
+import asyncio
+import schedule
+import requests
+import aiohttp
+from datetime import datetime, timedelta
+from typing import Dict, List, Any, Optional
+import threading
+from dataclasses import dataclass, asdict
+import sqlite3
+
+# 로깅 설정
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler('token_scheduler.log', encoding='utf-8'),
+        logging.StreamHandler()
+    ]
+)
+logger = logging.getLogger(__name__)
+
+@dataclass
+class TokenScheduleInfo:
+    """토큰 스케줄 정보"""
+    token: str
+    token_type: str
+    expires_in: int
+    issued_at: datetime
+    next_refresh: datetime
+    refresh_count: int = 0
+
+    @property
+    def is_expired(self) -> bool:
+        """토큰 만료 여부 (만료 30분 전 갱신)"""
+        return datetime.now() >= (self.issued_at +
+                                 timedelta(seconds=self.expires_in - 1800))
+
+    @property
+    def time_until_expiry(self) -> timedelta:
+        """만료까지 남은 시간"""
+        return (self.issued_at +
+                timedelta(seconds=self.expires_in)) - datetime.now()
+
+
+class KISTokenScheduler:
+    """KIS API 토큰 자동 스케줄러"""
+    # ... (나머지 코드 동일)
+```
