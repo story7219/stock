@@ -1,0 +1,78 @@
+# dashboard_main.py - Main Executable 모듈
+# 역할: Main Executable 관련 기능 제공
+
+```python
+# 🚀 주식선물 자동매매 봇 메인 실행 파일
+# - 실시간 데이터, 전략 통합, 포지션/리스크 관리, 대시보드, 백테스트 등 포함
+import os
+import time
+import json
+import threading
+import pandas as pd
+import numpy as np
+import yfinance as yf
+import streamlit as st
+from datetime import datetime, timedelta
+from analysis.market_analyzer import MarketAnalyzer
+from analysis.strategy_manager import StrategyManager
+from analysis.strategies import TraditionalStrategy, MLStrategy
+
+# 설정 로드
+CONFIG_PATH = os.path.join(os.path.dirname(__file__), '../configs/config.json')
+try:
+    with open(CONFIG_PATH, encoding='utf-8') as f:
+        config = json.load(f)
+except FileNotFoundError:
+    st.error(f"설정 파일 '{CONFIG_PATH}'를 찾을 수 없습니다.")
+    exit()
+except json.JSONDecodeError as e:
+    st.error(f"설정 파일 '{CONFIG_PATH}'의 JSON 형식 오류: {e}")
+    exit()
+
+
+SYMBOL = config['symbol']
+CAPITAL = config['capital']
+MAX_LOSS_PCT = config['max_loss_pct']
+TAKE_PROFIT_PCT = config['take_profit_pct']
+INTERVAL = config['interval']
+DASHBOARD_PORT = config['dashboard_port']
+
+# 백테스트 기간: 2000-01-01 ~ 오늘
+BACKTEST_START = '2000-01-01'
+BACKTEST_END = datetime.now().strftime('%Y-%m-%d')
+COMMISSION = 0.0005  # 0.05%
+
+# 전략/분석 인스턴스
+market_analyzer = MarketAnalyzer()
+strategy_manager = StrategyManager()
+trad_strategy = TraditionalStrategy()
+ml_strategy = MLStrategy()
+
+# 거래/포지션 관리 변수
+position = None
+trade_log = []
+max_drawdown = 0
+
+# yfinance 데이터 수집 (API 실패시 재시도, 데이터 없을 때 예외처리)
+def fetch_realtime_data(symbol: str, start: str = BACKTEST_START, end: str = BACKTEST_END,
+                        interval: str = INTERVAL, max_retry: int = 3) -> pd.DataFrame:
+    for attempt in range(max_retry):
+        try:
+            df = yf.download(symbol, start=start, end=end,
+                             interval=interval, progress=False)
+            if df is None or df.empty:
+                raise ValueError(f"데이터 없음: {symbol} {start}~{end}")
+            df = df.rename(columns={c: c.lower() for c in df.columns})
+            df = df.reset_index()
+            return df
+        except Exception as e:
+            if attempt < max_retry - 1:
+                time.sleep(2)
+                continue
+            else:
+                st.error(f"[API오류] 데이터 수집 실패: {e}")
+                return pd.DataFrame()
+
+
+# ... (나머지 코드는 동일)
+```

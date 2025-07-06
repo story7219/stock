@@ -1,0 +1,84 @@
+```python
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+고급 통합 분석기 - 한국어/영어 구분 처리
+한국주식/선물: 한국어 감정분석 + pykrx 데이터
+해외주식/선물: 영어 감정분석 + yfinance 데이터
+"""
+import logging
+import asyncio
+import pandas as pd
+import numpy as np
+from typing import Dict, List, Any, Optional, Tuple, Union
+from dataclasses import dataclass
+from datetime import datetime, timedelta
+import json
+import sqlite3
+from pathlib import Path
+
+# 고급 모듈들 import
+try:
+    from modules.advanced_sentiment_analyzer import AdvancedSentimentAnalyzer
+    from modules.enhanced_news_analyzer import EnhancedNewsAnalyzer
+    from data.enhanced_data_collector import EnhancedDataCollector
+    MODULES_AVAILABLE = True
+except ImportError:
+    try:
+        from advanced_sentiment_analyzer import AdvancedSentimentAnalyzer
+        from enhanced_news_analyzer import EnhancedNewsAnalyzer
+        from enhanced_data_collector import EnhancedDataCollector
+        MODULES_AVAILABLE = True
+    except ImportError:
+        MODULES_AVAILABLE = False
+
+logger = logging.getLogger(__name__)
+
+@dataclass
+class MarketAnalysisResult:
+    """시장 분석 결과"""
+    market_type: str
+    symbol: str
+    timestamp: datetime
+    
+    # 기술적 분석
+    technical_score: float  # -1 ~ 1
+    technical_signals: List[str]
+    
+    # 감정 분석
+    sentiment_score: float  # -1 ~ 1
+    sentiment_confidence: float
+    news_count: int
+    
+    # 통합 분석
+    combined_score: float  # -1 ~ 1
+    recommendation: str  # "buy", "sell", "hold"
+    confidence: float
+    risk_level: str  # "low", "medium", "high"
+    
+    # 상세 정보
+    price_data: Dict[str, Any]
+    technical_indicators: Dict[str, Any]
+    sentiment_details: Dict[str, Any]
+
+
+# ... (나머지 코드 동일)
+
+    async def analyze_market(self, symbol: str, market_type: str = "auto",
+                             days: int = 30) -> MarketAnalysisResult:
+        """
+        개별 시장 분석
+        
+        Args:
+            symbol: 분석할 심볼
+            market_type: 시장 유형 ("korean", "english", "auto")
+            days: 분석 기간
+        
+        Returns:
+            MarketAnalysisResult: 분석 결과
+        """
+        # ... (나머지 코드 동일)
+
+
+# ... (나머지 코드 동일)
+```

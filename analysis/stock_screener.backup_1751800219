@@ -1,0 +1,116 @@
+# stock_screener.py - Test 모듈
+# 역할: Test 관련 기능 제공
+
+```python
+# 파일명: stock_screener.py
+# 역할: 주식 스크리닝 모듈
+# - 다양한 조건으로 종목 필터링
+# - 투자 전략에 맞는 종목 선별
+# - 종목 순위 및 점수 계산
+
+"""
+주식 스크리닝 모듈
+
+다양한 기준으로 종목을 선별하고 순위를 매깁니다.
+기술적, 기본적 지표를 종합하여 투자 가능 종목을 추천합니다.
+"""
+
+from typing import List, Dict, Optional, Any, Callable
+from dataclasses import dataclass, field
+from datetime import datetime
+from enum import Enum, auto
+import logging
+import pandas as pd
+import numpy as np
+
+logger = logging.getLogger(__name__)
+
+# 역할: 스크리닝 기준 정의를 위한 열거형
+# 입력: 없음
+# 출력: ScreeningCriteria 열거형
+class ScreeningCriteria(Enum):
+    """스크리닝 기준"""
+    MOMENTUM = auto()  # 모멘텀
+    VALUE = auto()  # 가치
+    GROWTH = auto()  # 성장
+    QUALITY = auto()  # 퀄리티
+    VOLATILITY = auto()  # 변동성
+    VOLUME = auto()  # 거래량
+
+
+# 역할: 필터 조건을 저장하는 데이터 클래스
+# 입력: 필드명, 연산자, 값, 가중치
+# 출력: FilterCondition 인스턴스
+@dataclass
+class FilterCondition:
+    """필터 조건"""
+    field: str
+    operator: str  # '>', '<', '>=', '<=', '==', '!='
+    value: float
+    weight: float = 1.0
+
+    def apply(self, data: pd.Series) -> bool:
+        """조건 적용"""
+        if self.field not in data:
+            return False
+        field_value = data[self.field]
+        match self.operator:
+            case '>': return field_value > self.value
+            case '<': return field_value < self.value
+            case '>=': return field_value >= self.value
+            case '<=': return field_value <= self.value
+            case '==': return field_value == self.value
+            case '!=': return field_value != self.value
+            case _: return False
+
+
+# 역할: 스크리닝 전략을 저장하는 데이터 클래스
+# 입력: 전략명, 필터 조건 리스트, 정렬 기준
+# 출력: ScreeningStrategy 인스턴스
+@dataclass
+class ScreeningStrategy:
+    """스크리닝 전략"""
+    name: str
+    filters: List[FilterCondition]
+    sort_by: str
+    sort_ascending: bool = False
+    max_results: int = 20
+    min_score: float = 0.0
+
+
+# 역할: 스크리닝 결과를 저장하는 데이터 클래스
+# 입력: 심볼, 점수, 순위, 상세 점수, 통과 필터
+# 출력: ScreeningResult 인스턴스
+@dataclass
+class ScreeningResult:
+    """스크리닝 결과"""
+    symbol: str
+    name: str
+    score: float
+    rank: int
+    detail_scores: Dict[str, float]
+    passed_filters: List[str]
+    failed_filters: List[str]
+    recommendation: str
+    timestamp: datetime = field(default_factory=datetime.now)
+
+
+# 역할: 주식 스크리닝을 담당하는 메인 클래스
+# 입력: 스크리닝 설정 딕셔너리
+# 출력: StockScreener 인스턴스
+class StockScreener:
+    # ... (이전 코드 동일)
+    async def screen_stocks(self, stock_data_list: List[Dict[str, Any]],
+                          strategy_name: str) -> List[ScreeningResult]:
+        """
+        주식 스크리닝 실행
+        
+        Args:
+            stock_data_list: 주식 데이터 리스트
+            strategy_name: 사용할 전략명
+            
+        Returns:
+            스크리닝 결과 리스트
+        """
+        # ... (이전 코드 동일)
+```

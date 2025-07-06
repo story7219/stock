@@ -1,0 +1,75 @@
+```python
+"""
+분석 엔진 패키지 (Analysis Engine Package)
+=========================================
+
+투자 분석 시스템의 핵심 분석 기능을 담당하는 패키지입니다.
+현재는 기본 구조만 정의되어 있으며, 향후 확장 가능한 분석 모듈들이 추가될 예정입니다.
+
+계획된 분석 모듈:
+1. 기술적 분석 (Technical Analysis)
+   - 차트 패턴 인식
+   - 지지/저항선 분석
+   - 거래량 분석
+   - 모멘텀 분석
+
+2. 기본적 분석 (Fundamental Analysis)
+   - 재무제표 분석
+   - 밸류에이션 모델
+   - 산업 분석
+   - 경제 지표 분석
+
+3. 정량적 분석 (Quantitative Analysis)
+   - 통계적 모델링
+   - 위험 관리 모델
+   - 포트폴리오 최적화
+   - 백테스팅 분석
+
+4. 시장 분석 (Market Analysis)
+   - 시장 심리 분석
+   - 섹터 로테이션 분석
+   - 상관관계 분석
+   - 변동성 분석
+
+현재 분석 기능은 주로 modules 패키지에 구현되어 있으며,
+향후 더 전문화된 분석 도구들이 이 패키지에 추가될 예정입니다.
+
+분석 결과는 모두 core.base_interfaces의 표준 형식으로 출력되어
+시스템 내에서 일관되게 사용됩니다.
+"""
+
+try:
+    from .technical import *
+except ImportError:
+    pass
+
+try:
+    from .news_analyzer import NewsAnalyzer
+except ImportError:
+    try:
+        from analysis.news_analyzer import NewsAnalyzer
+    except ImportError:
+        NewsAnalyzer = None
+
+try:
+    from .gemini_analyzer import GeminiAnalyzer
+except ImportError:
+    try:
+        from analysis.gemini_analyzer import GeminiAnalyzer
+    except ImportError:
+        GeminiAnalyzer = None
+
+try:
+    from .analysis_manager import AnalysisManager
+except ImportError:
+    try:
+        from analysis.analysis_manager import AnalysisManager
+    except ImportError:
+        AnalysisManager = None
+
+__all__ = [
+    "NewsAnalyzer",
+    "GeminiAnalyzer",
+    "AnalysisManager",
+]
+```

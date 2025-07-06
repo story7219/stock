@@ -1,0 +1,49 @@
+# ichimoku_time_analysis.py - Test 모듈
+# 역할: Test 관련 기능 제공
+
+```python
+# 일목균형표 시간론 대등수치 분석 모듈
+# Ichimoku Time Theory and Equilibrium Analysis Module
+
+import numpy as np
+import pandas as pd
+from typing import Dict, List, Tuple, Optional
+from datetime import datetime, timedelta
+import warnings
+warnings.filterwarnings('ignore')
+
+class IchimokuTimeTheory:
+    """일목균형표 시간론 및 대등수치 분석 클래스"""
+    
+    def __init__(self):
+        """일목균형표 시간론 초기화"""
+        self.time_cycles = {
+            'daily': 26,      # 일봉 기준 26일 주기
+            'weekly': 9,      # 주봉 기준 9주 주기  
+            'monthly': 26,    # 월봉 기준 26개월 주기
+            'yearly': 9       # 년봉 기준 9년 주기
+        }
+        
+    def calculate_ichimoku_components(self, df: pd.DataFrame) -> pd.DataFrame:
+        """일목균형표 기본 구성요소 계산"""
+        try:
+            # 전환선 (Conversion Line): (9일 고가 + 9일 저가) / 2
+            df['tenkan_sen'] = (df['high'].rolling(window=9).max() + df['low'].rolling(window=9).min()) / 2
+            
+            # 기준선 (Base Line): (26일 고가 + 26일 저가) / 2
+            df['kijun_sen'] = (df['high'].rolling(window=26).max() + df['low'].rolling(window=26).min()) / 2
+            
+            # 선행스팬1 (Leading Span A): (전환선 + 기준선) / 2, 26일 앞으로 이동
+            df['senkou_span_a'] = ((df['tenkan_sen'] + df['kijun_sen']) / 2).shift(26)
+            
+            # 선행스팬2 (Leading Span B): (52일 고가 + 52일 저가) / 2, 26일 앞으로 이동
+            df['senkou_span_b'] = ((df['high'].rolling(window=52).max() + df['low'].rolling(window=52).min()) / 2).shift(26)
+            
+            # 후행스팬 (Lagging Span): 종가를 26일 뒤로 이동
+            df['chikou_span'] = df['close'].shift(-26)
+            
+            return df
+        except Exception as e:
+            print(f"일목균형표 계산 오류: {e}")
+            return df
+```

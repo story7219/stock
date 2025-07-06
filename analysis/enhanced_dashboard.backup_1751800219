@@ -1,0 +1,98 @@
+# enhanced_dashboard.py - Test 모듈
+# 역할: Test 관련 기능 제공
+
+```python
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+고급 대시보드 - 한국어/영어 구분 처리
+한국주식/선물: 한국어 인터페이스
+해외주식/선물: 영어 인터페이스
+"""
+
+import logging
+import asyncio
+import streamlit as st
+import plotly.graph_objects as go
+import plotly.express as px
+import pandas as pd
+import numpy as np
+from typing import Dict, List, Any, Optional, Tuple
+from datetime import datetime, timedelta
+import json
+import sqlite3
+from pathlib import Path
+
+# 고급 모듈들 import
+try:
+    from modules.advanced_sentiment_analyzer import AdvancedSentimentAnalyzer
+    from modules.enhanced_news_analyzer import EnhancedNewsAnalyzer
+    from data.enhanced_data_collector import EnhancedDataCollector
+    from analysis.enhanced_unified_analyzer import EnhancedUnifiedAnalyzer
+    MODULES_AVAILABLE = True
+except ImportError:
+    try:
+        from advanced_sentiment_analyzer import AdvancedSentimentAnalyzer
+        from enhanced_news_analyzer import EnhancedNewsAnalyzer
+        from enhanced_data_collector import EnhancedDataCollector
+        from enhanced_unified_analyzer import EnhancedUnifiedAnalyzer
+        MODULES_AVAILABLE = True
+    except ImportError:
+        MODULES_AVAILABLE = False
+
+logger = logging.getLogger(__name__)
+
+class EnhancedDashboard:
+    """고급 대시보드 - 한국어/영어 구분 처리"""
+    # ... (이전 코드) ...
+
+    def _display_technical_analysis(self, result, language: str):
+        """기술적 분석 표시"""
+        texts = self.languages[language]
+        st.subheader(texts["technical_analysis"])
+
+        # 기술적 점수
+        col1, col2 = st.columns(2)
+        with col1:
+            st.metric(
+                "기술적 점수" if language == "korean" else "Technical Score",
+                f"{result.technical_score:.3f}", delta=""
+            )
+        with col2:
+            st.metric(
+                "신호 수" if language == "korean" else "Signal Count",
+                len(result.technical_signals), delta=""
+            )
+
+        # 기술적 신호
+        if result.technical_signals:
+            st.write(
+                "**기술적 신호:**" if language == "korean"
+                else "**Technical Signals:**"
+            )
+            for signal in result.technical_signals:
+                signal_text = self._get_signal_text(signal, language)
+                st.write(f"• {signal_text}")
+
+        # 기술적 지표
+        if result.technical_indicators:
+            st.write(
+                "**기술적 지표:**" if language == "korean"
+                else "**Technical Indicators:**"
+            )
+            indicators = result.technical_indicators
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                st.metric("SMA 20", f"{indicators.get('sma_20', 0):.2f}")
+                st.metric("SMA 50", f"{indicators.get('sma_50', 0):.2f}")
+            with col2:
+                st.metric("RSI", f"{indicators.get('rsi', 0):.2f}")
+                st.metric("MACD", f"{indicators.get('macd', 0):.4f}")
+            with col3:
+                st.metric("MACD Signal",
+                          f"{indicators.get('macd_signal', 0):.4f}")
+                st.metric("현재가" if language == "korean"
+                          else "Current Price",
+                          f"{indicators.get('current_price', 0):.2f}")
+    # ... (나머지 코드) ...
+```

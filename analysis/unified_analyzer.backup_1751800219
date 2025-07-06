@@ -1,0 +1,94 @@
+# unified_analyzer.py - Core Module 모듈
+# 역할: Core Module 관련 기능 제공
+
+```python
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+🚀 통합 투자 분석 시스템 v4.0
+================================================================
+파일명: unified_analyzer.py
+역할: 모든 투자 분석 기능을 통합하여 제공하는 메인 분석 모듈
+- 비동기 고속 병렬처리
+- 멀티레벨 캐싱 시스템 
+- 커넥션 풀링 최적화
+- 메모리 최적화
+- 안정성 및 유지보수성 향상
+"""
+
+import asyncio
+import logging
+import time
+from datetime import datetime, timedelta
+from typing import Dict, List, Any, Optional, Union, Callable, TypeVar, Protocol
+from dataclasses import dataclass, field, asdict
+from concurrent.futures import ThreadPoolExecutor
+from contextlib import asynccontextmanager
+import aiohttp
+from functools import wraps, lru_cache
+import threading
+from collections import defaultdict, deque
+import json
+import pickle
+import sqlite3
+from pathlib import Path
+from enum import Enum, auto
+import hashlib
+import base64
+from abc import ABC, abstractmethod
+import pandas as pd
+import numpy as np
+from decimal import Decimal, ROUND_HALF_UP
+from scipy import stats
+import warnings
+
+# 로깅 설정
+logger = logging.getLogger(__name__)
+
+T = TypeVar('T')
+
+# 역할: 분석 타입 정의를 위한 열거형
+# 입력: 없음
+# 출력: AnalysisType 열거형
+class AnalysisType(Enum):
+    """분석 타입 정의"""
+    TECHNICAL = auto()
+    FUNDAMENTAL = auto()
+    SENTIMENT = auto()
+    MACHINE_LEARNING = auto()
+    PORTFOLIO = auto()
+    RISK = auto()
+
+# 역할: 시장 트렌드 정의를 위한 열거형
+# 입력: 없음
+# 출력: MarketTrend 열거형
+class MarketTrend(Enum):
+    """시장 트렌드 정의"""
+    BULLISH = auto()
+    BEARISH = auto()
+    SIDEWAYS = auto()
+    UNKNOWN = auto()
+
+# 역할: 신호 강도 정의를 위한 열거형
+# 입력: 없음
+# 출력: SignalStrength 열거형
+class SignalStrength(Enum):
+    """신호 강도 정의"""
+    STRONG_BUY = auto()
+    BUY = auto()
+    HOLD = auto()
+    SELL = auto()
+    STRONG_SELL = auto()
+
+# ... (나머지 코드는 동일)
+
+class UnifiedAnalyzer:
+    # ... (나머지 코드는 동일)
+    def register_engine(self, engine: AnalysisEngine):
+        """분석 엔진 등록"""
+        for analysis_type in AnalysisType:
+            if engine.can_analyze(analysis_type):
+                self.engines[analysis_type] = engine
+                logger.info(f"🔍 분석 엔진 등록: {type(engine).__name__} -> {analysis_type.name}")
+    # ... (나머지 코드는 동일)
+```

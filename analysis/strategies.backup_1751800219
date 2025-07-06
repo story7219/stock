@@ -1,0 +1,101 @@
+# strategies.py - Test 모듈
+# 역할: Test 관련 기능 제공
+
+```python
+# 🏛️ 전략 클래스 모듈
+# - 전통, 머신러닝, 딥러닝 전략 클래스 기본 구조 및 실제 구현 제공
+import numpy as np
+import talib
+import pandas as pd
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
+
+
+class TraditionalStrategy:
+    """
+    전통적 전략 (RSI, 이동평균, 볼린저밴드, MACD)
+    입력: OHLCV 데이터 (pandas DataFrame)
+    출력: 매매 신호 (-1=매도, 1=매수, 0=관망)
+    """
+    def run(self, df: pd.DataFrame) -> float:
+        # 필수 컬럼 체크
+        required_cols = ['close', 'open', 'high', 'low', 'volume']
+        for col in required_cols:
+            if col not in df.columns:
+                raise ValueError(f"필수 컬럼 누락: {col}")
+        close = df['close'].values
+        high = df['high'].values
+        low = df['low'].values
+        volume = df['volume'].values
+
+        score = 0
+        count = 0
+
+        # 1. RSI (14)
+        try:
+            rsi = talib.RSI(close, timeperiod=14)
+            if len(rsi) > 0:
+                if rsi[-1] >= 70:
+                    score -= 1
+                    count += 1
+                elif rsi[-1] <= 30:
+                    score += 1
+                    count += 1
+        except Exception as e:
+            print(f"RSI 계산 오류: {e}")
+
+        # 2. 이동평균선 (5, 20) - 골든/데드크로스
+        try:
+            ma5 = talib.SMA(close, timeperiod=5)
+            ma20 = talib.SMA(close, timeperiod=20)
+            if len(ma5) > 1 and len(ma20) > 1:
+                if ma5[-2] < ma20[-2] and ma5[-1] > ma20[-1]:
+                    score += 1
+                    count += 1
+                elif ma5[-2] > ma20[-2] and ma5[-1] < ma20[-1]:
+                    score -= 1
+                    count += 1
+        except Exception as e:
+            print(f"이동평균 계산 오류: {e}")
+
+
+        # 3. 볼린저밴드
+        try:
+            upper, middle, lower = talib.BBANDS(close, timeperiod=20, nbdevup=2, nbdevdn=2)
+            if len(upper) > 0 and len(lower) > 0:
+                if close[-1] >= upper[-1]:
+                    score -= 1
+                    count += 1
+                elif close[-1] <= lower[-1]:
+                    score += 1
+                    count += 1
+        except Exception as e:
+            print(f"볼린저밴드 계산 오류: {e}")
+
+
+        # 4. MACD
+        try:
+            macd, macdsignal, macdhist = talib.MACD(
+                close, fastperiod=12, slowperiod=26, signalperiod=9
+            )
+            if len(macd) > 1 and len(macdsignal) > 1:
+                if macd[-2] < macdsignal[-2] and macd[-1] > macdsignal[-1]:
+                    score += 1
+                    count += 1
+                elif macd[-2] > macdsignal[-2] and macd[-1] < macdsignal[-1]:
+                    score -= 1
+                    count += 1
+        except Exception as e:
+            print(f"MACD 계산 오류: {e}")
+
+
+        if count == 0:
+            return 0
+        signal = score / count
+        signal = max(-1, min(1, signal))
+        return signal
+
+class MLStrategy:
+    pass
+```

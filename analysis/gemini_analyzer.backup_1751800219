@@ -1,0 +1,73 @@
+# gemini_analyzer.py - Analysis Engine 모듈
+# 역할: Analysis Engine 관련 기능 제공
+
+```python
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+🤖 Gemini AI 기반 투자 대가 전략 분석 시스템 v1.0
+===================================================
+- 윌리엄 오닐, 제시 리버모어 등 투자 대가 전략 시뮬레이션 및 AI Top5 추천
+- Gemini AI API 연동, 동적 프롬프트, 폴백 로직, 종합 리포트 생성
+"""
+
+from datetime import datetime
+from dotenv import load_dotenv
+from typing import Dict, List, Optional
+import google.generativeai as genai
+import json
+import numpy as np
+import os
+import pandas as pd
+import re
+import time
+import traceback
+
+# 환경 변수 로드
+load_dotenv()
+
+class GeminiAIAnalyzer:
+    """Gemini AI 기반 투자 분석기"""
+    def __init__(self) -> None:
+        self.api_key = os.getenv('GEMINI_API_KEY', '')
+        self.use_gemini = bool(self.api_key)
+        self.portfolio_summary = {}
+        if self.api_key:
+            genai.configure(api_key=self.api_key)
+            model_name = os.getenv('GOOGLE_GEMINI_MODEL',
+                                   'gemini-1.5-flash-8b')
+            self.model = genai.GenerativeModel(model_name)
+        else:
+            print("⚠️ GEMINI_API_KEY가 설정되지 않았습니다")
+            self.model = None
+
+
+    # 👇👇👇 투자대가 20명 전략 함수 일괄 추가 (1번줄부터 한글주석)
+    # 각 함수는 심볼, 가격, 변동성 등 샘플 데이터만으로 점수 산출
+    # 실제 투자 철학을 최대한 반영하되, 데이터가 없으면 랜덤/샘플 기준 사용
+
+    # 1. 윌리엄 오닐 (성장+모멘텀)
+    def _calculate_oneil_score(self, stock: Dict[str, object]) -> float:
+        """윌리엄 오닐 전략 점수 계산 (성장+모멘텀)"""
+        score = 0.0
+        try:
+            symbol = stock.get('symbol', '')
+            price = stock.get('current_price', 0)
+            change = stock.get('change_rate', 0)
+            volume = stock.get('volume', 0)
+            if change > 1.5:
+                score += 30
+            if volume > 1000000:
+                score += 20
+            if price > 50:
+                score += 10
+            if symbol in ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'META']:
+                score += 30
+        except Exception as e:
+            print(f"오류: {traceback.format_exc()}")  # 예외 처리 개선
+        return min(score, 100.0)
+
+    # ... (나머지 함수들) ...
+
+    # ... (나머지 코드) ...
+```

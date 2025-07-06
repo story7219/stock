@@ -1,0 +1,88 @@
+# technical.py - Test 모듈
+# 역할: Test 관련 기능 제공
+
+```python
+# 📊 기술적 분석 모듈 v2.0
+# - ITechnicalAnalyzer 인터페이스 구현 및 표준화된 데이터 구조 사용
+# - RSI, MACD, 볼린저밴드, 이동평균 등 주요 기술적 지표 계산
+# - 실시간 신호 생성 및 신뢰도 평가
+
+from ..core.base_interfaces import (
+    ITechnicalAnalyzer, StockData, TechnicalIndicators,
+    TechnicalSignals, TechnicalAnalysisResult, AnalysisError, MarketType
+)
+from datetime import datetime
+from loguru import logger
+from typing import Dict, List, Tuple, Optional, Any, Union
+import numpy as np
+import os
+import pandas as pd
+import random
+import ta
+
+
+class TechnicalAnalyzer(ITechnicalAnalyzer):
+    """기술적 분석기 - ITechnicalAnalyzer 인터페이스 구현"""
+
+    def __init__(self):
+        """기술적 분석기 초기화"""
+        self.indicators = {}
+        logger.info("🔧 TechnicalAnalyzer 초기화 완료")
+
+    async def analyze(self, data: Union[str, StockData]) -> TechnicalAnalysisResult:
+        """기술적 분석 수행"""
+        try:
+            if isinstance(data, str):
+                symbol = data
+                stock_data = StockData(
+                    symbol=symbol,
+                    name=f"Mock {symbol}",
+                    current_price=100.0
+                )
+                logger.info(f"🔍 {symbol} Mock 기술적 분석 시작")
+            else:
+                stock_data = data
+                symbol = stock_data.symbol
+                logger.info(f"🔍 {symbol} 기술적 분석 시작")
+
+            if os.getenv('IS_MOCK', 'false').lower() == 'true' or isinstance(data, str):
+                return self._generate_mock_analysis(symbol)
+
+            if stock_data.historical_data is None or stock_data.historical_data.empty:
+                logger.warning(f"⚠️ {symbol}: 히스토리 데이터 없음, Mock 분석 사용")
+                return self._generate_mock_analysis(symbol)
+
+            indicators = self.calculate_indicators(stock_data.historical_data)
+            signals = self.generate_signals(indicators, stock_data.current_price)
+            confidence = self._calculate_confidence(indicators, signals)
+            summary = self._generate_summary(symbol, indicators, signals)
+
+            result = TechnicalAnalysisResult(
+                symbol=symbol,
+                indicators=indicators,
+                signals=signals,
+                confidence=confidence,
+                summary=summary
+            )
+
+            logger.info(f"✅ {symbol} 기술적 분석 완료 (신뢰도: {confidence:.2f})")
+            return result
+
+        except Exception as e:
+            logger.error(f"❌ 기술적 분석 중 오류: {e}")
+            return self._generate_mock_analysis(symbol if isinstance(data, str) else data.symbol)
+
+    # ... (기타 함수는 동일)
+
+    def calculate_stochastic(self, high: pd.Series, low: pd.Series, close: pd.Series, 
+                           k_period: int = 14, d_period: int = 3) -> TechnicalIndicators:
+        """스토캐스틱 오실레이터 계산"""
+        try:
+            stoch_indicator = ta.momentum.StochasticOscillator(high=high, low=low, close=close, window=k_period, smooth_window=d_period)
+            return TechnicalIndicators(stoch_k=stoch_indicator.stoch(), stoch_d=stoch_indicator.stoch_signal())
+        except Exception as e:
+            logger.error(f"❌ 스토캐스틱 계산 실패: {e}")
+            return TechnicalIndicators()
+
+    # ... (기타 함수는 동일)
+```

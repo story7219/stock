@@ -1,0 +1,80 @@
+# strategy_manager.py - Analysis Engine 모듈
+# 역할: Analysis Engine 관련 기능 제공
+
+```python
+# ⚖️ 전략 매니저 모듈
+# - 시장 상황에 따라 전략 비중을 자동 조절하고, 신호를 종합하여 최종 매매 결정을 내림
+from typing import Dict
+
+
+class StrategyManager:
+    """
+    시장 상황에 따라 전략 비중 자동 조절 및 신호 종합
+    """
+
+    def __init__(self) -> None:
+        # 기본 비중 (안정적)
+        self.weights: Dict[str, float] = {
+            'traditional': 0.5,
+            'ml': 0.3,
+            'dl': 0.2,
+        }
+        self.last_signals: Dict[str, int] = {
+            'traditional': 0,
+            'ml': 0,
+            'dl': 0,
+        }
+
+    def adjust_weights(self, market_condition: str) -> None:
+        """
+        시장 상황(stable, high_volatility, sideways)에 따라 전략 비중 자동 조절
+        """
+        match market_condition:
+            case 'stable':
+                self.weights = {'traditional': 0.5, 'ml': 0.3, 'dl': 0.2}
+            case 'high_volatility':
+                self.weights = {'traditional': 0.2, 'ml': 0.5, 'dl': 0.3}
+            case 'sideways':
+                self.weights = {'traditional': 0.6, 'ml': 0.25, 'dl': 0.15}
+            case _:
+                # 기본값 (안정적)
+                self.weights = {'traditional': 0.5, 'ml': 0.3, 'dl': 0.2}
+
+    def get_signal(self, trad_signal: int, ml_signal: int, dl_signal: int) -> float:
+        """
+        각 전략 신호를 비중에 따라 종합 (매수: 1, 중립: 0, 매도: -1)
+        Returns: 종합 신호값 (float)
+        """
+        self.last_signals = {
+            'traditional': trad_signal,
+            'ml': ml_signal,
+            'dl': dl_signal,
+        }
+        # 가중치 합산
+        weighted_signal = sum(
+            signal * weight
+            for signal, weight in zip(
+                (trad_signal, ml_signal, dl_signal),
+                (self.weights['traditional'], self.weights['ml'], self.weights['dl']),
+            )
+        )
+        return weighted_signal
+
+    def calculate_final_decision(self) -> str:
+        """
+        종합 신호값을 기준으로 최종 매매 결정 (매수/매도/관망)
+        Returns: 'buy', 'sell', 'hold'
+        """
+        signal = self.get_signal(
+            self.last_signals['traditional'],
+            self.last_signals['ml'],
+            self.last_signals['dl'],
+        )
+        return (
+            'buy'
+            if signal > 0.3
+            else 'sell'
+            if signal < -0.3
+            else 'hold'
+        )
+```

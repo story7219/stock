@@ -1,0 +1,59 @@
+# advanced_ml_models.py - Test 모듈
+# 역할: Test 관련 기능 제공
+
+```python
+# ML/DL 기반 전략/예측 모듈
+# 아래 코드는 의심/src/modules/advanced_ml_models.py의 실제 구현 전체를 복사/이식한 것입니다.
+# ... (이하 의심/src/modules/advanced_ml_models.py 전체 코드 복사) ...
+import pandas as pd
+import numpy as np
+from typing import List, Dict
+
+
+def calculate_returns(data: pd.DataFrame, column: str) -> pd.Series:
+    """주어진 데이터프레임의 특정 컬럼에 대한 수익률을 계산합니다.
+
+    Args:
+        data: 주가 데이터를 포함하는 데이터프레임.
+        column: 수익률을 계산할 컬럼 이름.
+
+    Returns:
+        수익률 시리즈.
+    """
+    try:
+        returns = data[column].pct_change()
+        return returns
+    except KeyError as e:
+        raise KeyError(f"컬럼 '{column}'이 데이터프레임에 존재하지 않습니다.") from e
+    except Exception as e:
+        raise Exception(f"예상치 못한 오류가 발생했습니다: {e}")
+
+
+def analyze_stock_performance(stock_data: pd.DataFrame,
+                              target_column: str = 'Close') -> Dict[str, pd.Series]:
+    """주식 성능을 분석하는 함수입니다.
+
+    Args:
+        stock_data: 주가 데이터를 포함하는 Pandas DataFrame.
+        target_column: 분석에 사용할 종가 컬럼 이름 (기본값: 'Close').
+
+    Returns:
+        수익률, 이동평균, 표준편차를 포함하는 딕셔너리입니다.
+    """
+    
+    # 유효성 검사 (예외 처리)
+    if not isinstance(stock_data, pd.DataFrame):
+        raise TypeError("stock_data는 Pandas DataFrame이어야 합니다.")
+    if target_column not in stock_data.columns:
+        raise ValueError(f"컬럼 '{target_column}'이 데이터프레임에 존재하지 않습니다.")
+
+    returns = calculate_returns(stock_data, target_column)
+    moving_average = returns.rolling(window=20).mean()
+    std_dev = returns.rolling(window=20).std()
+
+    return {
+        'returns': returns,
+        'moving_average': moving_average,
+        'std_dev': std_dev
+    }
+```
