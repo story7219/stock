@@ -1,0 +1,70 @@
+# Qubole 클라우드 설정
+QUBOLE_API_TOKEN=your_qubole_api_token_here
+QUBOLE_API_URL=https://api.qubole.com
+
+# AWS S3 설정 (데이터 레이크 저장소)
+AWS_ACCESS_KEY_ID=your_aws_access_key_here
+AWS_SECRET_ACCESS_KEY=your_aws_secret_key_here
+S3_BUCKET=trading-data-lake
+S3_REGION=us-east-1
+
+# KIS API 설정
+LIVE_KIS_APP_KEY=your_live_kis_app_key_here
+LIVE_KIS_APP_SECRET=your_live_kis_app_secret_here
+LIVE_KIS_ACCOUNT_NUMBER=your_account_number_here
+LIVE_KIS_PRODUCT_CODE=01
+
+# 데이터 레이크 설정
+DATA_LAKE_PATH=s3://trading-data-lake
+RAW_DATA_PATH=s3://trading-data-lake/raw
+PROCESSED_DATA_PATH=s3://trading-data-lake/processed
+ML_DATA_PATH=s3://trading-data-lake/ml
+
+# 클러스터 설정
+CLUSTER_NAME=trading-data-collector
+CLUSTER_SIZE=small
+CLUSTER_TYPE=spark
+
+# 데이터 수집 설정
+COLLECTION_INTERVAL=1.0
+MAX_CONCURRENT_REQUESTS=100
+REQUEST_TIMEOUT=10.0
+BATCH_SIZE=10000
+
+# 스트리밍 설정
+ENABLE_STREAMING=true
+STREAMING_BATCH_DURATION=60
+STREAMING_CHECKPOINT_PATH=s3://trading-data-lake/checkpoints
+
+# ML 파이프라인 설정
+ENABLE_ML_PIPELINE=true
+FEATURE_ENGINEERING_INTERVAL=3600
+MODEL_TRAINING_INTERVAL=86400
+
+# 데이터 보관 정책
+RAW_DATA_RETENTION_DAYS=1095
+PROCESSED_DATA_RETENTION_DAYS=730
+ML_DATA_RETENTION_DAYS=1825
+
+# 성능 설정
+COMPRESSION=snappy
+FILE_FORMAT=parquet
+PARTITION_BY=date,symbol,category
+
+# 모니터링 설정
+MONITOR_INTERVAL=300
+STATS_INTERVAL=60
+LOG_LEVEL=INFO
+
+# 비용 최적화 설정
+SPOT_INSTANCE=true
+SPOT_BID_PERCENTAGE=80
+AUTO_SCALING=true
+MIN_NODES=2
+MAX_NODES=10
+
+# 보안 설정
+ENCRYPTION=true
+ENCRYPTION_ALGORITHM=AES256
+ACCESS_LOGGING=true
+VERSIONING=true 

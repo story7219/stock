@@ -1,0 +1,84 @@
+# 엔터프라이즈 데이터 전략 시스템 의존성
+# Python 3.11+ 환경에서 테스트됨
+
+# === 핵심 데이터 처리 ===
+pandas>=2.0.0
+numpy>=1.24.0
+pyarrow>=12.0.0
+dask>=2023.8.0
+
+# === 데이터베이스 ===
+psycopg2-binary>=2.9.0
+redis>=4.6.0
+pymongo>=4.4.0
+sqlalchemy>=2.0.0
+
+# === 한국 투자 데이터 ===
+pykis>=1.0.0
+pykrx>=1.0.0
+finance-datareader>=0.9.0
+yfinance>=0.2.0
+
+# === 워크플로우 자동화 ===
+apache-airflow>=2.7.0
+apache-airflow-providers-postgres>=5.6.0
+apache-airflow-providers-amazon>=8.0.0
+apache-airflow-providers-redis>=3.0.0
+
+# === 스트리밍 및 메시징 ===
+kafka-python>=2.0.0
+confluent-kafka>=2.0.0
+
+# === 모니터링 및 메트릭 ===
+prometheus-client>=0.17.0
+grafana-api>=1.0.0
+
+# === 웹 대시보드 ===
+streamlit>=1.28.0
+dash>=2.14.0
+plotly>=5.17.0
+
+# === 클라우드 서비스 ===
+boto3>=1.28.0
+botocore>=1.31.0
+
+# === 비동기 처리 ===
+aiohttp>=3.9.0
+asyncio-mqtt>=0.13.0
+
+# === 데이터 검증 ===
+pydantic>=2.5.0
+marshmallow>=3.20.0
+
+# === 로깅 및 모니터링 ===
+structlog>=23.2.0
+python-json-logger>=2.0.0
+
+# === 시스템 모니터링 ===
+psutil>=5.9.0
+
+# === 테스트 ===
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
+pytest-cov>=4.1.0
+hypothesis>=6.98.0
+
+# === 코드 품질 ===
+black>=23.11.0
+flake8>=6.1.0
+isort>=5.12.0
+mypy>=1.7.0
+
+# === 개발 도구 ===
+jupyter>=1.0.0
+ipykernel>=6.29.0
+
+# === 보안 ===
+cryptography>=41.0.0
+argon2-cffi>=23.0.0
+
+# === 기타 유틸리티 ===
+python-dotenv>=1.0.0
+click>=8.1.0
+rich>=13.7.0
+tqdm>=4.66.0 

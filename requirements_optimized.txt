@@ -1,0 +1,75 @@
+# 최적화된 AI 트레이딩 파이프라인 필수 패키지
+# GPU 가속 및 병렬 처리를 위한 고성능 라이브러리
+
+# === 핵심 데이터 처리 ===
+pandas>=2.0.0
+numpy>=1.24.0
+pyarrow>=12.0.0
+dask>=2023.8.0
+dask-cuda>=23.8.0
+
+# === GPU 가속 라이브러리 ===
+torch>=2.0.0
+torchvision>=0.15.0
+torchaudio>=2.0.0
+cudf>=23.8.0
+cupy-cuda11x>=12.0.0  # CUDA 11.x 버전에 맞게 설치
+
+# === 비동기 처리 및 네트워크 ===
+aiohttp>=3.9.0
+asyncio-mqtt>=0.13.0
+websockets>=11.0.0
+
+# === 데이터베이스 및 캐싱 ===
+redis>=5.0.0
+sqlalchemy>=2.0.0
+psycopg2-binary>=2.9.0
+asyncpg>=0.29.0
+
+# === 한국투자증권 API ===
+pykis>=1.0.0
+
+# === 하이퍼파라미터 튜닝 ===
+ray[tune]>=2.7.0
+optuna>=3.4.0
+
+# === 시각화 및 분석 ===
+matplotlib>=3.7.0
+seaborn>=0.12.0
+plotly>=5.17.0
+
+# === 기술적 분석 ===
+ta>=0.10.0
+yfinance>=0.2.0
+pykrx>=1.0.0
+
+# === 성능 모니터링 ===
+psutil>=5.9.0
+memory-profiler>=0.61.0
+py-spy>=0.3.0
+
+# === 개발 도구 ===
+jupyter>=1.0.0
+ipykernel>=6.25.0
+black>=23.0.0
+flake8>=6.0.0
+mypy>=1.5.0
+
+# === 로깅 및 설정 ===
+python-dotenv>=1.0.0
+structlog>=23.1.0
+python-json-logger>=2.0.0
+
+# === 테스트 ===
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
+hypothesis>=6.80.0
+
+# === 보안 ===
+cryptography>=41.0.0
+argon2-cffi>=21.3.0
+
+# === 기타 유틸리티 ===
+tqdm>=4.65.0
+click>=8.1.0
+rich>=13.5.0 

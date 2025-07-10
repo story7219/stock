@@ -1,0 +1,91 @@
+# .github/workflows/backup_integrated.yml - Integrated Backup and Auto Cleanup Workflow
+# Purpose: ZIP+TAR.GZ backup, manifest, Git info, 30-day cleanup, auto commit/push
+
+name: Integrated Backup and Auto Cleanup
+
+on:
+  schedule:
+    - cron: '0 18 * * *'  # Daily 3 AM (KST, UTC+9)
+  workflow_dispatch:
+    inputs:
+      backup_type:
+        description: 'Backup type selection'
+        required: false
+        default: daily
+        type: choice
+        options:
+          - daily
+          - weekly
+          - full_system
+          - config_only
+
+jobs:
+  integrated-backup-cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Repository Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Python 3.11 Environment Setup
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Backup Tools Installation
+        run: |
+          pip install --upgrade pip
+          pip install requests python-dateutil
+          sudo apt-get update
+          sudo apt-get install -y zip unzip tar gzip
+
+      - name: Generate Backup Manifest and Git Info
+        run: |
+          python3 .github/scripts/generate_backup_manifest.py
+
+      - name: Create ZIP and TAR.GZ Backups
+        run: |
+          timestamp=$(date +%Y%m%d_%H%M%S)
+          backup_dir="backup_${timestamp}"
+          mkdir -p "$backup_dir"
+          cp -f core_trader.py advanced_scalping_system.py config.py test_optimized_scalping.py requirements.txt .gitignore README.md .env.example backup_manifest.json git_info.json "$backup_dir" 2>/dev/null || true
+          mkdir -p "$backup_dir/.github/workflows"
+          cp -f .github/workflows/*.yml "$backup_dir/.github/workflows/" 2>/dev/null || true
+          zip_name="trading_system_backup_${timestamp}"
+          tar_name="trading_system_backup_${timestamp}"
+          zip -r "$zip_name.zip" "$backup_dir"
+          tar -czf "$tar_name.tar.gz" "$backup_dir"
+          mkdir -p backups
+          mv "$zip_name.zip" backups/ || true
+          mv "$tar_name.tar.gz" backups/ || true
+          rm -rf "$backup_dir"
+
+      - name: Auto Cleanup Old Backups (30+ days)
+        run: |
+          find backups -type f -mtime +30 -print -delete || true
+
+      - name: Commit and Push Changes
+        run: |
+          git config --global user.name 'github-actions'
+          git config --global user.email 'github-actions@github.com'
+          git add backups/ || true
+          git add backup_manifest.json git_info.json || true
+          git commit -m '[AUTO] Integrated backup and 30-day cleanup completed' || echo 'No changes to commit'
+          git push || echo 'No changes to push'
+
+      - name: Backup Completion Notification
+        if: success()
+        run: |
+          echo "🎉 Backup process completed successfully!"
+          echo "📅 Backup timestamp: $(date)"
+          echo "📁 Backup location: backups/ directory"
+          echo "🗜️ Backup formats: ZIP and TAR.GZ"
+          echo "🧹 Old backups cleaned: 30+ days"
+
+      - name: Backup Failure Notification
+        if: failure()
+        run: |
+          echo "❌ Backup process failed!"
+          echo "📅 Failure timestamp: $(date)"
+          echo "🔍 Please check the workflow logs for details" 

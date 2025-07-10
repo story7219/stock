@@ -1,0 +1,51 @@
+# KIS API 설정
+LIVE_KIS_APP_KEY=your_live_kis_app_key_here
+LIVE_KIS_APP_SECRET=your_live_kis_app_secret_here
+LIVE_KIS_ACCOUNT_NUMBER=your_account_number_here
+LIVE_KIS_PRODUCT_CODE=01
+
+# 모의 계좌 설정 (테스트용)
+MOCK_KIS_APP_KEY=your_mock_kis_app_key_here
+MOCK_KIS_APP_SECRET=your_mock_kis_app_secret_here
+MOCK_KIS_ACCOUNT_NUMBER=your_mock_account_number_here
+
+# PostgreSQL 데이터베이스 설정
+POSTGRES_HOST=localhost
+POSTGRES_PORT=5432
+POSTGRES_DB=trading_data
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=your_postgres_password_here
+
+# Redis 설정 (캐싱용)
+REDIS_HOST=localhost
+REDIS_PORT=6379
+REDIS_DB=0
+REDIS_PASSWORD=
+
+# 데이터 수집 설정
+COLLECTION_INTERVAL=1.0
+BATCH_SIZE=1000
+MAX_CONCURRENT_REQUESTS=50
+REQUEST_TIMEOUT=10.0
+
+# 데이터 보관 정책
+PRICE_DATA_RETENTION_DAYS=365
+ORDERBOOK_DATA_RETENTION_DAYS=30
+MARKET_DATA_RETENTION_DAYS=90
+
+# 백업 설정
+BACKUP_INTERVAL_HOURS=24
+BACKUP_RETENTION_DAYS=30
+
+# 로깅 설정
+LOG_LEVEL=INFO
+LOG_FILE=collection.log
+
+# 성능 설정
+MAX_RETRIES=3
+RETRY_DELAY=5.0
+CACHE_TTL=60
+
+# 모니터링 설정
+MONITOR_INTERVAL=300
+STATS_INTERVAL=60 

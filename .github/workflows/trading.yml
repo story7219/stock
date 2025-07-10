@@ -1,0 +1,65 @@
+name: "🚀 척후병 전략 관리 시스템"
+
+on:
+  workflow_dispatch: # 수동 실행
+
+jobs:
+  scout_trading:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 코드 체크아웃
+        uses: actions/checkout@v4
+
+      - name: 🐍 Python 환경 설정
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: 📦 의존성 설치
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: 🚀 척후병 전략 관리 시스템 실행
+        run: python .github/scripts/scout_strategy_manager.py run
+        env:
+          # GitHub Repository Secrets에서 환경변수를 가져옵니다.
+          # 설정 방법: 리포지토리 > Settings > Secrets and variables > Actions
+          IS_MOCK: ${{ secrets.IS_MOCK }}
+          KIS_APP_KEY: ${{ secrets.KIS_APP_KEY }}
+          KIS_APP_SECRET: ${{ secrets.KIS_APP_SECRET }}
+          KIS_ACCOUNT_NO: ${{ secrets.KIS_ACCOUNT_NO }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+
+      - name: 📱 성공 알림
+        if: success()
+        run: |
+          python -c "
+          import requests, os
+          bot_token = os.environ.get('TELEGRAM_BOT_TOKEN')
+          chat_id = os.environ.get('TELEGRAM_CHAT_ID')
+          if bot_token and chat_id and bot_token != 'test_telegram_token':
+              message = '✅ 척후병 시스템 자동 실행 성공!\\n\\nGitHub Actions에서 매매 사이클이 성공적으로 완료되었습니다.'
+              requests.post(f'https://api.telegram.org/bot{bot_token}/sendMessage', 
+                          json={'chat_id': chat_id, 'text': message})
+          "
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+
+      - name: 📱 실패 알림
+        if: failure()
+        run: |
+          python -c "
+          import requests, os
+          bot_token = os.environ.get('TELEGRAM_BOT_TOKEN')
+          chat_id = os.environ.get('TELEGRAM_CHAT_ID')
+          if bot_token and chat_id and bot_token != 'test_telegram_token':
+              message = '❌ 척후병 시스템 자동 실행 실패!\\n\\nGitHub Actions에서 오류가 발생했습니다. 로그를 확인해주세요.'
+              requests.post(f'https://api.telegram.org/bot{bot_token}/sendMessage', 
+                          json={'chat_id': chat_id, 'text': message})
+          "
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }} 

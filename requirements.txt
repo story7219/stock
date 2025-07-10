@@ -1,0 +1,209 @@
+# Core Dependencies
+pydantic==2.5.0
+python-dotenv==1.0.0
+
+# Async and HTTP
+aiohttp==3.9.0
+asyncio-mqtt==0.16.1
+
+# Data Processing
+pandas==2.1.4
+numpy==1.24.0
+scikit-learn==1.3.0
+
+# Database
+sqlalchemy==2.0.0
+asyncpg==0.30.0
+redis==5.0.0
+
+# Monitoring and Metrics
+psutil==5.9.0
+prometheus-client==0.19.0
+
+# Scheduling
+schedule==1.2.0
+apscheduler==3.10.1
+
+# Testing
+pytest==7.4.0
+pytest-asyncio==0.21.0
+pytest-cov==4.1.0
+
+# Development
+black==23.11.0
+flake8==6.1.0
+mypy==1.7.0
+
+# Optional Dependencies
+# Uncomment if needed
+# tensorflow==2.15.0
+# torch==2.1.0
+# streamlit==1.28.0
+# plotly==5.17.0
+# dash==2.14.0
+
+# Web framework and API
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+websockets==12.0
+
+# Data collection and processing
+requests==2.31.0
+beautifulsoup4==4.12.2
+lxml==4.9.3
+feedparser==6.0.10
+yfinance==0.2.28
+ta==0.10.2
+
+# 한투 KIS API
+pykis==1.0.0
+
+# DART API
+OpenDartReader==0.1.5
+xmltodict==0.13.0
+
+# Real-time data processing
+celery==5.3.4
+kafka-python==2.0.2
+
+# Machine Learning and AI
+xgboost==2.0.2
+tensorflow==2.15.0
+torch==2.1.2
+transformers==4.36.2
+google-generativeai==0.3.2
+
+# Technical Analysis
+ta-lib==0.4.28
+talib-binary==0.4.26
+pandas-ta==0.3.14b0
+
+# Sentiment analysis
+textblob==0.17.1
+vaderSentiment==3.3.2
+konlpy==0.6.0
+
+# Market microstructure
+orderbook==0.1.0
+market-microstructure==0.2.0
+
+# Time series analysis
+statsmodels==0.14.0
+arch==6.2.0
+
+# Optimization
+scipy==1.11.4
+cvxpy==1.4.1
+
+# Visualization
+matplotlib==3.8.2
+seaborn==0.13.0
+
+# Financial data
+alpha-vantage==2.3.1
+
+# Async utilities
+aiofiles==23.2.1
+
+# Caching
+diskcache==5.6.3
+cachetools==5.3.2
+
+# Configuration
+dynaconf==3.2.4
+pydantic-settings==2.1.0
+
+# Monitoring and logging
+sentry-sdk==1.38.0
+python-json-logger==2.0.7
+
+# Firebase for push notifications
+firebase-admin==6.4.0
+
+# System monitoring
+bandit==1.7.5
+
+# Testing
+pytest-mock==3.12.0
+hypothesis==6.98.11
+
+# Development
+isort==5.13.2
+pre-commit==3.6.0
+
+# Documentation
+sphinx==7.2.6
+sphinx-rtd-theme==1.3.0
+
+# Development tools
+jupyter==1.0.0
+ipython==8.17.2
+
+# Additional utilities
+python-dateutil==2.8.2
+pytz==2023.3
+
+# Added from the code block
+python-telegram-bot==20.7
+
+# 시계열 데이터 저장 시스템 의존성
+# Python 3.11+ 필요
+
+# 데이터베이스 연결
+aioredis>=2.0.1
+sqlalchemy>=2.0.0
+psycopg2-binary>=2.9.0
+
+# 데이터 처리
+pandas>=2.0.0
+numpy>=1.24.0
+
+# 클라우드 저장
+boto3>=1.34.0
+botocore>=1.34.0
+
+# 시계열 데이터베이스 (선택사항)
+influxdb-client>=1.38.0
+
+# 비동기 처리
+aiohttp>=3.9.0
+asyncio-mqtt>=0.16.0
+
+# 로깅 및 모니터링
+structlog>=23.2.0
+python-json-logger>=2.0.7
+
+# 설정 관리
+pydantic>=2.5.0
+python-dotenv>=1.0.0
+
+# 유틸리티
+click>=8.1.7
+rich>=13.7.0
+tqdm>=4.66.0
+
+# 개발 도구 (선택사항)
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
+black>=23.11.0
+flake8>=6.1.0
+mypy>=1.7.0
+bandit>=1.7.5
+
+# 성능 최적화
+numba>=0.58.0
+cython>=3.0.0
+
+# 압축 및 암호화
+cryptography>=41.0.0
+
+# 메트릭 및 모니터링
+statsd>=4.0.1
+
+# 웹 대시보드
+streamlit>=1.29.0
+plotly>=5.17.0
+dash>=2.14.0
+
+# 테스트 데이터 생성
+faker>=20.1.0 

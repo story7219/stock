@@ -1,0 +1,115 @@
+name: "🔒 보안 감사"
+
+on:
+  workflow_dispatch: # 수동 실행
+
+jobs:
+  security_audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 코드 체크아웃
+        uses: actions/checkout@v4
+
+      - name: 🐍 Python 환경 설정
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: 📦 보안 도구 설치
+        run: |
+          pip install --upgrade pip
+          pip install bandit safety
+          pip install -r requirements.txt
+
+      - name: 🔍 보안 감사 스크립트 실행
+        run: |
+          python security_auditor.py
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+
+      - name: 🛡️ Python 보안 취약점 검사 (Bandit)
+        run: |
+          echo "✅ Bandit 검사는 security_auditor.py에서 통합 처리됩니다"
+
+      - name: 📚 의존성 취약점 검사 (Safety)
+        run: |
+          echo "✅ Safety 검사는 security_auditor.py에서 통합 처리됩니다"
+
+      - name: 🔧 환경 설정 보안 검사
+        run: |
+          echo "✅ 환경 설정 검사는 security_auditor.py에서 통합 처리됩니다"
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+
+      - name: 📱 보안 리포트 전송
+        if: success()
+        run: |
+          python -c "
+          import requests
+          import os
+          from datetime import datetime
+          
+          bot_token = os.environ.get('TELEGRAM_BOT_TOKEN')
+          chat_id = os.environ.get('TELEGRAM_CHAT_ID')
+          
+          if bot_token and chat_id and bot_token != 'test_telegram_token':
+              message = f'''🔒 보안 감사 완료!
+              
+              📅 검사일: {datetime.now().strftime('%Y-%m-%d %H:%M')}
+              
+              ✅ API 키 노출 검사 완료
+              ✅ Python 보안 취약점 검사 완료  
+              ✅ 의존성 취약점 검사 완료
+              ✅ 환경 설정 보안 검사 완료
+              
+              🛡️ 시스템 보안이 양호합니다.'''
+              
+              try:
+                  requests.post(
+                      f'https://api.telegram.org/bot{bot_token}/sendMessage',
+                      json={'chat_id': chat_id, 'text': message}
+                  )
+                  print('✅ 보안 리포트 전송 완료')
+              except Exception as e:
+                  print(f'⚠️ 텔레그램 전송 실패: {e}')
+          else:
+              print('✅ 보안 감사 완료 (테스트 모드)')
+          "
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+
+      - name: 📱 보안 경고 알림
+        if: failure()
+        run: |
+          python -c "
+          import requests
+          import os
+          from datetime import datetime
+          
+          bot_token = os.environ.get('TELEGRAM_BOT_TOKEN')
+          chat_id = os.environ.get('TELEGRAM_CHAT_ID')
+          
+          if bot_token and chat_id and bot_token != 'test_telegram_token':
+              message = f'''🚨 보안 감사 경고!
+              
+              ⚠️ 보안 검사 중 문제가 발견되었습니다.
+              📅 {datetime.now().strftime('%Y-%m-%d %H:%M')}
+              
+              즉시 점검이 필요합니다.
+              GitHub Actions 로그를 확인하세요.'''
+              
+              try:
+                  requests.post(
+                      f'https://api.telegram.org/bot{bot_token}/sendMessage',
+                      json={'chat_id': chat_id, 'text': message}
+                  )
+              except:
+                  pass
+          print('🚨 보안 경고 발생')
+          "
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }} 

@@ -1,0 +1,379 @@
+version: '3.8'
+
+services:
+  # 데이터베이스 서비스
+  postgres:
+    image: postgres:15-alpine
+    container_name: ai_trading_postgres
+    environment:
+      POSTGRES_DB: ai_trading
+      POSTGRES_USER: trading_user
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./config/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+    networks:
+      - ai_trading_network
+    restart: unless-stopped
+
+  timescaledb:
+    image: timescale/timescaledb:latest-pg15
+    container_name: ai_trading_timescaledb
+    environment:
+      POSTGRES_DB: timeseries_data
+      POSTGRES_USER: timeseries_user
+      POSTGRES_PASSWORD: ${TIMESCALE_PASSWORD}
+    volumes:
+      - timescaledb_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    networks:
+      - ai_trading_network
+    restart: unless-stopped
+
+  mongodb:
+    image: mongo:7.0
+    container_name: ai_trading_mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+      MONGO_INITDB_DATABASE: ai_trading
+    volumes:
+      - mongodb_data:/data/db
+    ports:
+      - "27017:27017"
+    networks:
+      - ai_trading_network
+    restart: unless-stopped
+
+  # 캐시 및 메시지 큐
+  redis:
+    image: redis:7.2-alpine
+    container_name: ai_trading_redis
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    networks:
+      - ai_trading_network
+    restart: unless-stopped
+
+  kafka:
+    image: confluentinc/cp-kafka:7.4.0
+    container_name: ai_trading_kafka
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
+      KAFKA_DELETE_TOPIC_ENABLE: 'true'
+    ports:
+      - "29092:29092"
+    networks:
+      - ai_trading_network
+    restart: unless-stopped
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.4.0
+    container_name: ai_trading_zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      - ai_trading_network
+    restart: unless-stopped
+
+  # 모니터링 및 로깅
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: ai_trading_prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    volumes:
+      - ./config/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    ports:
+      - "9090:9090"
+    networks:
+      - ai_trading_network
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: ai_trading_grafana
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD}
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./config/grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ./config/grafana/datasources:/etc/grafana/provisioning/datasources
+    ports:
+      - "3000:3000"
+    networks:
+      - ai_trading_network
+    restart: unless-stopped
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+    container_name: ai_trading_elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+    networks:
+      - ai_trading_network
+    restart: unless-stopped
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.11.0
+    container_name: ai_trading_kibana
+    environment:
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+    ports:
+      - "5601:5601"
+    networks:
+      - ai_trading_network
+    restart: unless-stopped
+    depends_on:
+      - elasticsearch
+
+  # AI 트레이딩 시스템 서비스
+  data_collector:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ai_trading_data_collector
+    environment:
+      - DATABASE_URL=postgresql://trading_user:${POSTGRES_PASSWORD}@postgres:5432/ai_trading
+      - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379/0
+      - KAFKA_BROKERS=kafka:9092
+      - LOG_LEVEL=INFO
+    volumes:
+      - ./logs:/app/logs
+    networks:
+      - ai_trading_network
+    restart: unless-stopped
+    depends_on:
+      - postgres
+      - redis
+      - kafka
+
+  data_processor:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ai_trading_data_processor
+    environment:
+      - DATABASE_URL=postgresql://trading_user:${POSTGRES_PASSWORD}@postgres:5432/ai_trading
+      - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379/0
+      - KAFKA_BROKERS=kafka:9092
+      - LOG_LEVEL=INFO
+    volumes:
+      - ./logs:/app/logs
+    networks:
+      - ai_trading_network
+    restart: unless-stopped
+    depends_on:
+      - postgres
+      - redis
+      - kafka
+
+  ml_engine:
+    build:
+      context: .
+      dockerfile: Dockerfile.ml
+    container_name: ai_trading_ml_engine
+    environment:
+      - DATABASE_URL=postgresql://trading_user:${POSTGRES_PASSWORD}@postgres:5432/ai_trading
+      - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379/0
+      - KAFKA_BROKERS=kafka:9092
+      - LOG_LEVEL=INFO
+      - GPU_ENABLED=true
+    volumes:
+      - ./logs:/app/logs
+      - ./models:/app/models
+    networks:
+      - ai_trading_network
+    restart: unless-stopped
+    depends_on:
+      - postgres
+      - redis
+      - kafka
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+  strategy_engine:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ai_trading_strategy_engine
+    environment:
+      - DATABASE_URL=postgresql://trading_user:${POSTGRES_PASSWORD}@postgres:5432/ai_trading
+      - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379/0
+      - KAFKA_BROKERS=kafka:9092
+      - LOG_LEVEL=INFO
+    volumes:
+      - ./logs:/app/logs
+    networks:
+      - ai_trading_network
+    restart: unless-stopped
+    depends_on:
+      - postgres
+      - redis
+      - kafka
+
+  execution_engine:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ai_trading_execution_engine
+    environment:
+      - DATABASE_URL=postgresql://trading_user:${POSTGRES_PASSWORD}@postgres:5432/ai_trading
+      - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379/0
+      - KAFKA_BROKERS=kafka:9092
+      - LOG_LEVEL=INFO
+      - KIS_API_KEY=${KIS_API_KEY}
+      - KIS_SECRET_KEY=${KIS_SECRET_KEY}
+    volumes:
+      - ./logs:/app/logs
+    networks:
+      - ai_trading_network
+    restart: unless-stopped
+    depends_on:
+      - postgres
+      - redis
+      - kafka
+
+  api_gateway:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ai_trading_api_gateway
+    environment:
+      - DATABASE_URL=postgresql://trading_user:${POSTGRES_PASSWORD}@postgres:5432/ai_trading
+      - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379/0
+      - LOG_LEVEL=INFO
+    volumes:
+      - ./logs:/app/logs
+    ports:
+      - "8000:8000"
+    networks:
+      - ai_trading_network
+    restart: unless-stopped
+    depends_on:
+      - postgres
+      - redis
+
+  monitoring:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ai_trading_monitoring
+    environment:
+      - DATABASE_URL=postgresql://trading_user:${POSTGRES_PASSWORD}@postgres:5432/ai_trading
+      - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379/0
+      - PROMETHEUS_URL=http://prometheus:9090
+      - GRAFANA_URL=http://grafana:3000
+      - LOG_LEVEL=INFO
+    volumes:
+      - ./logs:/app/logs
+    networks:
+      - ai_trading_network
+    restart: unless-stopped
+    depends_on:
+      - postgres
+      - redis
+      - prometheus
+      - grafana
+
+  # 워커 서비스
+  celery_worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ai_trading_celery_worker
+    command: celery -A ai_trading_system.celery worker --loglevel=info
+    environment:
+      - DATABASE_URL=postgresql://trading_user:${POSTGRES_PASSWORD}@postgres:5432/ai_trading
+      - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379/0
+      - LOG_LEVEL=INFO
+    volumes:
+      - ./logs:/app/logs
+    networks:
+      - ai_trading_network
+    restart: unless-stopped
+    depends_on:
+      - postgres
+      - redis
+
+  celery_beat:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ai_trading_celery_beat
+    command: celery -A ai_trading_system.celery beat --loglevel=info
+    environment:
+      - DATABASE_URL=postgresql://trading_user:${POSTGRES_PASSWORD}@postgres:5432/ai_trading
+      - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379/0
+      - LOG_LEVEL=INFO
+    volumes:
+      - ./logs:/app/logs
+    networks:
+      - ai_trading_network
+    restart: unless-stopped
+    depends_on:
+      - postgres
+      - redis
+
+  # 백업 서비스
+  backup:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ai_trading_backup
+    environment:
+      - DATABASE_URL=postgresql://trading_user:${POSTGRES_PASSWORD}@postgres:5432/ai_trading
+      - BACKUP_SCHEDULE=0 2 * * *
+      - BACKUP_RETENTION_DAYS=30
+    volumes:
+      - ./backups:/app/backups
+    networks:
+      - ai_trading_network
+    restart: unless-stopped
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data:
+  timescaledb_data:
+  mongodb_data:
+  redis_data:
+  prometheus_data:
+  grafana_data:
+  elasticsearch_data:
+
+networks:
+  ai_trading_network:
+    driver: bridge 
