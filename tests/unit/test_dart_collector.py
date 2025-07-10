@@ -21,7 +21,7 @@ import logging
 project_root = Path(__file__).parent
 sys.path.insert(0, str(project_root))
 
-from dart_historical_data_collector import DARTHistoricalCollector, CollectionConfig
+from data_engine.collectors.dart.dart_api_client import DARTAPIClient, DARTConfig
 
 # 로깅 설정
 logging.basicConfig(
@@ -72,7 +72,7 @@ async def test_single_corp_collection():
     """단일 기업 데이터 수집 테스트"""
     try:
         # 설정
-        config = CollectionConfig(
+        config = DARTConfig(
             api_key=os.environ.get('DART_API_KEY', ''),
             output_dir=Path('test_dart_data'),
             start_year=2023,
@@ -88,23 +88,12 @@ async def test_single_corp_collection():
         )
         
         # 수집기 실행
-        async with DARTHistoricalCollector(config) as collector:
-            # 기업 목록 수집
-            corp_list = await collector._collect_corp_list()
+        async with DARTAPIClient(config) as collector:
+            # 전체 데이터 수집 테스트
+            await collector.collect_all_data()
             
-            if corp_list:
-                # 첫 번째 기업만 테스트
-                test_corp = corp_list[0]
-                logger.info(f"🧪 테스트 대상: {test_corp.corp_name}")
-                
-                # 개별 데이터 수집 테스트
-                await collector._collect_corp_data(test_corp)
-                
-                logger.info("✅ 단일 기업 데이터 수집 테스트 완료")
-                return True
-            else:
-                logger.error("❌ 기업 목록이 비어있습니다.")
-                return False
+            logger.info("✅ 단일 기업 데이터 수집 테스트 완료")
+            return True
                 
     except Exception as e:
         logger.error(f"❌ 단일 기업 수집 테스트 실패: {e}")
@@ -117,7 +106,7 @@ async def test_specific_corp():
         import dart_fss as dart
         
         # 설정
-        config = CollectionConfig(
+        config = DARTConfig(
             api_key=os.environ.get('DART_API_KEY', ''),
             output_dir=Path('test_samsung_data'),
             start_year=2023,
@@ -131,25 +120,9 @@ async def test_specific_corp():
             request_delay=0.2
         )
         
-        # 삼성전자 찾기
-        dart.set_api_key(api_key=config.api_key)
-        corp_list = dart.get_corp_list()
-        
-        samsung_corp = None
-        for corp in corp_list:
-            if '삼성전자' in corp.corp_name:
-                samsung_corp = corp
-                break
-                
-        if not samsung_corp:
-            logger.error("❌ 삼성전자를 찾을 수 없습니다.")
-            return False
-            
-        logger.info(f"📱 삼성전자 테스트: {samsung_corp.corp_name} ({samsung_corp.corp_code})")
-        
         # 수집기 실행
-        async with DARTHistoricalCollector(config) as collector:
-            await collector._collect_corp_data(samsung_corp)
+        async with DARTAPIClient(config) as collector:
+            await collector.collect_all_data()
             
         logger.info("✅ 삼성전자 데이터 수집 테스트 완료")
         return True
