@@ -311,3 +311,44 @@ telegram_logs/
 personal_config/
 user_settings/
 local_config/
+
+# ============================================================================
+# 🧹 정리된 파일들 (GitHub에서 제거됨)
+# ============================================================================
+
+# 가상환경 폴더 (용량이 큼)
+execution/
+trading_env/
+
+# 디버그 파일들
+debug/
+*.html
+
+# ML 출력 파일들
+ml_outputs/
+world_class_ml_outputs/
+modules/collectors/ml_outputs/
+modules/collectors/world_class_ml_outputs/
+
+# 캐시 파일들
+.binance_cache/
+.cache/
+__pycache__/
+
+# 로그 파일들
+*.log
+logs/
+
+# 데이터베이스 파일들
+*.db
+*.sqlite
+*.sqlite3
+
+# 테스트 결과 파일들
+*_test_results.json
+*_test_results.json
+
+# 임시 파일들
+*.tmp
+*.temp
+*.bak

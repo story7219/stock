@@ -1,8 +1,0 @@
-=== Binance Data Profiling Report ===
-
-Shape: (39322, 15)
-Columns: ['open_time', 'open', 'high', 'low', 'close', 'volume', 'close_time', 'quote_asset_volume', 'number_of_trades', 'taker_buy_base_asset_volume', 'taker_buy_quote_asset_volume', 'ignore', 'symbol', 'market', 'interval']
-Missing Values:
-{'open_time': 0, 'open': 0, 'high': 0, 'low': 0, 'close': 0, 'volume': 0, 'close_time': 0, 'quote_asset_volume': 0, 'number_of_trades': 0, 'taker_buy_base_asset_volume': 0, 'taker_buy_quote_asset_volume': 0, 'ignore': 0, 'symbol': 0, 'market': 0, 'interval': 0}
-Numeric Statistics:
-{'number_of_trades': {'count': 39322.0, 'mean': 658319.3439296068, 'std': 1395739.4644837477, 'min': 0.0, '25%': 8797.75, '50%': 76521.0, '75%': 550003.0, 'max': 18662136.0}}
