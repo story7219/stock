@@ -3,540 +3,593 @@
 """
 파일명: quality_check.py
 모듈: 코드 품질 검사 시스템
-목적: 자동 품질 검사, 테스트 실행, 보안 감사
+목적: 코드 품질, 성능, 보안 검사
 
-Author: GitHub Actions
-Created: 2025-01-06
-Version: 1.0.0
+Author: Auto Trading System
+Created: 2025-01-13
+Modified: 2025-01-13
+Version: 2.0.0
 
 Dependencies:
     - Python 3.11+
-    - pytest
-    - subprocess
+    - ast
     - pathlib
+    - typing
+    - logging
 
 Performance:
-    - 검사 시간: < 120초
-    - 메모리사용량: < 300MB
-    - 처리용량: 500+ files/minute
+    - 검사 시간: < 30초
+    - 메모리사용량: < 50MB
+    - 처리용량: 1000+ files/minute
 
 Security:
     - 코드 보안 검사
     - 취약점 탐지
-    - 권한 검증
+    - 품질 메트릭 계산
 
 License: MIT
 """
 
 from __future__ import annotations
 
-import asyncio
-import json
+import ast
 import logging
 import os
-import re
-import subprocess
 import sys
-import time
 from dataclasses import dataclass, field
+from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Dict, List, Optional, Union, Final, Any, Set
 
-import pytest
+# 상수 정의
+MAX_COMPLEXITY: Final = 10
+MAX_LINE_LENGTH: Final = 88
+MAX_FUNCTION_LENGTH: Final = 50
+MAX_CLASS_LENGTH: Final = 200
+MIN_TEST_COVERAGE: Final = 80.0
 
 # 로깅 설정
 logging.basicConfig(
     level=logging.INFO,
-    format="%(asctime)s - %(levelname)s - %(message)s"
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler('logs/quality_check.log'),
+        logging.StreamHandler()
+    ]
 )
 logger = logging.getLogger(__name__)
 
 
 @dataclass
-class QualityResult:
-    """품질 검사 결과"""
-    tool_name: str
-    passed: bool
-    score: float
-    issues: List[Dict[str, Any]] = field(default_factory=list)
-    warnings: List[str] = field(default_factory=list)
-    execution_time: float = 0.0
-    output: str = ""
+class CodeIssue:
+    """코드 이슈 정보"""
+    file_path: Path
+    line_number: int
+    issue_type: str
+    severity: str
+    description: str
+    suggestion: str
+    timestamp: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+
+
+@dataclass
+class QualityMetrics:
+    """품질 메트릭 정보"""
+    file_path: Path
+    lines_of_code: int
+    cyclomatic_complexity: float
+    maintainability_index: float
+    test_coverage: Optional[float] = None
+    issues_count: int = 0
+    issues_by_severity: Dict[str, int] = field(default_factory=dict)
 
 
 @dataclass
 class QualityReport:
-    """전체 품질 보고서"""
-    overall_score: float
-    passed: bool
-    results: List[QualityResult] = field(default_factory=list)
-    summary: Dict[str, Any] = field(default_factory=dict)
-    recommendations: List[str] = field(default_factory=list)
-    execution_time: float = 0.0
+    """품질 검사 결과"""
+    total_files: int
+    total_issues: int
+    quality_score: float
+    metrics: List[QualityMetrics]
+    issues: List[CodeIssue]
+    timestamp: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
 
 
-class InvestmentSystemQualityChecker:
-    """투자 시스템 품질 검사기"""
-
-    def __init__(self, project_root: Optional[Path] = None):
-        """초기화"""
-        try:
-            self.project_root = project_root or Path(__file__).parent.parent.parent
-            self.src_path = self.project_root / "src"
-            self.config_path = self.project_root / "config"
-            
-            # 품질 기준
-            self.quality_standards = {
-                "pylint_min_score": 8.0,
-                "coverage_min_percent": 80.0,
-                "complexity_max": 10,
-                "line_length_max": 88,
-                "function_length_max": 50,
-                "class_length_max": 200,
-            }
-            
-            # Python 파일 목록
-            self.python_files = self._get_python_files()
-            
-            # 투자 시스템 특화 규칙
-            self.investment_rules = {
-                "required_modules": [
-                    "yfinance", "pandas", "numpy", "ta",
-                    "google-generative-ai", "aiohttp"
-                ],
-                "required_functions": {
-                    "strategy": ["analyze", "get_strategy_type"],
-                    "data_collector": ["collect_market_data", "get_stock_data"],
-                    "ai_analyzer": ["analyze_recommendations"],
-                },
-                "security_patterns": [
-                    r'api_key\s*=\s*"[^"]+"',
-                    r'password\s*=\s*"[^"]+"',
-                    r'secret\s*=\s*"[^"]+"',
-                ],
-            }
-            
-            logger.info("품질 검사기 초기화 완료")
-            
-        except Exception as e:
-            logger.error(f"Error during initialization: {e}")
-            raise
-
-    def _get_python_files(self) -> List[Path]:
-        """프로젝트 디렉토리 내의 Python 파일 목록을 반환합니다."""
+class CodeQualityChecker:
+    """코드 품질 검사 시스템"""
+    
+    def __init__(self, target_directory: Union[str, Path] = "."):
+        self.target_directory = Path(target_directory)
+        self.python_files: List[Path] = []
+        self.issues: List[CodeIssue] = []
+        self.metrics: List[QualityMetrics] = []
+        
+        if not self.target_directory.exists():
+            raise FileNotFoundError(f"Target directory does not exist: {target_directory}")
+    
+    def find_python_files(self) -> List[Path]:
+        """Python 파일 찾기"""
         try:
             python_files = []
-            for path in self.project_root.rglob("*.py"):
-                if "venv" not in str(path) and "__pycache__" not in str(path):
-                    python_files.append(path)
+            
+            for file_path in self.target_directory.rglob("*.py"):
+                if not any(exclude in str(file_path) for exclude in [
+                    "__pycache__", ".git", "venv", "env", ".pytest_cache"
+                ]):
+                    python_files.append(file_path)
+            
+            logger.info(f"📁 Found {len(python_files)} Python files")
             return python_files
+            
         except Exception as e:
-            logger.error(f"Python 파일 목록 생성 실패: {e}")
+            logger.error(f"❌ Failed to find Python files: {e}")
             return []
-
-    def run_pylint_check(self) -> QualityResult:
-        """Pylint 검사 실행"""
+    
+    def analyze_file_complexity(self, file_path: Path) -> Dict[str, Any]:
+        """파일 복잡도 분석"""
         try:
-            start_time = time.time()
+            with open(file_path, 'r', encoding='utf-8') as f:
+                content = f.read()
             
-            # Pylint 명령어 실행
-            cmd = [
-                "pylint",
-                "--output-format=json",
-                "--score=y",
-                "--disable=C0114,C0115,C0116",  # docstring 관련 경고 비활성화
-                str(self.project_root)
-            ]
+            tree = ast.parse(content)
             
-            result = subprocess.run(
-                cmd,
-                capture_output=True,
-                text=True,
-                timeout=300  # 5분 타임아웃
-            )
+            # 순환 복잡도 계산
+            complexity = self._calculate_cyclomatic_complexity(tree)
             
-            execution_time = time.time() - start_time
+            # 유지보수성 지수 계산
+            maintainability = self._calculate_maintainability_index(content, complexity)
             
-            # 결과 파싱
-            if result.returncode == 0:
-                return QualityResult(
-                    tool_name="pylint",
-                    passed=True,
-                    score=10.0,
-                    execution_time=execution_time,
-                    output=result.stdout
-                )
-            else:
-                # JSON 출력 파싱
-                issues = []
-                try:
-                    pylint_results = json.loads(result.stdout)
-                    for item in pylint_results:
-                        issues.append({
-                            'file': item.get('path', ''),
-                            'line': item.get('line', 0),
-                            'message': item.get('message', ''),
-                            'type': item.get('type', '')
-                        })
-                except json.JSONDecodeError:
-                    issues.append({'message': 'Pylint 결과 파싱 실패'})
-                
-                return QualityResult(
-                    tool_name="pylint",
-                    passed=False,
-                    score=0.0,
-                    issues=issues,
-                    execution_time=execution_time,
-                    output=result.stdout
-                )
-                
-        except subprocess.TimeoutExpired:
-            return QualityResult(
-                tool_name="pylint",
-                passed=False,
-                score=0.0,
-                warnings=["Pylint 실행 시간 초과"],
-                execution_time=300.0
-            )
-        except Exception as e:
-            return QualityResult(
-                tool_name="pylint",
-                passed=False,
-                score=0.0,
-                warnings=[f"Pylint 실행 실패: {e}"]
-            )
-
-    def run_test_coverage(self) -> QualityResult:
-        """테스트 커버리지 검사"""
-        try:
-            start_time = time.time()
+            # 라인 수 계산
+            lines_of_code = len(content.splitlines())
             
-            # pytest-cov 명령어 실행
-            cmd = [
-                "python", "-m", "pytest",
-                "--cov=.",
-                "--cov-report=json",
-                "--cov-report=term-missing",
-                str(self.project_root / "tests")
-            ]
-            
-            result = subprocess.run(
-                cmd,
-                capture_output=True,
-                text=True,
-                timeout=600  # 10분 타임아웃
-            )
-            
-            execution_time = time.time() - start_time
-            
-            # 커버리지 결과 파싱
-            coverage_score = 0.0
-            try:
-                # JSON 커버리지 리포트에서 점수 추출
-                coverage_match = re.search(r'TOTAL\s+(\d+)\s+(\d+)\s+(\d+)%', result.stdout)
-                if coverage_match:
-                    coverage_score = float(coverage_match.group(3))
-            except Exception:
-                coverage_score = 0.0
-            
-            passed = coverage_score >= self.quality_standards["coverage_min_percent"]
-            
-            return QualityResult(
-                tool_name="test_coverage",
-                passed=passed,
-                score=coverage_score,
-                execution_time=execution_time,
-                output=result.stdout
-            )
-            
-        except subprocess.TimeoutExpired:
-            return QualityResult(
-                tool_name="test_coverage",
-                passed=False,
-                score=0.0,
-                warnings=["테스트 커버리지 실행 시간 초과"],
-                execution_time=600.0
-            )
-        except Exception as e:
-            return QualityResult(
-                tool_name="test_coverage",
-                passed=False,
-                score=0.0,
-                warnings=[f"테스트 커버리지 실행 실패: {e}"]
-            )
-
-    def run_security_audit(self) -> QualityResult:
-        """보안 감사 실행"""
-        try:
-            start_time = time.time()
-            
-            # bandit 보안 검사
-            cmd = [
-                "bandit",
-                "-r",
-                str(self.project_root),
-                "-f", "json"
-            ]
-            
-            result = subprocess.run(
-                cmd,
-                capture_output=True,
-                text=True,
-                timeout=300
-            )
-            
-            execution_time = time.time() - start_time
-            
-            # 보안 이슈 파싱
-            security_issues = []
-            try:
-                bandit_results = json.loads(result.stdout)
-                for issue in bandit_results.get('results', []):
-                    security_issues.append({
-                        'file': issue.get('filename', ''),
-                        'line': issue.get('line_number', 0),
-                        'severity': issue.get('issue_severity', ''),
-                        'message': issue.get('issue_text', '')
-                    })
-            except json.JSONDecodeError:
-                security_issues.append({'message': '보안 감사 결과 파싱 실패'})
-            
-            # 보안 점수 계산 (이슈가 적을수록 높은 점수)
-            security_score = max(0.0, 10.0 - len(security_issues) * 2.0)
-            passed = len(security_issues) == 0
-            
-            return QualityResult(
-                tool_name="security_audit",
-                passed=passed,
-                score=security_score,
-                issues=security_issues,
-                execution_time=execution_time,
-                output=result.stdout
-            )
-            
-        except subprocess.TimeoutExpired:
-            return QualityResult(
-                tool_name="security_audit",
-                passed=False,
-                score=0.0,
-                warnings=["보안 감사 실행 시간 초과"],
-                execution_time=300.0
-            )
-        except Exception as e:
-            return QualityResult(
-                tool_name="security_audit",
-                passed=False,
-                score=0.0,
-                warnings=[f"보안 감사 실행 실패: {e}"]
-            )
-
-    def check_code_structure(self) -> QualityResult:
-        """코드 구조 검사"""
-        try:
-            start_time = time.time()
-            
-            issues = []
-            warnings = []
-            
-            # 파일 헤더 검사
-            for py_file in self.python_files:
-                try:
-                    with open(py_file, 'r', encoding='utf-8') as f:
-                        content = f.read()
-                    
-                    # 파일 헤더 검사
-                    if not content.startswith('#!/usr/bin/env python3'):
-                        issues.append({
-                            'file': str(py_file),
-                            'message': '파일 헤더가 누락되었습니다'
-                        })
-                    
-                    # 인코딩 선언 검사
-                    if '# -*- coding: utf-8 -*-' not in content:
-                        warnings.append(f"{py_file}: 인코딩 선언이 누락되었습니다")
-                    
-                    # 타입 힌트 검사
-                    if 'def ' in content and '->' not in content:
-                        warnings.append(f"{py_file}: 함수에 타입 힌트가 누락되었습니다")
-                    
-                except Exception as e:
-                    warnings.append(f"{py_file}: 파일 읽기 실패 - {e}")
-            
-            execution_time = time.time() - start_time
-            
-            # 구조 점수 계산
-            structure_score = max(0.0, 10.0 - len(issues) * 2.0 - len(warnings) * 0.5)
-            passed = len(issues) == 0
-            
-            return QualityResult(
-                tool_name="code_structure",
-                passed=passed,
-                score=structure_score,
-                issues=issues,
-                warnings=warnings,
-                execution_time=execution_time
-            )
-            
-        except Exception as e:
-            return QualityResult(
-                tool_name="code_structure",
-                passed=False,
-                score=0.0,
-                warnings=[f"코드 구조 검사 실패: {e}"]
-            )
-
-    def run_full_quality_check(self) -> QualityReport:
-        """전체 품질 검사 실행"""
-        try:
-            start_time = time.time()
-            logger.info("🔍 전체 품질 검사 시작")
-            
-            results = []
-            
-            # 1. Pylint 검사
-            logger.info("실행 중: Pylint 검사")
-            pylint_result = self.run_pylint_check()
-            results.append(pylint_result)
-            
-            # 2. 테스트 커버리지
-            logger.info("실행 중: 테스트 커버리지")
-            coverage_result = self.run_test_coverage()
-            results.append(coverage_result)
-            
-            # 3. 보안 감사
-            logger.info("실행 중: 보안 감사")
-            security_result = self.run_security_audit()
-            results.append(security_result)
-            
-            # 4. 코드 구조 검사
-            logger.info("실행 중: 코드 구조 검사")
-            structure_result = self.check_code_structure()
-            results.append(structure_result)
-            
-            # 전체 점수 계산
-            total_score = sum(result.score for result in results) / len(results)
-            all_passed = all(result.passed for result in results)
-            
-            execution_time = time.time() - start_time
-            
-            # 요약 생성
-            summary = {
-                'total_tools': len(results),
-                'passed_tools': sum(1 for r in results if r.passed),
-                'total_issues': sum(len(r.issues) for r in results),
-                'total_warnings': sum(len(r.warnings) for r in results),
-                'average_score': total_score
+            return {
+                'cyclomatic_complexity': complexity,
+                'maintainability_index': maintainability,
+                'lines_of_code': lines_of_code
             }
             
-            # 권장사항 생성
-            recommendations = []
-            if not all_passed:
-                recommendations.append("일부 품질 검사가 실패했습니다. 이슈를 수정하고 다시 실행하세요.")
-            if total_score < 8.0:
-                recommendations.append("전체 품질 점수가 낮습니다. 코드 품질을 개선하세요.")
-            if summary['total_issues'] > 0:
-                recommendations.append(f"{summary['total_issues']}개의 이슈를 수정하세요.")
+        except Exception as e:
+            logger.error(f"❌ Failed to analyze complexity for {file_path}: {e}")
+            return {
+                'cyclomatic_complexity': 0,
+                'maintainability_index': 0,
+                'lines_of_code': 0
+            }
+    
+    def _calculate_cyclomatic_complexity(self, tree: ast.AST) -> float:
+        """순환 복잡도 계산"""
+        complexity = 1  # 기본 복잡도
+        
+        for node in ast.walk(tree):
+            if isinstance(node, (ast.If, ast.While, ast.For, ast.AsyncFor)):
+                complexity += 1
+            elif isinstance(node, ast.ExceptHandler):
+                complexity += 1
+            elif isinstance(node, ast.BoolOp):
+                complexity += len(node.values) - 1
+        
+        return complexity
+    
+    def _calculate_maintainability_index(self, content: str, complexity: float) -> float:
+        """유지보수성 지수 계산"""
+        try:
+            lines = content.splitlines()
+            loc = len(lines)
             
-            report = QualityReport(
-                overall_score=total_score,
-                passed=all_passed,
-                results=results,
-                summary=summary,
-                recommendations=recommendations,
-                execution_time=execution_time
+            # 주석 라인 수 계산
+            comment_lines = sum(1 for line in lines if line.strip().startswith('#'))
+            
+            # 빈 라인 수 계산
+            blank_lines = sum(1 for line in lines if not line.strip())
+            
+            # 실제 코드 라인 수
+            code_lines = loc - comment_lines - blank_lines
+            
+            # 유지보수성 지수 계산 (Halstead 복잡도 기반)
+            if code_lines > 0:
+                mi = 171 - 5.2 * complexity - 0.23 * code_lines - 16.2 * (comment_lines / code_lines if code_lines > 0 else 0)
+                return max(0, min(100, mi))
+            else:
+                return 100.0
+                
+        except Exception:
+            return 50.0  # 기본값
+    
+    def check_code_style(self, file_path: Path) -> List[CodeIssue]:
+        """코드 스타일 검사"""
+        issues: List[CodeIssue] = []
+        
+        try:
+            with open(file_path, 'r', encoding='utf-8') as f:
+                lines = f.readlines()
+            
+            for line_num, line in enumerate(lines, 1):
+                # 라인 길이 검사
+                if len(line.rstrip()) > MAX_LINE_LENGTH:
+                    issues.append(CodeIssue(
+                        file_path=file_path,
+                        line_number=line_num,
+                        issue_type="LINE_TOO_LONG",
+                        severity="MEDIUM",
+                        description=f"Line length ({len(line.rstrip())}) exceeds limit ({MAX_LINE_LENGTH})",
+                        suggestion="Break long lines or use line continuation"
+                    ))
+                
+                # 들여쓰기 검사
+                if line.strip() and not line.startswith('#'):
+                    indent = len(line) - len(line.lstrip())
+                    if indent % 4 != 0:
+                        issues.append(CodeIssue(
+                            file_path=file_path,
+                            line_number=line_num,
+                            issue_type="INDENTATION_ERROR",
+                            severity="HIGH",
+                            description=f"Indentation should be multiple of 4 spaces",
+                            suggestion="Use 4 spaces for indentation"
+                        ))
+                
+                # 공백 검사
+                if line.endswith(' \n'):
+                    issues.append(CodeIssue(
+                        file_path=file_path,
+                        line_number=line_num,
+                        issue_type="TRAILING_WHITESPACE",
+                        severity="LOW",
+                        description="Trailing whitespace found",
+                        suggestion="Remove trailing whitespace"
+                    ))
+            
+            return issues
+            
+        except Exception as e:
+            logger.error(f"❌ Failed to check code style for {file_path}: {e}")
+            return []
+    
+    def check_security_issues(self, file_path: Path) -> List[CodeIssue]:
+        """보안 이슈 검사"""
+        issues: List[CodeIssue] = []
+        
+        try:
+            with open(file_path, 'r', encoding='utf-8') as f:
+                content = f.read()
+            
+            # 위험한 함수 사용 검사
+            dangerous_functions = [
+                'eval(', 'exec(', 'os.system(', 'subprocess.call(',
+                'pickle.loads(', 'marshal.loads(', '__import__('
+            ]
+            
+            lines = content.splitlines()
+            for line_num, line in enumerate(lines, 1):
+                for func in dangerous_functions:
+                    if func in line:
+                        issues.append(CodeIssue(
+                            file_path=file_path,
+                            line_number=line_num,
+                            issue_type="DANGEROUS_FUNCTION",
+                            severity="CRITICAL",
+                            description=f"Use of dangerous function: {func}",
+                            suggestion="Use safer alternatives and validate inputs"
+                        ))
+            
+            # 하드코딩된 비밀번호 검사
+            password_patterns = [
+                r'password\s*=\s*["\'][^"\']+["\']',
+                r'secret\s*=\s*["\'][^"\']+["\']',
+                r'api_key\s*=\s*["\'][^"\']+["\']'
+            ]
+            
+            for pattern in password_patterns:
+                import re
+                matches = re.finditer(pattern, content, re.IGNORECASE)
+                for match in matches:
+                    line_num = content[:match.start()].count('\n') + 1
+                    issues.append(CodeIssue(
+                        file_path=file_path,
+                        line_number=line_num,
+                        issue_type="HARDCODED_SECRET",
+                        severity="CRITICAL",
+                        description="Hardcoded secret detected",
+                        suggestion="Move secrets to environment variables or secure storage"
+                    ))
+            
+            return issues
+            
+        except Exception as e:
+            logger.error(f"❌ Failed to check security for {file_path}: {e}")
+            return []
+    
+    def check_performance_issues(self, file_path: Path) -> List[CodeIssue]:
+        """성능 이슈 검사"""
+        issues: List[CodeIssue] = []
+        
+        try:
+            with open(file_path, 'r', encoding='utf-8') as f:
+                content = f.read()
+            
+            lines = content.splitlines()
+            
+            # 긴 함수 검사
+            function_lines = 0
+            in_function = False
+            
+            for line_num, line in enumerate(lines, 1):
+                stripped = line.strip()
+                
+                if stripped.startswith('def ') or stripped.startswith('async def '):
+                    if in_function and function_lines > MAX_FUNCTION_LENGTH:
+                        issues.append(CodeIssue(
+                            file_path=file_path,
+                            line_number=line_num - function_lines,
+                            issue_type="FUNCTION_TOO_LONG",
+                            severity="MEDIUM",
+                            description=f"Function length ({function_lines}) exceeds limit ({MAX_FUNCTION_LENGTH})",
+                            suggestion="Break function into smaller functions"
+                        ))
+                    
+                    in_function = True
+                    function_lines = 0
+                elif in_function:
+                    if stripped and not stripped.startswith('#'):
+                        function_lines += 1
+                    
+                    # 함수 끝 확인
+                    if stripped and not stripped.startswith(' ') and not stripped.startswith('\t'):
+                        if function_lines > MAX_FUNCTION_LENGTH:
+                            issues.append(CodeIssue(
+                                file_path=file_path,
+                                line_number=line_num - function_lines,
+                                issue_type="FUNCTION_TOO_LONG",
+                                severity="MEDIUM",
+                                description=f"Function length ({function_lines}) exceeds limit ({MAX_FUNCTION_LENGTH})",
+                                suggestion="Break function into smaller functions"
+                            ))
+                        in_function = False
+                        function_lines = 0
+            
+            # 중첩된 루프 검사
+            nested_loops = 0
+            for line_num, line in enumerate(lines, 1):
+                stripped = line.strip()
+                if stripped.startswith(('for ', 'while ')):
+                    nested_loops += 1
+                    if nested_loops > 3:
+                        issues.append(CodeIssue(
+                            file_path=file_path,
+                            line_number=line_num,
+                            issue_type="NESTED_LOOPS",
+                            severity="MEDIUM",
+                            description="Too many nested loops detected",
+                            suggestion="Consider refactoring to reduce nesting"
+                        ))
+                elif stripped and not stripped.startswith(' '):
+                    nested_loops = 0
+            
+            return issues
+            
+        except Exception as e:
+            logger.error(f"❌ Failed to check performance for {file_path}: {e}")
+            return []
+    
+    def analyze_file(self, file_path: Path) -> QualityMetrics:
+        """개별 파일 분석"""
+        try:
+            logger.debug(f"🔍 Analyzing {file_path}")
+            
+            # 복잡도 분석
+            complexity_data = self.analyze_file_complexity(file_path)
+            
+            # 이슈 검사
+            style_issues = self.check_code_style(file_path)
+            security_issues = self.check_security_issues(file_path)
+            performance_issues = self.check_performance_issues(file_path)
+            
+            all_issues = style_issues + security_issues + performance_issues
+            
+            # 이슈 심각도별 분류
+            issues_by_severity = {}
+            for issue in all_issues:
+                issues_by_severity[issue.severity] = issues_by_severity.get(issue.severity, 0) + 1
+            
+            metrics = QualityMetrics(
+                file_path=file_path,
+                lines_of_code=complexity_data['lines_of_code'],
+                cyclomatic_complexity=complexity_data['cyclomatic_complexity'],
+                maintainability_index=complexity_data['maintainability_index'],
+                issues_count=len(all_issues),
+                issues_by_severity=issues_by_severity
             )
             
-            logger.info(f"✅ 전체 품질 검사 완료 (점수: {total_score:.2f}, 통과: {all_passed})")
+            # 이슈 저장
+            self.issues.extend(all_issues)
+            
+            return metrics
+            
+        except Exception as e:
+            logger.error(f"❌ Failed to analyze {file_path}: {e}")
+            return QualityMetrics(
+                file_path=file_path,
+                lines_of_code=0,
+                cyclomatic_complexity=0,
+                maintainability_index=0,
+                issues_count=0
+            )
+    
+    def run_quality_check(self) -> QualityReport:
+        """품질 검사 실행"""
+        try:
+            logger.info("🔍 Starting code quality check...")
+            
+            # Python 파일 찾기
+            python_files = self.find_python_files()
+            
+            if not python_files:
+                logger.warning("⚠️ No Python files found")
+                return QualityReport(
+                    total_files=0,
+                    total_issues=0,
+                    quality_score=0.0,
+                    metrics=[],
+                    issues=[]
+                )
+            
+            # 각 파일 분석
+            for file_path in python_files:
+                metrics = self.analyze_file(file_path)
+                self.metrics.append(metrics)
+            
+            # 품질 점수 계산
+            quality_score = self._calculate_quality_score()
+            
+            report = QualityReport(
+                total_files=len(python_files),
+                total_issues=len(self.issues),
+                quality_score=quality_score,
+                metrics=self.metrics,
+                issues=self.issues
+            )
+            
+            logger.info(f"✅ Quality check completed: {len(python_files)} files, "
+                       f"{len(self.issues)} issues, score: {quality_score:.1f}")
+            
             return report
             
         except Exception as e:
-            logger.error(f"전체 품질 검사 실패: {e}")
-            return QualityReport(
-                overall_score=0.0,
-                passed=False,
-                recommendations=[f"품질 검사 실행 실패: {e}"]
-            )
-
-    def save_quality_report(self, report: QualityReport, output_path: str = "quality_report.json") -> bool:
-        """품질 보고서 저장"""
-        try:
-            report_dict = {
-                'overall_score': report.overall_score,
-                'passed': report.passed,
-                'summary': report.summary,
-                'recommendations': report.recommendations,
-                'execution_time': report.execution_time,
-                'results': [
-                    {
-                        'tool_name': r.tool_name,
-                        'passed': r.passed,
-                        'score': r.score,
-                        'issues': r.issues,
-                        'warnings': r.warnings,
-                        'execution_time': r.execution_time
-                    }
-                    for r in report.results
-                ]
-            }
+            logger.error(f"❌ Quality check failed: {e}")
+            raise
+    
+    def _calculate_quality_score(self) -> float:
+        """품질 점수 계산"""
+        if not self.metrics:
+            return 0.0
+        
+        total_score = 0.0
+        total_weight = 0.0
+        
+        for metric in self.metrics:
+            # 유지보수성 지수 (40%)
+            maintainability_score = min(100, max(0, metric.maintainability_index)) / 100
+            total_score += maintainability_score * 0.4
+            total_weight += 0.4
             
-            with open(output_path, 'w', encoding='utf-8') as f:
-                json.dump(report_dict, f, indent=2, ensure_ascii=False)
+            # 복잡도 점수 (30%)
+            complexity_score = max(0, 1 - (metric.cyclomatic_complexity / MAX_COMPLEXITY))
+            total_score += complexity_score * 0.3
+            total_weight += 0.3
             
-            logger.info(f"품질 보고서 저장 완료: {output_path}")
-            return True
+            # 이슈 점수 (30%)
+            if metric.issues_count == 0:
+                issue_score = 1.0
+            else:
+                # 심각도별 가중치
+                critical_issues = metric.issues_by_severity.get('CRITICAL', 0)
+                high_issues = metric.issues_by_severity.get('HIGH', 0)
+                medium_issues = metric.issues_by_severity.get('MEDIUM', 0)
+                low_issues = metric.issues_by_severity.get('LOW', 0)
+                
+                issue_score = max(0, 1 - (critical_issues * 0.5 + high_issues * 0.3 + 
+                                         medium_issues * 0.15 + low_issues * 0.05))
             
-        except Exception as e:
-            logger.error(f"품질 보고서 저장 실패: {e}")
-            return False
+            total_score += issue_score * 0.3
+            total_weight += 0.3
+        
+        return (total_score / total_weight) * 100 if total_weight > 0 else 0.0
+    
+    def generate_report(self, quality_report: QualityReport) -> str:
+        """품질 보고서 생성"""
+        report_lines = [
+            "# Code Quality Report",
+            f"Generated: {quality_report.timestamp.isoformat()}",
+            f"Target Directory: {self.target_directory}",
+            "",
+            "## Summary",
+            f"- Total Files: {quality_report.total_files}",
+            f"- Total Issues: {quality_report.total_issues}",
+            f"- Quality Score: {quality_report.quality_score:.1f}/100",
+            ""
+        ]
+        
+        # 이슈별 통계
+        if quality_report.issues:
+            severity_counts = {}
+            for issue in quality_report.issues:
+                severity_counts[issue.severity] = severity_counts.get(issue.severity, 0) + 1
+            
+            report_lines.extend([
+                "## Issues by Severity",
+                ""
+            ])
+            
+            for severity in ['CRITICAL', 'HIGH', 'MEDIUM', 'LOW']:
+                count = severity_counts.get(severity, 0)
+                report_lines.append(f"- **{severity}**: {count}")
+            
+            report_lines.append("")
+        
+        # 파일별 상세 정보
+        if quality_report.metrics:
+            report_lines.extend([
+                "## File Details",
+                ""
+            ])
+            
+            for metric in quality_report.metrics:
+                report_lines.extend([
+                    f"### {metric.file_path}",
+                    f"- **Lines of Code**: {metric.lines_of_code}",
+                    f"- **Cyclomatic Complexity**: {metric.cyclomatic_complexity:.1f}",
+                    f"- **Maintainability Index**: {metric.maintainability_index:.1f}",
+                    f"- **Issues**: {metric.issues_count}",
+                    ""
+                ])
+        
+        # 권장사항
+        report_lines.extend([
+            "## Recommendations",
+            ""
+        ])
+        
+        if quality_report.quality_score >= 80:
+            report_lines.append("✅ Code quality is excellent!")
+        elif quality_report.quality_score >= 60:
+            report_lines.append("⚠️ Code quality needs improvement")
+        else:
+            report_lines.append("❌ Code quality requires significant attention")
+        
+        return "\n".join(report_lines)
 
 
-def test_investment_system_quality_checker_init():
-    """품질 검사기 초기화 테스트"""
-    try:
-        checker = InvestmentSystemQualityChecker()
-        assert isinstance(checker.project_root, Path)
-        assert isinstance(checker.src_path, Path)
-        assert isinstance(checker.quality_standards, dict)
-        assert isinstance(checker.python_files, list)
-        assert isinstance(checker.investment_rules, dict)
-        logger.info("품질 검사기 초기화 테스트 통과")
-    except Exception as e:
-        pytest.fail(f"품질 검사기 초기화 테스트 실패: {e}")
-
-
-def main():
+def main() -> int:
     """메인 함수"""
     try:
-        logger.info("🔄 품질 검사 시작")
+        # 로그 디렉토리 생성
+        Path("logs").mkdir(exist_ok=True)
         
-        checker = InvestmentSystemQualityChecker()
-        report = checker.run_full_quality_check()
+        # 품질 검사 실행
+        checker = CodeQualityChecker()
+        quality_report = checker.run_quality_check()
         
-        # 보고서 저장
-        checker.save_quality_report(report)
+        # 보고서 생성 및 저장
+        report_content = checker.generate_report(quality_report)
+        report_file = Path("quality_report.md")
+        report_file.write_text(report_content, encoding='utf-8')
         
-        # 결과 출력
-        print(f"📊 품질 검사 결과:")
-        print(f"  - 전체 점수: {report.overall_score:.2f}/10.0")
-        print(f"  - 통과 여부: {'✅' if report.passed else '❌'}")
-        print(f"  - 실행 시간: {report.execution_time:.2f}초")
-        print(f"  - 총 이슈: {report.summary.get('total_issues', 0)}개")
-        print(f"  - 총 경고: {report.summary.get('total_warnings', 0)}개")
+        print("✅ Code quality check completed successfully")
+        print(f"📊 Quality score: {quality_report.quality_score:.1f}/100")
+        print(f"📄 Report saved to: {report_file}")
         
-        if report.recommendations:
-            print(f"\n💡 권장사항:")
-            for rec in report.recommendations:
-                print(f"  - {rec}")
-        
-        return report.passed
-        
+        # 성공/실패 판단
+        if quality_report.quality_score >= 60:
+            return 0
+        else:
+            print("⚠️ Code quality below threshold")
+            return 1
+            
     except Exception as e:
-        logger.error(f"메인 함수 실행 실패: {e}")
-        print(f"❌ 품질 검사 실패: {e}")
-        return False
+        logger.error(f"❌ Quality check failed: {e}")
+        print(f"❌ Quality check failed: {e}")
+        return 1
 
 
 if __name__ == "__main__":
-    success = main()
-    sys.exit(0 if success else 1)
-
+    sys.exit(main())

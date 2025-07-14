@@ -1,0 +1,57 @@
+name: Auto Backup System
+
+on:
+  push:
+    branches: [ main, develop ]
+  schedule:
+    # 매일 오전 2시에 자동 백업
+    - cron: '0 2 * * *'
+  workflow_dispatch: # 수동 실행 가능
+
+jobs:
+  backup-and-cleanup:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install requests pyyaml
+        
+    - name: Run backup script
+      run: |
+        python scripts/github_backup_manager.py
+        
+    - name: Check repository size
+      id: repo-size
+      run: |
+        # 저장소 크기 계산 (MB 단위)
+        SIZE=$(du -sm . | cut -f1)
+        echo "size=$SIZE" >> $GITHUB_OUTPUT
+        echo "Repository size: ${SIZE}MB"
+        
+    - name: Cleanup old files if size > 900MB
+      if: steps.repo-size.outputs.size > 900
+      run: |
+        python scripts/cleanup_old_files.py
+        
+    - name: Commit and push changes
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add .
+        git commit -m "Auto backup and cleanup $(date)" || exit 0
+        git push
+        
+    - name: Upload to Naver Cloud
+      if: always()
+      run: |
+        python scripts/naver_cloud_upload.py 

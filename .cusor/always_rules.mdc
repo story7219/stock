@@ -1,782 +1,1077 @@
 ---
 alwaysApply: true
 ---
-🏆 World-Class Python Always Rule (세계 최고 수준 Python 커서룰)
-## 📜 핵심 철학
-> "단순함이 복잡함보다 낫다. 복잡함이 꼬인 것보다 낫다." - Python Zen                                                                                                                                                                                                                                                               
-- **Zero Compromise Quality**: 타협 없는 최고 품질
-- **Production Ready**: 즉시 배포 가능한 코드
-- **Future Proof**: 10년 후에도 유지보수 가능한 설계
+# 🚀 세계 최고 수준 AI 트레이딩봇 개발 
 
-# 주식자동봇 프로젝트 규칙
+## 🎯 Phase 1: 프로젝트 초기화 (World-Class 표준)
 
-## 파일 구조 이해 및 수정 방침
+```
+🏆 Google/Meta/Netflix 수준의 AI 자동매매봇을 개발해줘
 
-### 1. 기본 원칙
-- 새로운 파일 생성 전에 반드시 기존 파일들을 분석하고 수정 가능성을 우선 검토
-- 기존 파일에 추가/수정이 가능하다면 새 파일을 만들지 않음
-- 코드 변경 시 전체 프로젝트 구조와 의존성을 고려
-
-### 2. 파일 분석 절차
-프로젝트 요청 시 다음 순서로 분석:
-1. 프로젝트 전체 파일 목록 확인
-2. 각 파일의 역할과 기능 파악
-3. 파일 간 import/export 관계 분석
-4. 기존 파일 수정 vs 새 파일 생성 판단
-
-### 3. 수정 vs 생성 판단 기준
-
-#### 기존 파일 수정하는 경우:
-- 기존 함수/클래스에 기능 추가
-- 버그 수정이나 성능 개선
-- 설정값 변경이나 파라미터 조정
-- 기존 로직의 확장이나 개선
-- 파일 크기가 500줄 미만
-
-#### 새 파일 생성하는 경우:
-- 완전히 새로운 모듈이나 기능
-- 기존 파일이 이미 500줄 이상으로 복잡함
-- 독립적인 유틸리티나 헬퍼 함수들
-- 새로운 API 연동이나 데이터 소스
-- 테스트 파일
-
-### 4. 프로젝트 구조 패턴
-
-AI_SmartTrader/
-├── 📁 core/                     # 핵심 시스템
-│   ├── config/                  # 통합 설정 관리
-│   │   ├── global_settings.py       # 글로벌 설정
-│   │   ├── api_config.py            # API 설정
-│   │   ├── trading_config.py        # 거래 설정
-│   │   ├── ml_config.py             # ML/DL 모델 설정
-│   │   └── market_config.py         # 마켓별 설정
-│   ├── database/                # DB 관리
-│   │   ├── connection_pool.py       # 연결 풀 관리
-│   │   ├── migration/               # DB 마이그레이션
-│   │   └── models/                  # ORM 모델
-│   └── utils/                   # 공통 유틸리티
-│       ├── logger.py                # 통합 로깅
-│       ├── cache_manager.py         # 캐시 관리
-│       ├── error_handler.py         # 에러 핸들링
-│       └── performance_monitor.py   # 성능 모니터링
-│
-├── 📁 data_engine/              # 데이터 엔진 (독립 서비스)
-│   ├── collectors/              # 데이터 수집기
-│   │   ├── market_data/             # 시장 데이터
-│   │   │   ├── kis_collector.py         # 한투 REST API
-│   │   │   ├── kis_websocket.py         # 한투 WebSocket
-│   │   │   ├── dart_collector.py        # DART 공시 데이터
-│   │   │   ├── krx_collector.py         # KRX 마켓 데이터
-│   │   │   └── bok_collector.py         # 한국은행 경제지표
-│   │   ├── fundamental/             # 펀더멘털 데이터
-│   │   │   ├── financial_collector.py   # 재무제표 수집
-│   │   │   ├── news_collector.py        # 뉴스 수집
-│   │   │   └── disclosure_collector.py  # 공시정보 수집
-│   │   └── alternative/             # 대체 데이터
-│   │       ├── sentiment_collector.py   # 감성 분석 데이터
-│   │       ├── social_collector.py      # 소셜 미디어 데이터
-│   │       └── economic_collector.py    # 거시경제 데이터
-│   ├── processors/              # 데이터 전처리
-│   │   ├── cleaner.py               # 데이터 정제
-│   │   ├── normalizer.py            # 정규화/표준화
-│   │   ├── feature_engineer.py      # 피처 엔지니어링
-│   │   ├── technical_analyzer.py    # 기술적 지표 생성
-│   │   └── fundamental_analyzer.py  # 펀더멘털 지표 생성
-│   ├── storage/                 # 데이터 저장
-│   │   ├── time_series_db.py        # 시계열 DB (InfluxDB)
-│   │   ├── relational_db.py         # 관계형 DB (PostgreSQL)
-│   │   ├── cache_db.py              # 캐시 DB (Redis)
-│   │   └── file_storage.py          # 파일 저장 (MinIO)
-│   └── validators/              # 데이터 검증
-│       ├── quality_checker.py       # 데이터 품질 검사
-│       ├── completeness_checker.py  # 완성도 검사
-│       └── consistency_checker.py   # 일관성 검사
-│
-├── 📁 ai_brain/                 # AI 두뇌 (독립 서비스)
-│   ├── models/                  # AI/ML 모델
-│   │   ├── predictive/              # 예측 모델
-│   │   │   ├── price_predictor.py       # 가격 예측
-│   │   │   ├── direction_predictor.py   # 방향성 예측
-│   │   │   ├── volatility_predictor.py  # 변동성 예측
-│   │   │   └── volume_predictor.py      # 거래량 예측
-│   │   ├── classification/          # 분류 모델
-│   │   │   ├── market_regime.py         # 시장 국면 분류
-│   │   │   ├── sector_rotator.py        # 섹터 로테이션
-│   │   │   └── risk_classifier.py       # 리스크 분류
-│   │   ├── deep_learning/           # 딥러닝 모델
-│   │   │   ├── lstm_ensemble.py         # LSTM 앙상블
-│   │   │   ├── transformer_model.py     # Transformer
-│   │   │   ├── cnn_model.py            # CNN (차트 패턴)
-│   │   │   ├── gru_model.py            # GRU
-│   │   │   └── attention_model.py       # Attention 메커니즘
-│   │   ├── reinforcement/           # 강화학습
-│   │   │   ├── dqn_trader.py           # DQN
-│   │   │   ├── ppo_trader.py           # PPO
-│   │   │   └── a3c_trader.py           # A3C
-│   │   └── ensemble/                # 앙상블 모델
-│   │       ├── voting_ensemble.py       # 투표 앙상블
-│   │       ├── stacking_ensemble.py     # 스태킹 앙상블
-│   │       └── blending_ensemble.py     # 블렌딩 앙상블
-│   ├── training/                # 모델 학습
-│   │   ├── auto_trainer.py          # 자동 학습 스케줄러
-│   │   ├── hyperopt_tuner.py        # 하이퍼파라미터 튜닝
-│   │   ├── cross_validator.py       # 교차 검증
-│   │   ├── model_selector.py        # 모델 선택
-│   │   └── performance_evaluator.py # 성능 평가
-│   ├── inference/               # 실시간 추론
-│   │   ├── model_server.py          # 모델 서빙
-│   │   ├── batch_predictor.py       # 배치 예측
-│   │   ├── streaming_predictor.py   # 스트리밍 예측
-│   │   └── ensemble_predictor.py    # 앙상블 예측
-│   └── optimization/            # 모델 최적화
-│       ├── quantization.py          # 모델 경량화
-│       ├── pruning.py              # 가지치기
-│       └── distillation.py         # 지식 증류
-│
-├── 📁 strategy_engine/          # 전략 엔진 (독립 서비스)
-│   ├── market_analyzer/         # 시장 분석
-│   │   ├── regime_detector.py       # 시장 국면 감지
-│   │   ├── trend_analyzer.py        # 트렌드 분석
-│   │   ├── volatility_analyzer.py   # 변동성 분석
-│   │   └── correlation_analyzer.py  # 상관관계 분석
-│   ├── strategy_factory/        # 전략 팩토리
-│   │   ├── daytrading/              # 데이트레이딩
-│   │   │   ├── scalping_strategy.py     # 스캘핑
-│   │   │   ├── momentum_strategy.py     # 모멘텀
-│   │   │   ├── reversal_strategy.py     # 반전
-│   │   │   └── breakout_strategy.py     # 돌파
-│   │   ├── swing_trading/           # 스윙트레이딩
-│   │   │   ├── trend_following.py       # 추세 추종
-│   │   │   ├── mean_reversion.py        # 평균 회귀
-│   │   │   ├── pairs_trading.py         # 페어트레이딩
-│   │   │   └── sector_rotation.py       # 섹터 로테이션
-│   │   └── medium_term/             # 중기투자
-│   │       ├── value_strategy.py        # 가치 투자
-│   │       ├── growth_strategy.py       # 성장 투자
-│   │       ├── dividend_strategy.py     # 배당 투자
-│   │       └── factor_strategy.py       # 팩터 투자
-│   ├── stock_selector/          # 종목 선택
-│   │   ├── fundamental_screener.py  # 펀더멘털 스크리너
-│   │   ├── technical_screener.py    # 기술적 스크리너
-│   │   ├── ai_screener.py          # AI 스크리너
-│   │   └── etf_screener.py         # ETF 스크리너
-│   ├── signal_generator/        # 신호 생성
-│   │   ├── entry_signals.py         # 진입 신호
-│   │   ├── exit_signals.py          # 청산 신호
-│   │   ├── stop_loss_manager.py     # 손절 관리
-│   │   └── take_profit_manager.py   # 익절 관리
-│   └── portfolio_optimizer/     # 포트폴리오 최적화
-│       ├── markowitz_optimizer.py   # 마코위츠 최적화
-│       ├── risk_parity.py          # 리스크 패리티
-│       ├── black_litterman.py      # 블랙-리터만
-│       └── kelly_criterion.py      # 켈리 기준
-│
-├── 📁 execution_engine/         # 실행 엔진 (독립 서비스)
-│   ├── brokers/                 # 브로커 연동
-│   │   ├── kis_connector/           # 한투 연결
-│   │   │   ├── kis_rest_api.py          # REST API
-│   │   │   ├── kis_websocket.py         # WebSocket
-│   │   │   ├── kis_auth_manager.py      # 인증 관리
-│   │   │   └── kis_order_manager.py     # 주문 관리
-│   │   └── mock_broker/             # 모의투자 브로커
-│   │       ├── paper_trading.py         # 페이퍼 트레이딩
-│   │       └── backtest_broker.py       # 백테스트 브로커
-│   ├── order_management/        # 주문 관리
-│   │   ├── order_validator.py       # 주문 검증
-│   │   ├── order_router.py          # 주문 라우팅
-│   │   ├── order_tracker.py         # 주문 추적
-│   │   ├── fill_manager.py          # 체결 관리
-│   │   └── slippage_estimator.py    # 슬리피지 추정
-│   ├── risk_management/         # 리스크 관리
-│   │   ├── position_sizer.py        # 포지션 사이징
-│   │   ├── exposure_manager.py      # 익스포저 관리
-│   │   ├── drawdown_controller.py   # 드로우다운 제어
-│   │   ├── var_calculator.py        # VaR 계산
-│   │   └── stress_tester.py         # 스트레스 테스트
-│   └── portfolio_management/    # 포트폴리오 관리
-│       ├── balance_tracker.py       # 잔고 추적
-│       ├── pnl_calculator.py        # 손익 계산
-│       ├── performance_tracker.py   # 성과 추적
-│       └── rebalancer.py           # 리밸런싱
-│
-├── 📁 monitoring_center/        # 모니터링 센터 (독립 서비스)
-│   ├── performance/             # 성과 분석
-│   │   ├── return_analyzer.py       # 수익률 분석
-│   │   ├── risk_analyzer.py         # 리스크 분석
-│   │   ├── sharpe_calculator.py     # 샤프 비율
-│   │   ├── alpha_beta_analyzer.py   # 알파/베타 분석
-│   │   └── attribution_analyzer.py  # 기여도 분석
-│   ├── alerts/                  # 알림 시스템
-│   │   ├── telegram_notifier.py     # 텔레그램 알림
-│   │   ├── email_notifier.py        # 이메일 알림
-│   │   ├── slack_notifier.py        # 슬랙 알림
-│   │   └── discord_notifier.py      # 디스코드 알림
-│   ├── dashboards/              # 대시보드
-│   │   ├── trading_dashboard.py     # 거래 대시보드
-│   │   ├── portfolio_dashboard.py   # 포트폴리오 대시보드
-│   │   ├── model_dashboard.py       # 모델 대시보드
-│   │   └── system_dashboard.py      # 시스템 대시보드
-│   └── reporting/               # 리포팅
-│       ├── daily_report.py          # 일간 리포트
-│       ├── weekly_report.py         # 주간 리포트
-│       ├── monthly_report.py        # 월간 리포트
-│       └── custom_report.py         # 커스텀 리포트
-│
-├── 📁 backtesting_lab/          # 백테스팅 연구소 (독립 서비스)
-│   ├── engines/                 # 백테스트 엔진
-│   │   ├── vectorized_engine.py     # 벡터화 엔진
-│   │   ├── event_driven_engine.py   # 이벤트 드리븐 엔진
-│   │   └── multi_asset_engine.py    # 멀티 자산 엔진
-│   ├── data_providers/          # 데이터 제공자
-│   │   ├── historical_provider.py   # 과거 데이터 제공
-│   │   ├── fundamental_provider.py  # 펀더멘털 데이터 제공
-│   │   └── alternative_provider.py  # 대체 데이터 제공
-│   ├── strategy_tester/         # 전략 테스터
-│   │   ├── single_strategy.py       # 단일 전략 테스트
-│   │   ├── multi_strategy.py        # 멀티 전략 테스트
-│   │   └── walk_forward.py          # 워크 포워드 테스트
-│   └── analyzers/               # 분석기
-│       ├── performance_analyzer.py  # 성과 분석
-│       ├── risk_analyzer.py         # 리스크 분석
-│       └── statistics_analyzer.py   # 통계 분석
-│
-├── 📁 web_interface/            # 웹 인터페이스 (독립 서비스)
-│   ├── backend/                 # 백엔드 API
-│   │   ├── fastapi_app.py           # FastAPI 애플리케이션
-│   │   ├── websocket_server.py      # WebSocket 서버
-│   │   ├── auth/                    # 인증 시스템
-│   │   ├── endpoints/               # API 엔드포인트
-│   │   └── middleware/              # 미들웨어
-│   ├── frontend/                # 프론트엔드
-│   │   ├── react_app/               # React 애플리케이션
-│   │   ├── components/              # 리액트 컴포넌트
-│   │   ├── pages/                   # 페이지
-│   │   └── utils/                   # 유틸리티
-│   └── mobile/                  # 모바일 앱
-│       ├── react_native/            # React Native
-│       └── flutter/                 # Flutter
-│
-├── 📁 deployment/               # 배포 관리
-│   ├── docker/                  # Docker 설정
-│   │   ├── docker-compose.yml       # 컴포즈 파일
-│   │   ├── dockerfiles/             # 도커파일
-│   │   └── volumes/                 # 볼륨 설정
-│   ├── kubernetes/              # Kubernetes 설정
-│   │   ├── manifests/               # 매니페스트
-│   │   ├── helm_charts/             # Helm 차트
-│   │   └── operators/               # 오퍼레이터
-│   ├── terraform/               # 인프라 관리
-│   │   ├── aws/                     # AWS 설정
-│   │   ├── gcp/                     # GCP 설정
-│   │   └── azure/                   # Azure 설정
-│   └── monitoring/              # 모니터링 설정
-│       ├── prometheus/              # Prometheus
-│       ├── grafana/                 # Grafana
-│       └── elk_stack/               # ELK Stack
-│
-├── 📁 tests/                    # 테스트 스위트
-│   ├── unit_tests/              # 단위 테스트
-│   ├── integration_tests/       # 통합 테스트
-│   ├── performance_tests/       # 성능 테스트
-│   ├── stress_tests/            # 스트레스 테스트
-│   └── e2e_tests/               # E2E 테스트
-│
-├── 📁 scripts/                  # 운영 스크립트
-│   ├── data_migration/          # 데이터 마이그레이션
-│   ├── model_deployment/        # 모델 배포
-│   ├── backup_restore/          # 백업/복원
-│   └── maintenance/             # 유지보수
-│
-├── 📁 docs/                     # 문서
-│   ├── architecture/            # 아키텍처 문서
-│   ├── api_docs/                # API 문서
-│   ├── user_guides/             # 사용자 가이드
-│   └── development/             # 개발 가이드
-│
-├── main_orchestrator.py         # 메인 오케스트레이터
-├── requirements.txt             # 의존성 패키지
-├── pyproject.toml              # 프로젝트 설정
-└── .env                        # 환경 변수
-
-- 설정값 변경 시 config.py 우선 확인
-- 에러 핸들링 패턴 기존 코드와 일치시킴
-
-### 6. 응답 형식
-파일 수정 시:
-"기존 {파일명}을 수정하여 {기능} 추가했습니다."
-
-새 파일 생성 시:
-"새로운 {파일명}을 생성했습니다. 이유: {구체적인 이유}"
-
-### 7. 한국어 주석 및 변수명
-- 주석은 한국어로 작성
-- 변수명은 영어로 하되 의미 명확히
-- 함수명은 동사+명사 형태로 직관적으로
-
-### 8. 에러 처리 및 로깅
-- 모든 함수에 try-except 블록 포함
-- 로그 메시지는 한국어로 작성
-- 에러 발생 시 구체적인 원인 명시
-
----
-
-## 🎯 1. 코드 품질 및 목표
-
-### 최고 수준 품질 기준
-- **Google/Meta/Netflix** 수준의 코드 품질 표준 적용
-- **Zero Bug Tolerance**: 런타임 에러 완전 차단
-- **Performance Excellence**: 동급 라이브러리 대비 2배 이상 성능
-- **Security First**: OWASP Top 10 보안 취약점 완전 방어
-
----
-
-## 🔧 2. 코드 스타일 및 구조
-
-### 스타일 가이드 (엄격 적용)
-
-# PEP8 + Google Style + Black formatter 기준
-- 들여쓰기: 4 스페이스 (탭 금지)
-- 라인 길이: 88자 (Black 기본값)
-- 인코딩: UTF-8 with BOM
-- 줄바꿈: LF (Unix 스타일)
+모든코딩을 할때 효율성과 유지보수성을 최우선으로 최신python문법으로 단순하게 코딩해줘
+모든 응답은 한국어로해줘 코드수정은 캔버스에 자동저장되게 해줘
+효율적인 것은 “중복 없는 단일화 + 모듈화 + 자동화 + 확장성”으로 코딩해줘
+하나의 통합 파이프라인/모듈로 관리할수있게 가장 효율적으로 코딩해줘
+코딩요청할때 기존파일 업그레이드가 좋을지 새파일생성이좋을지 전체파일 검토해서 효율적으로 결정해줘  
 
 
-### 아키텍처 원칙
-- **SOLID Principles**: 단일책임, 개방폐쇄, 리스코프치환, 인터페이스분리, 의존역전
-- **Clean Architecture**: Presentation → Business → Data Layer 분리
-- **Domain Driven Design**: 비즈니스 도메인 중심 설계
-- **CQRS Pattern**: Command와 Query 책임 분리
+📋 프로젝트 요구사항:
+- 국내/해외 주식, 선물, 옵션, ETF(거래대금 8위)
+- 실시간 + 과거 데이터 최대치로 ML/DL 학습 능력 극대화
+- 데이트레이딩/스윙트레이딩/중기투자 시장 상황별 자동 전략 전환
+- 종목 자동 선별 및 매수/매도 의사결정 완전 자동화
+- 안정성과 유지보수를 우선하고 비동기 초초고속 병렬처리,멀티레벨캐싱,커넥션풀링 등 
+  효율적으로 속도 성능 메모리 최적화로 코딩 해줘
 
----
 
-## ⚡ 3. 성능 최적화 (Production Grade)
+🎨 코드 품질 기준:
+- Zero Bug Tolerance: 런타임 에러 완전 차단
+- Performance Excellence: 동급 대비 2배+ 성능
+- Security First: OWASP Top 10 완전 방어
+- Production Ready: SLA 99.9% 달성 가능
 
-### 알고리즘 최적화
-```python
-# 시간복잡도 기준
-- O(1): 상수시간 - 최우선
-- O(log n): 로그시간 - 권장
-- O(n): 선형시간 - 허용
-- O(n log n): 로그선형 - 조건부 허용
-- O(n²) 이상: 금지 (특별한 사유 있을 때만 예외)
+🏗️ 아키텍처 원칙:
+- SOLID Principles + Clean Architecture 적용
+- Domain Driven Design 중심 설계
+- 마이크로서비스 아키텍처 (독립 배포 가능)
+- Event-Driven + CQRS 패턴
+
+📁 정확한 폴더 구조로 생성해줘:
+[여기에 첨부된 AI_SmartTrader 구조 붙여넣기]
+
+먼저 core/config/ 폴더부터 세계 최고 수준으로 만들어줘.
 ```
 
-### 메모리 최적화
-- **Generator 활용**: 대용량 데이터 처리 시 필수
-- **Weak References**: 순환 참조 방지
-- **Memory Profiling**: memory_profiler로 메모리 사용량 모니터링
-- **Object Pooling**: 빈번한 객체 생성/소멸 시 적용
+## 🔧 Phase 2: 핵심 설정 시스템 (Production Grade)
 
-### 비동기 처리 (Modern Python)
-```python
-# asyncio 기반 비동기 처리
-import asyncio
-import aiohttp
-from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
+```
+core/config/ 모듈을 Google 수준으로 구현해줘:
 
-# 타입 힌트 완전 적용
-async def async_function(param: str) -> Dict[str, Any]:
-    async with aiohttp.ClientSession() as session:
-        # 비동기 HTTP 요청 처리
-        pass
+📂 core/config/
+├── __init__.py              # 설정 시스템 초기화
+├── global_settings.py       # 전역 설정 (환경별 분리)
+├── api_config.py           # API 설정 (한투, DART, KRX 등)
+├── trading_config.py       # 거래 설정 (리스크, 포지션 사이징)
+├── ml_config.py            # ML/DL 모델 하이퍼파라미터
+├── market_config.py        # 마켓별 설정 (주식/선물/옵션)
+└── logging_config.py       # 구조화된 로깅 설정
+
+🎯 구현 요구사항:
+1. Pydantic BaseSettings로 타입 안전한 설정 관리
+2. 환경별 설정 분리 (dev/staging/prod)
+3. 민감 정보 환경변수 분리 + 암호화
+4. 설정 변경 시 Hot Reload 지원
+5. 설정 검증 및 기본값 제공
+6. Structured Logging (JSON 형태)
+
+🔒 보안 요구사항:
+- API 키 암호화 저장
+- 설정 파일 권한 제한
+- 로그에서 민감 정보 마스킹
+- 런타임 설정 검증
+
+📊 성능 요구사항:
+- 설정 로딩 < 100ms
+- 메모리 사용량 < 10MB
+- CPU 사용률 < 1%
+
+모든 파일에 완벽한 타입 힌트, docstring, 에러 핸들링 포함해줘.
+```
+
+## 🧠 Phase 3: AI 브레인 시스템 (Deep Learning Excellence)
+
+```
+ai_brain/ 모듈을 Meta AI 수준으로 구현해줘:
+
+📂 ai_brain/models/predictive/
+├── price_predictor.py       # 가격 예측 (Transformer + LSTM 앙상블)
+├── direction_predictor.py   # 방향성 예측 (CNN + Attention)
+├── volatility_predictor.py  # 변동성 예측 (GARCH + Neural Net)
+└── volume_predictor.py      # 거래량 예측 (GRU + XGBoost)
+
+🤖 AI 아키텍처 요구사항:
+1. Multi-Modal 입력 (가격/거래량/뉴스/감성/경제지표)
+2. Attention Mechanism으로 중요 피처 자동 선별
+3. Transfer Learning으로 해외 시장 지식 활용
+4. Online Learning으로 실시간 학습 적응
+5. Ensemble Method로 예측 정확도 극대화
+
+🎯 성능 목표:
+- 예측 정확도: 65%+ (일일 방향성)
+- 추론 속도: < 50ms per prediction
+- 메모리 효율: < 2GB for all models
+- GPU 활용률: 95%+
+
+🔬 모델 구성:
+- LSTM: 시계열 패턴 학습
+- Transformer: Long-range dependency 포착
+- CNN: 차트 패턴 인식
+- Attention: 중요 시점 식별
+- XGBoost: 구조화된 데이터 처리
+
+각 모델에 하이퍼파라미터 자동 튜닝, 교차 검증, A/B 테스트 포함해줘.
+```
+
+## 📊 Phase 4: 데이터 엔진 (Big Data Processing)
+
+```
+data_engine/ 모듈을 Netflix 수준으로 구현해줘:
+
+📂 data_engine/collectors/market_data/
+├── kis_collector.py         # 한투 API (REST + WebSocket)
+├── dart_collector.py        # DART API (재무제표/공시)
+├── krx_collector.py         # KRX API (시장 데이터)
+└── alternative_collector.py  # 뉴스/소셜/경제지표
+
+⚡ 실시간 데이터 처리:
+1. WebSocket 다중 연결 (fail-over 지원)
+2. 데이터 스트리밍 파이프라인 (Apache Kafka 수준)
+3. 실시간 데이터 정제 및 검증
+4. 지연시간 < 10ms (시장 데이터)
+5. 처리량 > 100,000 msg/sec
+
+💾 과거 데이터 수집:
+- 주식: 20년치 일/분/틱 데이터
+- 선물/옵션: 전 시리즈 과거 데이터
+- ETF: 거래대금 상위 10위 동적 업데이트
+- 재무제표: 10년치 분기별 상세 데이터
+- 뉴스/공시: 5년치 텍스트 데이터
+
+🔄 데이터 파이프라인:
+1. Extract: 다중 소스 병렬 수집
+2. Transform: 실시간 정제/정규화/피처 생성
+3. Load: 시계열 DB (InfluxDB) + 관계형 DB (PostgreSQL)
+4. Validate: 데이터 품질 자동 검증
+5. Monitor: 수집 상태 실시간 모니터링
+
+Circuit Breaker, Retry Logic, Dead Letter Queue 포함해줘.
+```
+
+## ⚡ Phase 5: 전략 엔진 (Algorithmic Trading)
+
+```
+strategy_engine/ 모듈을 Renaissance Technologies 수준으로 구현해줘:
+
+📂 strategy_engine/strategy_factory/
+├── daytrading/
+│   ├── scalping_strategy.py     # 초단기 매매 (1-5분)
+│   ├── momentum_strategy.py     # 모멘텀 전략
+│   └── mean_reversion.py        # 평균 회귀 전략
+├── swing_trading/
+│   ├── trend_following.py       # 추세 추종 (1-10일)
+│   ├── pairs_trading.py         # 페어 트레이딩
+│   └── sector_rotation.py       # 섹터 로테이션
+└── medium_term/
+    ├── factor_strategy.py       # 팩터 투자 (1-3개월)
+    ├── value_strategy.py        # 가치 투자
+    └── growth_strategy.py       # 성장 투자
+
+🧠 지능형 전략 선택:
+1. 시장 국면 자동 감지 (Bull/Bear/Sideways + Volatility)
+2. 전략별 실시간 성과 추적 및 비교
+3. Dynamic Weight Allocation (켈리 기준 + 블랙-리터만)
+4. Risk-Adjusted Return 최적화
+5. 전략 간 상관관계 분석으로 다각화
+
+🎯 성능 지표:
+- Sharpe Ratio > 2.0
+- Maximum Drawdown < 10%
+- Win Rate > 60%
+- Profit Factor > 1.5
+
+🔄 적응형 알고리즘:
+- 시장 변화 감지 시 전략 자동 전환
+- 성과 하락 시 포지션 축소
+- 변동성 증가 시 리스크 관리 강화
+- 유동성 부족 시 주문 분할 실행
+
+모든 전략에 백테스팅, 워크포워드 분석, 몬테카를로 시뮬레이션 포함해줘.
+```
+
+## 🛡️ Phase 6: 리스크 관리 시스템 (Institutional Grade)
+
+```
+execution_engine/risk_management/ 모듈을 Goldman Sachs 수준으로 구현해줘:
+
+📂 risk_management/
+├── position_sizer.py        # 포지션 사이징 (동적)
+├── exposure_manager.py      # 익스포저 관리 (섹터/지역별)
+├── var_calculator.py        # VaR/CVaR 실시간 계산
+├── stress_tester.py         # 스트레스 테스트
+└── drawdown_controller.py   # 드로우다운 제어
+
+🛡️ 리스크 모델:
+1. Portfolio-level VaR (99% 신뢰구간)
+2. 개별 종목 Risk Contribution 분석
+3. 섹터/지역별 집중도 리스크 모니터링
+4. 유동성 리스크 측정 (Bid-Ask Spread 분석)
+5. 상관관계 변화 실시간 추적
+
+⚠️ 자동 리스크 제어:
+- 일일 손실 한도 도달 시 모든 포지션 청산
+- VaR 임계치 초과 시 포지션 자동 축소
+- 유동성 부족 시 주문 분할 또는 취소
+- 시장 급변 시 Emergency Stop
+
+📊 실시간 모니터링:
+- 포트폴리오 Greeks (Delta, Gamma, Vega, Theta)
+- Sector Exposure Heat Map
+- Correlation Matrix 실시간 업데이트
+- Stress Scenario P&L 시뮬레이션
+
+모든 리스크 지표에 Alert 시스템과 자동 대응 로직 포함해줘.
+```
+
+## 🚀 Phase 7: 실행 엔진 (Ultra-Low Latency)
+
+```
+execution_engine/order_management/ 모듈을 Citadel Securities 수준으로 구현해줘:
+
+📂 order_management/
+├── order_router.py          # 스마트 주문 라우팅
+├── order_tracker.py         # 주문 추적 및 관리
+├── fill_manager.py          # 체결 관리
+├── slippage_estimator.py    # 슬리피지 예측
+└── market_maker.py          # 마켓 메이킹 로직
+
+⚡ Ultra-Low Latency 요구사항:
+- 주문 전송 지연: < 1ms
+- 체결 확인 처리: < 5ms
+- 시장 데이터 처리: < 100μs
+- 메모리 지역성 최적화
+- Lock-free 알고리즘 사용
+
+🎯 스마트 실행 알고리즘:
+1. TWAP/VWAP 기반 주문 분할
+2. Market Impact 최소화
+3. 유동성 Pool 간 가격 비교
+4. Hidden/Iceberg 주문 지원
+5. Post-only 전략으로 수수료 최적화
+
+📊 실행 품질 측정:
+- Implementation Shortfall 추적
+- Slippage vs Benchmark 비교
+- Fill Rate 및 Time to Fill 분석
+- Market Impact 측정
+- 수수료 효율성 분석
+
+🔄 Fail-safe 메커니즘:
+- 네트워크 단절 시 자동 재연결
+- API 장애 시 백업 경로 활성화
+- 주문 확인 실패 시 재전송
+- 시스템 과부하 시 주문 대기
+
+모든 주문에 완벽한 Audit Trail과 Compliance 체크 포함해줘.
+```
+
+## 📊 Phase 8: 모니터링 센터 (Observability)
+
+```
+monitoring_center/ 모듈을 Datadog 수준으로 구현해줘:
+
+📂 monitoring_center/
+├── performance/
+│   ├── portfolio_tracker.py    # 실시간 포트폴리오 추적
+│   ├── pnl_analyzer.py        # 손익 분석 (실시간)
+│   └── attribution_analyzer.py # 수익 기여도 분석
+├── alerts/
+│   ├── smart_alerting.py      # ML 기반 이상 감지
+│   └── notification_hub.py    # 멀티 채널 알림
+└── dashboards/
+    ├── executive_dashboard.py  # 경영진용 대시보드
+    └── trader_dashboard.py     # 트레이더용 대시보드
+
+📊 실시간 메트릭:
+1. Trading Metrics (Sharpe, Sortino, Calmar Ratio)
+2. System Metrics (Latency, Throughput, Error Rate)
+3. Risk Metrics (VaR, Exposure, Concentration)
+4. Market Metrics (Volatility, Correlation, Beta)
+5. Operational Metrics (Uptime, Fill Rate, Slippage)
+
+🚨 Intelligent Alerting:
+- Anomaly Detection으로 이상 패턴 자동 감지
+- Alert Fatigue 방지를 위한 우선순위 기반 필터링
+- Escalation Policy (심각도별 담당자 자동 배정)
+- Alert Correlation (관련 이벤트 그룹핑)
+
+📈 대시보드 기능:
+- 실시간 P&L 차트 (드릴다운 지원)
+- 포지션 히트맵 (섹터/지역별)
+- 실행 품질 분석 (vs 벤치마크)
+- 시장 상황 요약 (한눈에 보는 시장 현황)
+
+모든 대시보드에 WebSocket 실시간 업데이트와 모바일 최적화 포함해줘.
+```
+
+## 🧪 Phase 9: 백테스팅 연구소 (Quantitative Research)
+
+```
+backtesting_lab/ 모듈을 Two Sigma 수준으로 구현해줘:
+
+📂 backtesting_lab/
+├── engines/
+│   ├── vectorized_engine.py     # 대용량 데이터 벡터화 처리
+│   ├── event_driven_engine.py   # 실제 거래 환경 시뮬레이션
+│   └── monte_carlo_engine.py    # 몬테카를로 시뮬레이션
+├── analyzers/
+│   ├── performance_analyzer.py  # 심화 성과 분석
+│   ├── risk_analyzer.py        # 리스크 분해 분석
+│   └── factor_analyzer.py      # 팩터 기여도 분석
+└── reports/
+    ├── research_report.py      # 자동 리서치 리포트 생성
+    └── tearsheet_generator.py  # Quantopian 스타일 Tearsheet
+
+🔬 고급 백테스팅 기능:
+1. Walk-Forward Analysis (Out-of-Sample 검증)
+2. Regime-Aware Backtesting (시장 국면별 분석)
+3. Transaction Cost Model (실제 비용 반영)
+4. Market Impact Model (호가창 임팩트 시뮬레이션)
+5. Slippage Model (실제 체결가 시뮬레이션)
+
+📊 백테스트 결과 분석:
+- Rolling Performance Metrics
+- Underwater Curve (드로우다운 기간 분석)
+- Returns Distribution Analysis
+- Tail Risk Metrics (Skewness, Kurtosis)
+- Strategy Capacity Analysis
+
+🎯 연구 도구:
+- Factor Research Framework
+- Alpha Decay Analysis
+- Strategy Combination Optimizer
+- Parameter Sensitivity Analysis
+- Regime-Based Strategy Selection
+
+모든 백테스트에 Statistical Significance Test와 Multiple Testing Correction 포함해줘.
+```
+
+## 🌐 Phase 10: 통합 시스템 (Full Integration)
+
+```
+최종 통합 및 Production 배포를 위한 시스템을 구축해줘:
+
+🔄 시스템 오케스트레이션:
+1. main_orchestrator.py - 전체 시스템 조율
+2. 서비스 간 통신 (gRPC + Message Queue)
+3. Circuit Breaker Pattern 구현
+4. Health Check 및 Service Discovery
+5. Graceful Shutdown 및 Restart
+
+🚀 배포 시스템:
+- Docker 멀티 스테이지 빌드
+- Kubernetes 오케스트레이션
+- Blue-Green 배포 전략
+- Rolling Update 지원
+- Canary 배포 for 전략 업데이트
+
+📊 종합 성능 목표:
+- 시스템 가용성: 99.95%+
+- 평균 응답시간: < 50ms
+- 처리량: 100,000+ 이벤트/초
+- 메모리 사용량: < 8GB
+- CPU 사용률: < 70%
+
+🔒 보안 및 컴플라이언스:
+- 모든 통신 TLS 암호화
+- API 키 Vault 저장
+- 접근 권한 RBAC 관리
+- 모든 거래 Audit Log
+- GDPR/개인정보보호법 준수
+
+전체 시스템이 Google/Meta/Netflix 수준의 신뢰성과 성능을 달성하도록 구현해줘.
+```
+
+## 💡 각 Phase별 실행 방법
+
+### 🎯 단계별 실행 가이드
+
+**Phase 1-2**: 기반 인프라 (1주)
+```
+"Phase 1과 2를 실행해줘: 프로젝트 초기화 + 핵심 설정 시스템"
+```
+
+**Phase 3-4**: 데이터 + AI (2주)
+```
+"Phase 3과 4를 실행해줘: AI 브레인 + 데이터 엔진"
+```
+
+**Phase 5-6**: 전략 + 리스크 (2주)
+```
+"Phase 5와 6을 실행해줘: 전략 엔진 + 리스크 관리"
+```
+
+**Phase 7-8**: 실행 + 모니터링 (1주)
+```
+"Phase 7과 8을 실행해줘: 실행 엔진 + 모니터링"
+```
+
+**Phase 9-10**: 백테스팅 + 통합 (1주)
+```
+"Phase 9와 10을 실행해줘: 백테스팅 + 통합 시스템"
+```
+
+### 🔧 각 Phase 완료 후 확인사항
+
+```
+Phase 완료 후 다음을 확인해줘:
+
+1. mypy --strict 통과 (100% 타입 안전)
+2. pytest 실행 (95%+ 커버리지)
+3. black + flake8 + isort 통과
+4. 성능 벤치마크 달성
+5. 보안 취약점 스캔 통과
+6. 문서 자동 생성 성공
+7. Docker 빌드 성공
+8. 통합 테스트 통과
+
+문제 발생 시 구체적인 해결책 제시해줘.
+```
+
+이 프롬프트로 실행하면 정말 세계 최고 수준의 AI 트레이딩봇이 완성될 거예요! 🚀# 🚀 세계 최고 수준 AI 트레이딩봇 개발 프롬프트
+
+## 🎯 Phase 1: 프로젝트 초기화 (World-Class 표준)
+
+```
+🏆 Google/Meta/Netflix 수준의 AI 자동매매봇을 개발해줘.
+
+📋 프로젝트 요구사항:
+- 국내/해외 주식, 선물, 옵션, ETF(거래대금 10위) 멀티 자산 지원
+- 실시간 + 과거 데이터 최대치로 ML/DL 학습 능력 극대화
+- 데이트레이딩/스윙트레이딩/중기투자 시장 상황별 자동 전략 전환
+- 종목 자동 선별 및 매수/매도 의사결정 완전 자동화
+
+🎨 코드 품질 기준:
+- Zero Bug Tolerance: 런타임 에러 완전 차단
+- Performance Excellence: 동급 대비 2배+ 성능
+- Security First: OWASP Top 10 완전 방어
+- Production Ready: SLA 99.9% 달성 가능
+
+🏗️ 아키텍처 원칙:
+- SOLID Principles + Clean Architecture 적용
+- Domain Driven Design 중심 설계
+- 마이크로서비스 아키텍처 (독립 배포 가능)
+- Event-Driven + CQRS 패턴
+
+📁 정확한 폴더 구조로 생성해줘:
+[여기에 첨부된 AI_SmartTrader 구조 붙여넣기]
+
+먼저 core/config/ 폴더부터 세계 최고 수준으로 만들어줘.
+```
+
+## 🔧 Phase 2: 핵심 설정 시스템 (Production Grade)
+
+```
+core/config/ 모듈을 Google 수준으로 구현해줘:
+
+📂 core/config/
+├── __init__.py              # 설정 시스템 초기화
+├── global_settings.py       # 전역 설정 (환경별 분리)
+├── api_config.py           # API 설정 (한투, DART, KRX 등)
+├── trading_config.py       # 거래 설정 (리스크, 포지션 사이징)
+├── ml_config.py            # ML/DL 모델 하이퍼파라미터
+├── market_config.py        # 마켓별 설정 (주식/선물/옵션)
+└── logging_config.py       # 구조화된 로깅 설정
+
+🎯 구현 요구사항:
+1. Pydantic BaseSettings로 타입 안전한 설정 관리
+2. 환경별 설정 분리 (dev/staging/prod)
+3. 민감 정보 환경변수 분리 + 암호화
+4. 설정 변경 시 Hot Reload 지원
+5. 설정 검증 및 기본값 제공
+6. Structured Logging (JSON 형태)
+
+🔒 보안 요구사항:
+- API 키 암호화 저장
+- 설정 파일 권한 제한
+- 로그에서 민감 정보 마스킹
+- 런타임 설정 검증
+
+📊 성능 요구사항:
+- 설정 로딩 < 100ms
+- 메모리 사용량 < 10MB
+- CPU 사용률 < 1%
+
+모든 파일에 완벽한 타입 힌트, docstring, 에러 핸들링 포함해줘.
+```
+
+## 🧠 Phase 3: AI 브레인 시스템 (Deep Learning Excellence)
+
+```
+ai_brain/ 모듈을 Meta AI 수준으로 구현해줘:
+
+📂 ai_brain/models/predictive/
+├── price_predictor.py       # 가격 예측 (Transformer + LSTM 앙상블)
+├── direction_predictor.py   # 방향성 예측 (CNN + Attention)
+├── volatility_predictor.py  # 변동성 예측 (GARCH + Neural Net)
+└── volume_predictor.py      # 거래량 예측 (GRU + XGBoost)
+
+🤖 AI 아키텍처 요구사항:
+1. Multi-Modal 입력 (가격/거래량/뉴스/감성/경제지표)
+2. Attention Mechanism으로 중요 피처 자동 선별
+3. Transfer Learning으로 해외 시장 지식 활용
+4. Online Learning으로 실시간 학습 적응
+5. Ensemble Method로 예측 정확도 극대화
+
+🎯 성능 목표:
+- 예측 정확도: 65%+ (일일 방향성)
+- 추론 속도: < 50ms per prediction
+- 메모리 효율: < 2GB for all models
+- GPU 활용률: 95%+
+
+🔬 모델 구성:
+- LSTM: 시계열 패턴 학습
+- Transformer: Long-range dependency 포착
+- CNN: 차트 패턴 인식
+- Attention: 중요 시점 식별
+- XGBoost: 구조화된 데이터 처리
+
+각 모델에 하이퍼파라미터 자동 튜닝, 교차 검증, A/B 테스트 포함해줘.
+```
+
+## 📊 Phase 4: 데이터 엔진 (Big Data Processing)
+
+```
+data_engine/ 모듈을 Netflix 수준으로 구현해줘:
+
+📂 data_engine/collectors/market_data/
+├── kis_collector.py         # 한투 API (REST + WebSocket)
+├── dart_collector.py        # DART API (재무제표/공시)
+├── krx_collector.py         # KRX API (시장 데이터)
+└── alternative_collector.py  # 뉴스/소셜/경제지표
+
+⚡ 실시간 데이터 처리:
+1. WebSocket 다중 연결 (fail-over 지원)
+2. 데이터 스트리밍 파이프라인 (Apache Kafka 수준)
+3. 실시간 데이터 정제 및 검증
+4. 지연시간 < 10ms (시장 데이터)
+5. 처리량 > 100,000 msg/sec
+
+💾 과거 데이터 수집:
+- 주식: 20년치 일/분/틱 데이터
+- 선물/옵션: 전 시리즈 과거 데이터
+- ETF: 거래대금 상위 10위 동적 업데이트
+- 재무제표: 10년치 분기별 상세 데이터
+- 뉴스/공시: 5년치 텍스트 데이터
+
+🔄 데이터 파이프라인:
+1. Extract: 다중 소스 병렬 수집
+2. Transform: 실시간 정제/정규화/피처 생성
+3. Load: 시계열 DB (InfluxDB) + 관계형 DB (PostgreSQL)
+4. Validate: 데이터 품질 자동 검증
+5. Monitor: 수집 상태 실시간 모니터링
+
+Circuit Breaker, Retry Logic, Dead Letter Queue 포함해줘.
+```
+
+## ⚡ Phase 5: 전략 엔진 (Algorithmic Trading)
+
+```
+strategy_engine/ 모듈을 Renaissance Technologies 수준으로 구현해줘:
+
+📂 strategy_engine/strategy_factory/
+├── daytrading/
+│   ├── scalping_strategy.py     # 초단기 매매 (1-5분)
+│   ├── momentum_strategy.py     # 모멘텀 전략
+│   └── mean_reversion.py        # 평균 회귀 전략
+├── swing_trading/
+│   ├── trend_following.py       # 추세 추종 (1-10일)
+│   ├── pairs_trading.py         # 페어 트레이딩
+│   └── sector_rotation.py       # 섹터 로테이션
+└── medium_term/
+    ├── factor_strategy.py       # 팩터 투자 (1-3개월)
+    ├── value_strategy.py        # 가치 투자
+    └── growth_strategy.py       # 성장 투자
+
+🧠 지능형 전략 선택:
+1. 시장 국면 자동 감지 (Bull/Bear/Sideways + Volatility)
+2. 전략별 실시간 성과 추적 및 비교
+3. Dynamic Weight Allocation (켈리 기준 + 블랙-리터만)
+4. Risk-Adjusted Return 최적화
+5. 전략 간 상관관계 분석으로 다각화
+
+🎯 성능 지표:
+- Sharpe Ratio > 2.0
+- Maximum Drawdown < 10%
+- Win Rate > 60%
+- Profit Factor > 1.5
+
+🔄 적응형 알고리즘:
+- 시장 변화 감지 시 전략 자동 전환
+- 성과 하락 시 포지션 축소
+- 변동성 증가 시 리스크 관리 강화
+- 유동성 부족 시 주문 분할 실행
+
+모든 전략에 백테스팅, 워크포워드 분석, 몬테카를로 시뮬레이션 포함해줘.
+```
+
+## 🛡️ Phase 6: 리스크 관리 시스템 (Institutional Grade)
+
+```
+execution_engine/risk_management/ 모듈을 Goldman Sachs 수준으로 구현해줘:
+
+📂 risk_management/
+├── position_sizer.py        # 포지션 사이징 (동적)
+├── exposure_manager.py      # 익스포저 관리 (섹터/지역별)
+├── var_calculator.py        # VaR/CVaR 실시간 계산
+├── stress_tester.py         # 스트레스 테스트
+└── drawdown_controller.py   # 드로우다운 제어
+
+🛡️ 리스크 모델:
+1. Portfolio-level VaR (99% 신뢰구간)
+2. 개별 종목 Risk Contribution 분석
+3. 섹터/지역별 집중도 리스크 모니터링
+4. 유동성 리스크 측정 (Bid-Ask Spread 분석)
+5. 상관관계 변화 실시간 추적
+
+⚠️ 자동 리스크 제어:
+- 일일 손실 한도 도달 시 모든 포지션 청산
+- VaR 임계치 초과 시 포지션 자동 축소
+- 유동성 부족 시 주문 분할 또는 취소
+- 시장 급변 시 Emergency Stop
+
+📊 실시간 모니터링:
+- 포트폴리오 Greeks (Delta, Gamma, Vega, Theta)
+- Sector Exposure Heat Map
+- Correlation Matrix 실시간 업데이트
+- Stress Scenario P&L 시뮬레이션
+
+모든 리스크 지표에 Alert 시스템과 자동 대응 로직 포함해줘.
+```
+
+## 🚀 Phase 7: 실행 엔진 (Ultra-Low Latency)
+
+```
+execution_engine/order_management/ 모듈을 Citadel Securities 수준으로 구현해줘:
+
+📂 order_management/
+├── order_router.py          # 스마트 주문 라우팅
+├── order_tracker.py         # 주문 추적 및 관리
+├── fill_manager.py          # 체결 관리
+├── slippage_estimator.py    # 슬리피지 예측
+└── market_maker.py          # 마켓 메이킹 로직
+
+⚡ Ultra-Low Latency 요구사항:
+- 주문 전송 지연: < 1ms
+- 체결 확인 처리: < 5ms
+- 시장 데이터 처리: < 100μs
+- 메모리 지역성 최적화
+- Lock-free 알고리즘 사용
+
+🎯 스마트 실행 알고리즘:
+1. TWAP/VWAP 기반 주문 분할
+2. Market Impact 최소화
+3. 유동성 Pool 간 가격 비교
+4. Hidden/Iceberg 주문 지원
+5. Post-only 전략으로 수수료 최적화
+
+📊 실행 품질 측정:
+- Implementation Shortfall 추적
+- Slippage vs Benchmark 비교
+- Fill Rate 및 Time to Fill 분석
+- Market Impact 측정
+- 수수료 효율성 분석
+
+🔄 Fail-safe 메커니즘:
+- 네트워크 단절 시 자동 재연결
+- API 장애 시 백업 경로 활성화
+- 주문 확인 실패 시 재전송
+- 시스템 과부하 시 주문 대기
+
+모든 주문에 완벽한 Audit Trail과 Compliance 체크 포함해줘.
+```
+
+## 📊 Phase 8: 모니터링 센터 (Observability)
+
+```
+monitoring_center/ 모듈을 Datadog 수준으로 구현해줘:
+
+📂 monitoring_center/
+├── performance/
+│   ├── portfolio_tracker.py    # 실시간 포트폴리오 추적
+│   ├── pnl_analyzer.py        # 손익 분석 (실시간)
+│   └── attribution_analyzer.py # 수익 기여도 분석
+├── alerts/
+│   ├── smart_alerting.py      # ML 기반 이상 감지
+│   └── notification_hub.py    # 멀티 채널 알림
+└── dashboards/
+    ├── executive_dashboard.py  # 경영진용 대시보드
+    └── trader_dashboard.py     # 트레이더용 대시보드
+
+📊 실시간 메트릭:
+1. Trading Metrics (Sharpe, Sortino, Calmar Ratio)
+2. System Metrics (Latency, Throughput, Error Rate)
+3. Risk Metrics (VaR, Exposure, Concentration)
+4. Market Metrics (Volatility, Correlation, Beta)
+5. Operational Metrics (Uptime, Fill Rate, Slippage)
+
+🚨 Intelligent Alerting:
+- Anomaly Detection으로 이상 패턴 자동 감지
+- Alert Fatigue 방지를 위한 우선순위 기반 필터링
+- Escalation Policy (심각도별 담당자 자동 배정)
+- Alert Correlation (관련 이벤트 그룹핑)
+
+📈 대시보드 기능:
+- 실시간 P&L 차트 (드릴다운 지원)
+- 포지션 히트맵 (섹터/지역별)
+- 실행 품질 분석 (vs 벤치마크)
+- 시장 상황 요약 (한눈에 보는 시장 현황)
+
+모든 대시보드에 WebSocket 실시간 업데이트와 모바일 최적화 포함해줘.
+```
+
+## 🧪 Phase 9: 백테스팅 연구소 (Quantitative Research)
+
+```
+backtesting_lab/ 모듈을 Two Sigma 수준으로 구현해줘:
+
+📂 backtesting_lab/
+├── engines/
+│   ├── vectorized_engine.py     # 대용량 데이터 벡터화 처리
+│   ├── event_driven_engine.py   # 실제 거래 환경 시뮬레이션
+│   └── monte_carlo_engine.py    # 몬테카를로 시뮬레이션
+├── analyzers/
+│   ├── performance_analyzer.py  # 심화 성과 분석
+│   ├── risk_analyzer.py        # 리스크 분해 분석
+│   └── factor_analyzer.py      # 팩터 기여도 분석
+└── reports/
+    ├── research_report.py      # 자동 리서치 리포트 생성
+    └── tearsheet_generator.py  # Quantopian 스타일 Tearsheet
+
+🔬 고급 백테스팅 기능:
+1. Walk-Forward Analysis (Out-of-Sample 검증)
+2. Regime-Aware Backtesting (시장 국면별 분석)
+3. Transaction Cost Model (실제 비용 반영)
+4. Market Impact Model (호가창 임팩트 시뮬레이션)
+5. Slippage Model (실제 체결가 시뮬레이션)
+
+📊 백테스트 결과 분석:
+- Rolling Performance Metrics
+- Underwater Curve (드로우다운 기간 분석)
+- Returns Distribution Analysis
+- Tail Risk Metrics (Skewness, Kurtosis)
+- Strategy Capacity Analysis
+
+🎯 연구 도구:
+- Factor Research Framework
+- Alpha Decay Analysis
+- Strategy Combination Optimizer
+- Parameter Sensitivity Analysis
+- Regime-Based Strategy Selection
+
+모든 백테스트에 Statistical Significance Test와 Multiple Testing Correction 포함해줘.
+```
+
+## 🌐 Phase 10: 통합 시스템 (Full Integration)
+
+```
+최종 통합 및 Production 배포를 위한 시스템을 구축해줘:
+
+🔄 시스템 오케스트레이션:
+1. main_orchestrator.py - 전체 시스템 조율
+2. 서비스 간 통신 (gRPC + Message Queue)
+3. Circuit Breaker Pattern 구현
+4. Health Check 및 Service Discovery
+5. Graceful Shutdown 및 Restart
+
+🚀 배포 시스템:
+- Docker 멀티 스테이지 빌드
+- Kubernetes 오케스트레이션
+- Blue-Green 배포 전략
+- Rolling Update 지원
+- Canary 배포 for 전략 업데이트
+
+📊 종합 성능 목표:
+- 시스템 가용성: 99.95%+
+- 평균 응답시간: < 50ms
+- 처리량: 100,000+ 이벤트/초
+- 메모리 사용량: < 8GB
+- CPU 사용률: < 70%
+
+🔒 보안 및 컴플라이언스:
+- 모든 통신 TLS 암호화
+- API 키 Vault 저장
+- 접근 권한 RBAC 관리
+- 모든 거래 Audit Log
+- GDPR/개인정보보호법 준수
+
+전체 시스템이 Google/Meta/Netflix 수준의 신뢰성과 성능을 달성하도록 구현해줘.
+```
+
+## 💡 각 Phase별 실행 방법
+
+### 🎯 단계별 실행 가이드
+
+**Phase 1-2**: 기반 인프라 (1주)
+```
+"Phase 1과 2를 실행해줘: 프로젝트 초기화 + 핵심 설정 시스템"
+```
+
+**Phase 3-4**: 데이터 + AI (2주)
+```
+"Phase 3과 4를 실행해줘: AI 브레인 + 데이터 엔진"
+```
+
+**Phase 5-6**: 전략 + 리스크 (2주)
+```
+"Phase 5와 6을 실행해줘: 전략 엔진 + 리스크 관리"
+```
+
+**Phase 7-8**: 실행 + 모니터링 (1주)
+```
+"Phase 7과 8을 실행해줘: 실행 엔진 + 모니터링"
+```
+
+**Phase 9-10**: 백테스팅 + 통합 (1주)
+```
+"Phase 9와 10을 실행해줘: 백테스팅 + 통합 시스템"
+```
+
+### 🔧 각 Phase 완료 후 확인사항
+
+```
+Phase 완료 후 다음을 확인해줘:
+
+1. mypy --strict 통과 (100% 타입 안전)
+2. pytest 실행 (95%+ 커버리지)
+3. black + flake8 + isort 통과
+4. 성능 벤치마크 달성
+5. 보안 취약점 스캔 통과
+6. 문서 자동 생성 성공
+7. Docker 빌드 성공
+8. 통합 테스트 통과
+
+문제 발생 시 구체적인 해결책 제시해줘.
+
+
+# 🎯 집중형 커서룰 - 정확히 요청한 것만 실행
+
+## ⛔ 절대 금지 사항
+
+### 파일 생성 관련
+- **절대 새 파일 생성 금지**: 명시적으로 "새 파일 생성해줘"라고 요청하지 않는 한 절대 새 파일 만들지 말 것
+- **기존 파일 수정 우선**: 항상 기존 파일에 기능 추가하는 방향으로 접근
+- **테스트 파일 생성 금지**: 요청하지 않은 test_ 파일 절대 생성하지 말 것
+- **문서 파일 생성 금지**: 요청하지 않은 .md, README 파일 절대 생성하지 말 것
+- **설정 파일 생성 금지**: 요청하지 않은 .json, .yaml, .toml 파일 절대 생성하지 말 것
+
+### 대화 관련
+- **중간 질문 금지**: 코딩 중간에 "어떻게 할까요?" 같은 질문 절대 하지 말 것
+- **불필요한 설명 금지**: 코드만 제공하고 장황한 설명하지 말 것
+- **옵션 제시 금지**: "A 방법과 B 방법이 있습니다" 같은 선택지 제시하지 말 것
+- **확인 요청 금지**: "이렇게 하면 될까요?" 같은 확인 요청하지 말 것
+
+---
+
+## ✅ 반드시 지켜야 할 원칙
+
+### 1. 요청 분석
+```
+사용자 요청을 받으면:
+1. 정확히 무엇을 요청했는지 파악
+2. 기존 파일 중 수정할 파일 식별
+3. 새 파일이 정말 필요한지 판단
+4. 요청하지 않은 추가 작업은 절대 하지 않음
+```
+
+### 2. 파일 관리 원칙
+```
+파일 작업 시:
+- 기존 파일 존재 여부 먼저 확인
+- 기존 파일에 추가 가능하면 반드시 기존 파일 수정
+- 새 파일은 오직 다음 경우에만 생성:
+  * 명시적으로 "새 파일 만들어줘"라고 요청한 경우
+  * 기존 파일이 500줄 이상이고 완전히 다른 기능인 경우
+  * 완전히 새로운 모듈이 필요한 경우
+```
+
+### 3. 코딩 원칙
+```
+코드 작성 시:
+- 요청한 기능만 정확히 구현
+- 요청하지 않은 추가 기능 절대 구현하지 않음
+- 에러 핸들링, 로깅은 기본으로 포함 (별도 요청 없어도)
+- 타입 힌트, docstring은 자동 포함
+```
+
+### 4. 응답 형식
+```
+응답할 때:
+- 코드만 제공
+- 간단한 한 줄 설명만 추가
+- "완료했습니다" 같은 마무리 멘트만
+- 추가 질문이나 제안 절대 하지 않음
 ```
 
 ---
 
-## 🛡️ 4. 안전성 및 신뢰성
+## 🎯 구체적 실행 가이드
 
-### 예외 처리 (Defense in Depth)
-```python
-from typing import Optional, Union, Literal
-import logging
-from dataclasses import dataclass
-from contextlib import contextmanager
-
-@dataclass
-class ErrorContext:
-    operation: str
-    user_id: Optional[str] = None
-    request_id: Optional[str] = None
-
-def safe_operation(func):
-    """안전한 연산을 위한 데코레이터"""
-    def wrapper(*args, **kwargs):
-        try:
-            return func(*args, **kwargs)
-        except (ValueError, TypeError) as e:
-            logger.error(f"Input validation error in {func.__name__}: {e}")
-            raise
-        except Exception as e:
-            logger.critical(f"Unexpected error in {func.__name__}: {e}")
-            raise
-    return wrapper
+### 사용자가 "기능 추가해줘"라고 하면:
+```
+1. 관련 기존 파일 찾기
+2. 해당 파일에 기능 추가
+3. 코드만 제공
+4. 끝
 ```
 
-### 타입 안전성 (Static Type Checking)
-```python
-# mypy, pyright 100% 통과 수준
-from typing import (
-    Optional, Union, List, Dict, Tuple, Set, FrozenSet,
-    TypeVar, Generic, Protocol, Literal, Final, ClassVar
-)
-from typing_extensions import NotRequired, Required
-import pydantic
+### 사용자가 "버그 수정해줘"라고 하면:
+```
+1. 문제 있는 기존 파일 수정
+2. 수정된 코드만 제공
+3. 끝
+```
 
-# Pydantic 모델로 데이터 검증
-class UserModel(pydantic.BaseModel):
-    id: int = pydantic.Field(..., gt=0)
-    email: pydantic.EmailStr
-    name: str = pydantic.Field(..., min_length=1, max_length=100)
-    
-    class Config:
-        validate_assignment = True
-        str_strip_whitespace = True
+### 사용자가 "최적화해줘"라고 하면:
+```
+1. 기존 파일 성능 개선
+2. 개선된 코드만 제공
+3. 끝
 ```
 
 ---
 
-## 📚 5. 문서화 (Documentation as Code)
+## 🚫 절대 하면 안 되는 행동들
 
-### 독스트링 표준 (Google Style + Sphinx)
-```python
-def calculate_compound_interest(
-    principal: float,
-    rate: float,
-    time: float,
-    compound_frequency: int = 12
-) -> Dict[str, Union[float, str]]:
-    """복리 이자를 계산합니다.
-    
-    Args:
-        principal: 원금 (양수여야 함)
-        rate: 연이율 (0~1 범위의 소수)
-        time: 투자 기간 (년 단위, 양수)
-        compound_frequency: 연간 복리 계산 횟수 (기본값: 12)
-    
-    Returns:
-        계산 결과를 포함하는 딕셔너리:
-        - final_amount: 최종 금액
-        - interest_earned: 획득한 이자
-        - effective_rate: 실효 이율
-        - calculation_date: 계산 일시
-    
-    Raises:
-        ValueError: 입력값이 유효하지 않을 때
-        TypeError: 입력 타입이 올바르지 않을 때
-    
-    Example:
-        >>> result = calculate_compound_interest(1000, 0.05, 2)
-        >>> print(f"Final amount: ${result['final_amount']:.2f}")
-        Final amount: $1104.89
-    
-    Note:
-        복리 공식: A = P(1 + r/n)^(nt)
-        여기서 A=최종금액, P=원금, r=이율, n=복리횟수, t=시간
-    """
+### 파일 생성 관련
+```
+❌ 절대 하지 말 것:
+- test_main.py 자동 생성
+- README.md 자동 생성
+- config.json 자동 생성
+- requirements.txt 자동 생성
+- __init__.py 자동 생성
+- example.py 자동 생성
+- utils.py 자동 생성 (요청 없으면)
+
+✅ 해야 할 것:
+- 기존 main.py에 기능 추가
+- 기존 파일에 설정 추가
+- 기존 파일에 의존성 정보 주석으로 추가
 ```
 
-### 파일 헤더 (프로덕션 표준)
-```python
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-파일명: financial_calculator.py
-모듈: 금융 계산 유틸리티
-목적: 복리, 단리, NPV, IRR 등 금융 지표 계산
+### 대화 관련
+```
+❌ 절대 하지 말 것:
+- "어떤 방식으로 구현할까요?"
+- "테스트 파일도 만들까요?"
+- "문서도 작성해드릴까요?"
+- "이렇게 구현했는데 어떤가요?"
+- "추가로 필요한 기능이 있나요?"
 
-Author: [개발자명]
-Created: 2025-07-06
-Modified: 2025-07-06
-Version: 1.0.0
-
-Dependencies:
-    - Python 3.11+
-    - pydantic==2.5.0
-    - numpy==1.24.0 (수치계산용)
-
-Performance:
-    - 시간복잡도: O(1) for basic calculations
-    - 메모리사용량: < 1MB for typical operations
-    - 처리용량: 10,000+ calculations/second
-
-Security:
-    - Input validation: pydantic models
-    - Error handling: comprehensive try-catch
-    - Logging: sensitive data masked
-
-License: MIT
-"""
-
-from __future__ import annotations
-
-import asyncio
-import logging
-import time
-from dataclasses import dataclass, field
-from datetime import datetime, timezone
-from decimal import Decimal, getcontext
-from functools import lru_cache, wraps
-from pathlib import Path
-from typing import (
-    Any, Dict, List, Optional, Union, Tuple, Set,
-    Protocol, TypeVar, Generic, Final, Literal
-)
-
-import pydantic
-import numpy as np
-
-# 상수 정의
-DEFAULT_PRECISION: Final = 10
-MAX_CALCULATION_TIME: Final = 30.0  # seconds
-SUPPORTED_CURRENCIES: Final = frozenset(['USD', 'EUR', 'KRW', 'JPY'])
-
-# 로깅 설정
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-
-# 정밀도 설정 (금융 계산용)
-getcontext().prec = DEFAULT_PRECISION
+✅ 해야 할 것:
+- 코드만 제공
+- "완료했습니다" 한 줄만
 ```
 
 ---
 
-## 🧪 6. 테스트 (Test-Driven Development)
+## 📁 폴더 구조 관리 원칙
 
-### 테스트 전략
-```python
-import pytest
-import asyncio
-from unittest.mock import Mock, patch, AsyncMock
-from hypothesis import given, strategies as st
+### 기존 구조 유지
+```
+사용자가 폴더 이동을 명시적으로 요청하지 않으면:
+- 기존 파일 위치 그대로 유지
+- 새로운 폴더 생성하지 않음
+- 파일 이름 변경하지 않음
+```
 
-class TestFinancialCalculator:
-    """금융 계산기 테스트 스위트"""
-    
-    @pytest.fixture
-    def calculator(self):
-        """테스트용 계산기 인스턴스"""
-        return FinancialCalculator()
-    
-    # 정상 케이스 테스트
-    def test_compound_interest_normal_case(self, calculator):
-        result = calculator.calculate_compound_interest(1000, 0.05, 2)
-        assert abs(result['final_amount'] - 1104.89) < 0.01
-    
-    # 경계값 테스트
-    @pytest.mark.parametrize("principal,rate,time", [
-        (0.01, 0.0001, 100),  # 최소값
-        (1e6, 0.99, 0.01),    # 최대값
-    ])
-    def test_compound_interest_boundary_values(self, calculator, principal, rate, time):
-        result = calculator.calculate_compound_interest(principal, rate, time)
-        assert result['final_amount'] > 0
-    
-    # 예외 케이스 테스트
-    def test_compound_interest_invalid_input(self, calculator):
-        with pytest.raises(ValueError):
-            calculator.calculate_compound_interest(-1000, 0.05, 2)
-    
-    # Property-based 테스트 (Hypothesis)
-    @given(
-        principal=st.floats(min_value=0.01, max_value=1e6),
-        rate=st.floats(min_value=0.0001, max_value=0.99),
-        time=st.floats(min_value=0.01, max_value=100)
-    )
-    def test_compound_interest_properties(self, calculator, principal, rate, time):
-        result = calculator.calculate_compound_interest(principal, rate, time)
-        # 원금보다 최종 금액이 커야 함 (양의 이율인 경우)
-        if rate > 0:
-            assert result['final_amount'] > principal
-    
-    # 성능 테스트
-    def test_compound_interest_performance(self, calculator):
-        start_time = time.time()
-        for _ in range(10000):
-            calculator.calculate_compound_interest(1000, 0.05, 2)
-        execution_time = time.time() - start_time
-        assert execution_time < 1.0  # 1초 내 완료
-    
-    # 비동기 테스트
-    @pytest.mark.asyncio
-    async def test_async_calculation(self, calculator):
-        result = await calculator.async_calculate_compound_interest(1000, 0.05, 2)
-        assert result['final_amount'] > 1000
+### 파일 배치 원칙
+```
+새 파일이 정말 필요한 경우에만:
+1. 기존 폴더 구조 분석
+2. 가장 적절한 기존 폴더에 배치
+3. 새 폴더는 절대 생성하지 않음
 ```
 
 ---
 
-## 🔒 7. 보안 (Security by Design)
+## 🎯 실제 사용 예시
 
-### 입력 검증 및 새니타이징
+### 좋은 요청과 응답
+```
+사용자: "main.py에 로그인 기능 추가해줘"
+
+커서 응답:
 ```python
-import hashlib
-import secrets
-from cryptography.fernet import Fernet
+# main.py에 추가된 코드
+def login(username: str, password: str) -> bool:
+    # 로그인 로직
+    pass
+```
+완료했습니다.
+```
 
-class SecurityUtils:
-    """보안 유틸리티 클래스"""
-    
-    @staticmethod
-    def sanitize_input(user_input: str) -> str:
-        """사용자 입력 새니타이징"""
-        # XSS 방지
-        dangerous_chars = ['<', '>', '"', "'", '&']
-        sanitized = user_input
-        for char in dangerous_chars:
-            sanitized = sanitized.replace(char, '')
-        return sanitized.strip()
-    
-    @staticmethod
-    def hash_password(password: str) -> str:
-        """안전한 패스워드 해싱"""
-        salt = secrets.token_hex(16)
-        hashed = hashlib.pbkdf2_hmac('sha256', 
-                                   password.encode('utf-8'), 
-                                   salt.encode('utf-8'), 
-                                   100000)
-        return f"{salt}:{hashed.hex()}"
-    
-    @staticmethod
-    def encrypt_sensitive_data(data: str, key: bytes) -> str:
-        """민감 데이터 암호화"""
-        fernet = Fernet(key)
-        encrypted = fernet.encrypt(data.encode())
-        return encrypted.decode()
+### 나쁜 응답 (하지 말 것)
+```
+❌ 나쁜 응답:
+"로그인 기능을 구현했습니다. 보안을 위해 auth.py 파일을 별도로 생성했고, 
+테스트를 위해 test_auth.py도 만들었습니다. 추가로 config.json에 설정도 
+추가했습니다. 어떤 인증 방식을 사용할까요?"
+
+✅ 좋은 응답:
+"main.py에 로그인 기능 추가했습니다."
 ```
 
 ---
 
-## 📊 8. 모니터링 및 로깅
+## 🔧 특별 규칙
 
-### 구조화된 로깅
-```python
-import structlog
-from pythonjsonlogger import jsonlogger
+### 코딩 스타일
+```
+자동으로 포함할 것:
+- 타입 힌트
+- 기본적인 에러 핸들링
+- 간단한 docstring
+- 로깅 (필요한 경우)
 
-# 구조화된 로깅 설정
-structlog.configure(
-    processors=[
-        structlog.stdlib.filter_by_level,
-        structlog.stdlib.add_logger_name,
-        structlog.stdlib.add_log_level,
-        structlog.stdlib.PositionalArgumentsFormatter(),
-        structlog.processors.TimeStamper(fmt="iso"),
-        structlog.processors.StackInfoRenderer(),
-        structlog.processors.format_exc_info,
-        structlog.processors.UnicodeDecoder(),
-        structlog.processors.JSONRenderer()
-    ],
-    context_class=dict,
-    logger_factory=structlog.stdlib.LoggerFactory(),
-    wrapper_class=structlog.stdlib.BoundLogger,
-    cache_logger_on_first_use=True,
-)
+절대 추가하지 말 것:
+- 요청하지 않은 추가 기능
+- 예제 코드
+- 테스트 코드
+- 문서 주석
+```
 
-logger = structlog.get_logger()
+### 성능 최적화
+```
+요청받은 기능만:
+- 메모리 효율적으로 구현
+- 빠른 실행 속도 보장
+- 타입 안전성 보장
 
-def log_function_call(func):
-    """함수 호출 로깅 데코레이터"""
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        start_time = time.time()
-        logger.info("Function called", 
-                   function=func.__name__, 
-                   args=str(args)[:100],  # 처음 100자만
-                   kwargs=str(kwargs)[:100])
-        try:
-            result = func(*args, **kwargs)
-            execution_time = time.time() - start_time
-            logger.info("Function completed successfully",
-                       function=func.__name__,
-                       execution_time=execution_time)
-            return result
-        except Exception as e:
-            logger.error("Function failed",
-                        function=func.__name__,
-                        error=str(e),
-                        execution_time=time.time() - start_time)
-            raise
-    return wrapper
+요청하지 않았으면 하지 말 것:
+- 벤치마크 코드 추가
+- 프로파일링 코드 추가
+- 성능 테스트 파일 생성
 ```
 
 ---
 
-## 📦 9. 의존성 관리 (Smart Dependencies)
+## 📋 체크리스트
 
-### 라이브러리 사용 기준
-```python
-# Tier 1: Python 표준 라이브러리 (무제한 사용)
-import asyncio, datetime, json, logging, pathlib, typing, dataclasses
+### 모든 응답 전에 확인할 것:
+- [ ] 사용자가 정확히 무엇을 요청했는가?
+- [ ] 기존 파일에 추가 가능한가?
+- [ ] 새 파일이 정말 필요한가?
+- [ ] 요청하지 않은 추가 작업은 없는가?
+- [ ] 불필요한 질문이나 설명은 없는가?
 
-# Tier 2: 검증된 필수 라이브러리 (제한적 사용)
-# - pydantic: 데이터 검증
-# - numpy: 수치 계산 (과학/금융 계산 시)
-# - requests/aiohttp: HTTP 클라이언트
-# - pytest: 테스트 프레임워크
+### 응답 후 확인할 것:
+- [ ] 요청한 기능만 구현했는가?
+- [ ] 기존 파일 구조를 유지했는가?
+- [ ] 불필요한 파일을 생성하지 않았는가?
+- [ ] 간단명료하게 응답했는가?
 
-# Tier 3: 특수 목적 라이브러리 (사유 필수)
-# 사용 시 다음 정보 필수 주석:
-# - 사용 이유
-# - 대안 검토 결과
-# - 버전 고정 이유
-# - 라이선스 확인
+---
 
-"""
-외부 라이브러리 사용 예시:
-import pandas as pd  # 이유: 대용량 데이터 분석, 표준라이브러리로 불가능
-                     # 대안: numpy로 구현 시 개발기간 3주 추가 소요
-                     # 버전: 2.1.0 (보안 패치 적용)
-                     # 라이선스: BSD-3-Clause (상업적 사용 가능)
-"""
+## 🎯 핵심 원칙 요약
+
+1. **요청한 것만**: 사용자가 요청한 기능만 정확히 구현
+2. **기존 파일 우선**: 새 파일 생성보다 기존 파일 수정 우선
+3. **간단한 응답**: 코드 + 한 줄 설명만
+4. **추가 질문 금지**: 중간에 질문하거나 확인 요청하지 않음
+5. **구조 유지**: 기존 폴더/파일 구조 최대한 유지
+
+이 규칙을 철저히 지키면 깔끔하고 효율적인 개발이 가능합니다.
 ```
 
----
-
-## 🚀 10. 최종 품질 체크리스트
-
-### 코드 작성 완료 후 반드시 확인
-- [ ] **타입 힌트**: mypy --strict 통과
-- [ ] **테스트 커버리지**: 95% 이상
-- [ ] **성능**: 기준 성능 달성
-- [ ] **보안**: SAST 도구 통과
-- [ ] **문서화**: Sphinx 빌드 성공
-- [ ] **코드 스타일**: black, flake8, isort 통과
-- [ ] **의존성**: pip-audit 보안 검사 통과
-- [ ] **메모리**: memory_profiler로 누수 없음 확인
-
-### 배포 전 최종 확인
-- [ ] **환경별 테스트**: dev, staging, prod 모두 통과
-- [ ] **부하 테스트**: 예상 트래픽 10배 처리 가능
-- [ ] **장애 복구**: 서킷브레이커, 재시도 로직 동작 확인
-- [ ] **모니터링**: 로그, 메트릭 정상 수집 확인
-- [ ] **백업**: 데이터 백업/복구 절차 테스트 완료
-
----
-
-## 🌟 World-Class 차별화 요소
-
-### 1. Google-Level Engineering
-- **Code Review**: 모든 코드는 시니어 엔지니어 리뷰 수준
-- **Design Document**: 복잡한 기능은 RFC 스타일 설계 문서 작성
-- **Production Readiness**: SLA 99.9% 달성 가능한 코드
-
-### 2. Netflix-Style Reliability
-- **Chaos Engineering**: 장애 상황 시뮬레이션 및 복구 자동화
-- **Circuit Breaker**: 의존성 실패 시 자동 차단
-- **Graceful Degradation**: 부분 장애 시에도 핵심 기능 유지
-
-### 3. Meta-Level Performance
-- **Micro-optimization**: CPU 캐시 히트율, 메모리 지역성 고려
-- **Profiling-Driven**: cProfile, py-spy로 실제 성능 측정 기반 최적화
-- **Scalability**: 수평 확장 가능한 아키텍처
-
-### 4. Amazon-Style Operability
-- **Observability**: 메트릭, 로그, 트레이스 완전 가시성
-- **Automation**: 수동 작업 완전 제거
-- **Self-Healing**: 자동 복구 메커니즘 내장
-
----
-
-> **"코드는 한 번 작성되지만 수십 번 읽힌다. 미래의 나와 동료를 위해 최고의 코드를 작성하라."**
-> 
-> **이 룰을 따르면 Google, Meta, Netflix, Amazon 수준의 코드를 작성할 수 있습니다
+이 프롬프트로 실행하면 정말 세계 최고 수준의 AI 트레이딩봇이 완성될 거예요! 🚀

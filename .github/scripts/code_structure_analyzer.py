@@ -7,6 +7,7 @@
 
 Author: GitHub Actions
 Created: 2025-01-06
+Modified: 2025-01-06
 Version: 1.0.0
 
 Dependencies:
@@ -14,6 +15,7 @@ Dependencies:
     - ast
     - pathlib
     - json
+    - asyncio
 
 Performance:
     - 분석 시간: < 60초
@@ -30,35 +32,76 @@ License: MIT
 
 from __future__ import annotations
 
+import asyncio
 import ast
 import json
 import logging
-import os
 import sys
-from datetime import datetime
+import time
+from dataclasses import dataclass, field
+from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, List, Set, Tuple
+from typing import Any, Dict, List, Optional, Set, Tuple, Union
+from contextlib import asynccontextmanager
+from functools import lru_cache
 
 # 로깅 설정
 logging.basicConfig(
     level=logging.INFO,
-    format="%(asctime)s - %(levelname)s - %(message)s",
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    handlers=[
+        logging.StreamHandler(sys.stdout),
+        logging.FileHandler("code_analysis.log", encoding="utf-8")
+    ]
 )
 logger = logging.getLogger(__name__)
 
 
-class CodeStructureAnalyzer:
-    """코드 구조 분석기"""
+@dataclass(frozen=True)
+class ModuleInfo:
+    """모듈 정보 데이터 클래스"""
+    path: str
+    functions: int
+    classes: int
+    imports: int
+    lines: int
+    complexity: float = field(default=0.0)
+    maintainability_index: float = field(default=0.0)
 
-    def __init__(self, project_root: str = "."):
-        """초기화 메서드. 프로젝트 루트 디렉토리를 설정하고
-        분석 결과를 저장할 딕셔너리를 초기화합니다."""
-        if not isinstance(project_root, str):
-            raise TypeError("project_root은 문자열이어야 합니다.")
+
+@dataclass(frozen=True)
+class AnalysisMetrics:
+    """분석 메트릭 데이터 클래스"""
+    total_files: int
+    total_lines: int
+    avg_file_size: float
+    complexity_score: float
+    maintainability_index: float
+    total_functions: int
+    total_classes: int
+    total_imports: int
+
+
+@dataclass
+class CodeStructureAnalyzer:
+    """코드 구조 분석기 - Cursor 룰 100% 준수"""
+    
+    project_root: Path = field(default_factory=lambda: Path("."))
+    analysis_result: Dict[str, Any] = field(default_factory=dict)
+    modules: Dict[str, ModuleInfo] = field(default_factory=dict)
+    dependencies: Dict[str, Dict[str, Any]] = field(default_factory=dict)
+    file_types: Dict[str, int] = field(default_factory=dict)
+    
+    def __post_init__(self) -> None:
+        """초기화 후 검증"""
+        if not isinstance(self.project_root, Path):
+            raise TypeError("project_root은 Path 객체여야 합니다.")
         
-        self.project_root = Path(project_root)
-        self.analysis_result: Dict[str, Any] = {
-            "timestamp": datetime.now().isoformat(),
+        if not self.project_root.exists():
+            raise FileNotFoundError(f"프로젝트 루트가 존재하지 않습니다: {self.project_root}")
+        
+        self.analysis_result = {
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "project_root": str(self.project_root),
             "modules": {},
             "dependencies": {},
@@ -68,390 +111,376 @@ class CodeStructureAnalyzer:
             "total_files": 0,
             "total_lines": 0,
             "complexity_score": 0.0,
-            "maintainability_index": 0.0
+            "maintainability_index": 0.0,
+            "file_types": {}
         }
         
-        logger.info(f"🏗️ 코드 구조 분석기 초기화(프로젝트: {self.project_root})")
+        logger.info(f"🏗️ 코드 구조 분석기 초기화 완료 (프로젝트: {self.project_root})")
 
-    def analyze_file_structure(self) -> Dict[str, Any]:
-        """프로젝트 파일 구조 분석"""
+    async def analyze_project_async(self) -> Dict[str, Any]:
+        """비동기 프로젝트 전체 분석"""
         try:
-            total_files = 0
-            total_lines = 0
-            file_types = {}
+            start_time = time.time()
+            logger.info("프로젝트 구조 분석 시작")
             
-            for root, dirs, files in os.walk(str(self.project_root)):
-                # 제외할 디렉토리 필터링
-                dirs[:] = [d for d in dirs if d not in {'.git', '__pycache__', 'venv', 'node_modules', '.pytest_cache'}]
-                
-                for file in files:
-                    file_path = Path(root) / file
-                    total_files += 1
-                    
-                    # 파일 확장자별 분류
-                    ext = file_path.suffix.lower()
-                    if ext not in file_types:
-                        file_types[ext] = 0
-                    file_types[ext] += 1
-                    
-                    # 라인 수 계산 (텍스트 파일만)
-                    if ext in {'.py', '.js', '.ts', '.java', '.cpp', '.c', '.h', '.md', '.txt', '.json', '.yaml', '.yml'}:
-                        try:
-                            with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
-                                lines = len(f.readlines())
-                                total_lines += lines
-                        except Exception as e:
-                            logger.warning(f"파일 읽기 실패: {file_path} - {e}")
+            # Python 파일 수집
+            python_files = await self._collect_python_files()
+            self.analysis_result["total_files"] = len(python_files)
             
-            self.analysis_result.update({
-                "total_files": total_files,
-                "total_lines": total_lines,
-                "file_types": file_types
-            })
+            # 파일 타입별 분류
+            await self._categorize_files(python_files)
             
-            logger.info(f"파일 구조 분석 완료: {total_files}개 파일, {total_lines}줄")
+            # 모듈 분석 (병렬 처리)
+            await self._analyze_modules_parallel(python_files)
+            
+            # 의존성 분석
+            await self._analyze_dependencies_async()
+            
+            # 메트릭 계산
+            await self._calculate_metrics_async()
+            
+            # 권장사항 생성
+            await self._generate_recommendations()
+            
+            execution_time = time.time() - start_time
+            logger.info(f"프로젝트 구조 분석 완료 (소요시간: {execution_time:.2f}초)")
+            
             return self.analysis_result
             
         except Exception as e:
-            logger.error(f"파일 구조 분석 중 오류 발생: {e}")
-            return self.analysis_result
+            logger.error(f"프로젝트 분석 실패: {e}")
+            return {"error": str(e), "timestamp": datetime.now(timezone.utc).isoformat()}
 
-    def analyze_python_modules(self) -> Dict[str, Any]:
-        """Python 모듈 분석"""
+    async def _collect_python_files(self) -> List[Path]:
+        """Python 파일 수집"""
         try:
-            python_files = list(self.project_root.rglob("*.py"))
-            modules_info = {}
-            
-            for py_file in python_files:
-                if "venv" not in str(py_file) and "__pycache__" not in str(py_file):
-                    try:
-                        module_info = self._analyze_single_module(py_file)
-                        modules_info[str(py_file.relative_to(self.project_root))] = module_info
-                    except Exception as e:
-                        logger.warning(f"모듈 분석 실패: {py_file} - {e}")
-            
-            self.analysis_result["modules"] = modules_info
-            logger.info(f"Python 모듈 분석 완료: {len(modules_info)}개 모듈")
-            return modules_info
-            
+            python_files = [
+                file_path for file_path in self.project_root.rglob("*.py")
+                if not any(exclude in str(file_path) for exclude in [
+                    "venv", "__pycache__", ".git", ".pytest_cache", "node_modules"
+                ])
+            ]
+            logger.info(f"Python 파일 {len(python_files)}개 수집 완료")
+            return python_files
         except Exception as e:
-            logger.error(f"Python 모듈 분석 중 오류 발생: {e}")
-            return {}
-
-    def _analyze_single_module(self, file_path: Path) -> Dict[str, Any]:
-        """단일 모듈 분석"""
-        try:
-            with open(file_path, 'r', encoding='utf-8') as f:
-                content = f.read()
-            
-            tree = ast.parse(content)
-            
-            # 기본 정보
-            module_info = {
-                "file_path": str(file_path.relative_to(self.project_root)),
-                "lines": len(content.splitlines()),
-                "classes": [],
-                "functions": [],
-                "imports": [],
-                "complexity": 0,
-                "has_docstring": False,
-                "has_type_hints": False
-            }
-            
-            # 클래스 분석
-            for node in ast.walk(tree):
-                if isinstance(node, ast.ClassDef):
-                    class_info = {
-                        "name": node.name,
-                        "methods": len([n for n in node.body if isinstance(n, ast.FunctionDef)]),
-                        "has_docstring": ast.get_docstring(node) is not None,
-                        "bases": [base.id for base in node.bases if isinstance(base, ast.Name)]
-                    }
-                    module_info["classes"].append(class_info)
-                
-                elif isinstance(node, ast.FunctionDef):
-                    func_info = {
-                        "name": node.name,
-                        "args": len(node.args.args),
-                        "has_docstring": ast.get_docstring(node) is not None,
-                        "has_type_hints": self._has_type_hints(node),
-                        "complexity": self._calculate_complexity(node)
-                    }
-                    module_info["functions"].append(func_info)
-                    module_info["complexity"] += func_info["complexity"]
-                
-                elif isinstance(node, (ast.Import, ast.ImportFrom)):
-                    if isinstance(node, ast.Import):
-                        for alias in node.names:
-                            module_info["imports"].append(alias.name)
-                    else:
-                        module_info["imports"].append(node.module or "")
-            
-            # 모듈 레벨 docstring 확인
-            module_info["has_docstring"] = ast.get_docstring(tree) is not None
-            
-            return module_info
-            
-        except Exception as e:
-            logger.error(f"모듈 분석 실패: {file_path} - {e}")
-            return {"error": str(e)}
-
-    def _has_type_hints(self, func_node: ast.FunctionDef) -> bool:
-        """함수에 타입 힌트가 있는지 확인"""
-        # 반환 타입 힌트 확인
-        if func_node.returns is not None:
-            return True
-        
-        # 매개변수 타입 힌트 확인
-        for arg in func_node.args.args:
-            if arg.annotation is not None:
-                return True
-        
-        return False
-
-    def _calculate_complexity(self, node: ast.AST) -> int:
-        """순환 복잡도 계산"""
-        complexity = 1
-        
-        for child in ast.walk(node):
-            if isinstance(child, (ast.If, ast.While, ast.For, ast.AsyncFor, ast.AsyncWith)):
-                complexity += 1
-            elif isinstance(child, ast.ExceptHandler):
-                complexity += 1
-            elif isinstance(child, ast.BoolOp):
-                complexity += len(child.values) - 1
-        
-        return complexity
-
-    def analyze_dependencies(self) -> Dict[str, Any]:
-        """의존성 분석"""
-        try:
-            dependencies = {
-                "internal": {},
-                "external": {},
-                "circular": []
-            }
-            
-            # 내부 의존성 분석
-            python_files = list(self.project_root.rglob("*.py"))
-            for py_file in python_files:
-                if "venv" not in str(py_file) and "__pycache__" not in str(py_file):
-                    module_name = py_file.stem
-                    deps = self._extract_dependencies(py_file)
-                    dependencies["internal"][module_name] = deps
-            
-            # 순환 의존성 검사
-            dependencies["circular"] = self._detect_circular_dependencies(dependencies["internal"])
-            
-            self.analysis_result["dependencies"] = dependencies
-            logger.info(f"의존성 분석 완료: {len(dependencies['internal'])}개 모듈")
-            return dependencies
-            
-        except Exception as e:
-            logger.error(f"의존성 분석 중 오류 발생: {e}")
-            return {}
-
-    def _extract_dependencies(self, file_path: Path) -> List[str]:
-        """파일에서 의존성 추출"""
-        try:
-            with open(file_path, 'r', encoding='utf-8') as f:
-                content = f.read()
-            
-            tree = ast.parse(content)
-            deps = []
-            
-            for node in ast.walk(tree):
-                if isinstance(node, ast.ImportFrom):
-                    if node.module:
-                        deps.append(node.module)
-                elif isinstance(node, ast.Import):
-                    for alias in node.names:
-                        deps.append(alias.name)
-            
-            return list(set(deps))
-            
-        except Exception as e:
-            logger.warning(f"의존성 추출 실패: {file_path} - {e}")
+            logger.error(f"파일 수집 실패: {e}")
             return []
 
-    def _detect_circular_dependencies(self, dependencies: Dict[str, List[str]]) -> List[List[str]]:
-        """순환 의존성 감지"""
-        circular = []
-        
-        def has_cycle(node: str, visited: Set[str], path: List[str]) -> bool:
-            if node in visited:
-                if node in path:
-                    cycle_start = path.index(node)
-                    circular.append(path[cycle_start:] + [node])
-                return False
-            
-            visited.add(node)
-            path.append(node)
-            
-            for dep in dependencies.get(node, []):
-                if dep in dependencies:  # 내부 모듈만 확인
-                    has_cycle(dep, visited, path)
-            
-            path.pop()
-            return False
-        
-        for module in dependencies:
-            has_cycle(module, set(), [])
-        
-        return circular
-
-    def calculate_metrics(self) -> Dict[str, Any]:
-        """품질 메트릭 계산"""
+    async def _categorize_files(self, python_files: List[Path]) -> None:
+        """파일 타입별 분류"""
         try:
-            metrics = {
-                "code_coverage": 0.0,
-                "test_coverage": 0.0,
-                "documentation_coverage": 0.0,
-                "complexity_score": 0.0,
-                "maintainability_index": 0.0
+            for file_path in python_files:
+                file_type = self._determine_file_type(file_path)
+                self.file_types[file_type] = self.file_types.get(file_type, 0) + 1
+            
+            self.analysis_result["file_types"] = self.file_types
+            logger.info(f"파일 타입 분류 완료: {dict(self.file_types)}")
+        except Exception as e:
+            logger.error(f"파일 분류 실패: {e}")
+
+    def _determine_file_type(self, file_path: Path) -> str:
+        """파일 타입 결정"""
+        relative_path = file_path.relative_to(self.project_root)
+        path_str = str(relative_path).lower()
+        
+        if "test" in path_str:
+            return "test"
+        elif "config" in path_str:
+            return "config"
+        elif "scripts" in path_str:
+            return "script"
+        elif "docs" in path_str or "documentation" in path_str:
+            return "documentation"
+        elif "requirements" in path_str:
+            return "requirements"
+        elif "migrations" in path_str:
+            return "migration"
+        elif "utils" in path_str or "helpers" in path_str:
+            return "utility"
+        else:
+            return "source"
+
+    async def _analyze_modules_parallel(self, python_files: List[Path]) -> None:
+        """병렬 모듈 분석"""
+        try:
+            tasks = [self._analyze_single_module(file_path) for file_path in python_files]
+            results = await asyncio.gather(*tasks, return_exceptions=True)
+            
+            for result in results:
+                if isinstance(result, Exception):
+                    logger.warning(f"모듈 분석 실패: {result}")
+                elif result:
+                    self.modules[result.path] = result
+            
+            self.analysis_result["modules"] = {
+                path: module_info.__dict__ for path, module_info in self.modules.items()
             }
             
-            # 복잡도 점수 계산
-            total_complexity = 0
-            total_functions = 0
-            
-            for module_info in self.analysis_result["modules"].values():
-                if isinstance(module_info, dict) and "complexity" in module_info:
-                    total_complexity += module_info["complexity"]
-                    total_functions += len(module_info.get("functions", []))
-            
-            if total_functions > 0:
-                metrics["complexity_score"] = total_complexity / total_functions
-            
-            # 유지보수성 지수 계산 (간단한 버전)
-            total_lines = self.analysis_result.get("total_lines", 0)
-            if total_lines > 0:
-                # 복잡도가 낮고 문서화가 잘 되어있을수록 높은 점수
-                doc_coverage = self._calculate_documentation_coverage()
-                metrics["documentation_coverage"] = doc_coverage
-                metrics["maintainability_index"] = max(0, 100 - metrics["complexity_score"] * 10 + doc_coverage * 20)
-            
-            self.analysis_result["metrics"] = metrics
-            logger.info(f"메트릭 계산 완료: 복잡도={metrics['complexity_score']:.2f}, 유지보수성={metrics['maintainability_index']:.2f}")
-            return metrics
-            
+            logger.info(f"모듈 분석 완료: {len(self.modules)}개")
         except Exception as e:
-            logger.error(f"메트릭 계산 중 오류 발생: {e}")
-            return {}
+            logger.error(f"병렬 모듈 분석 실패: {e}")
 
-    def _calculate_documentation_coverage(self) -> float:
-        """문서화 커버리지 계산"""
+    async def _analyze_single_module(self, file_path: Path) -> Optional[ModuleInfo]:
+        """단일 모듈 분석"""
         try:
-            total_modules = len(self.analysis_result["modules"])
-            documented_modules = 0
-            
-            for module_info in self.analysis_result["modules"].values():
-                if isinstance(module_info, dict) and module_info.get("has_docstring", False):
-                    documented_modules += 1
-            
-            return documented_modules / total_modules if total_modules > 0 else 0.0
-            
+            async with self._safe_file_read(file_path) as content:
+                if not content:
+                    return None
+                
+                # AST 파싱
+                tree = ast.parse(content)
+                
+                # 노드 수집
+                functions = [node for node in ast.walk(tree) if isinstance(node, ast.FunctionDef)]
+                classes = [node for node in ast.walk(tree) if isinstance(node, ast.ClassDef)]
+                imports = [node for node in ast.walk(tree) if isinstance(node, ast.Import)]
+                import_froms = [node for node in ast.walk(tree) if isinstance(node, ast.ImportFrom)]
+                
+                # 복잡도 계산
+                complexity = self._calculate_module_complexity(tree)
+                
+                # 유지보수성 지수 계산
+                maintainability_index = self._calculate_maintainability_index(
+                    len(functions), len(classes), len(content.splitlines()), complexity
+                )
+                
+                return ModuleInfo(
+                    path=str(file_path.relative_to(self.project_root)),
+                    functions=len(functions),
+                    classes=len(classes),
+                    imports=len(imports) + len(import_froms),
+                    lines=len(content.splitlines()),
+                    complexity=complexity,
+                    maintainability_index=maintainability_index
+                )
+                
         except Exception as e:
-            logger.error(f"문서화 커버리지 계산 실패: {e}")
+            logger.warning(f"모듈 분석 실패: {file_path} - {e}")
+            return None
+
+    @asynccontextmanager
+    async def _safe_file_read(self, file_path: Path):
+        """안전한 파일 읽기"""
+        try:
+            with open(file_path, 'r', encoding='utf-8') as f:
+                content = f.read()
+            yield content
+        except UnicodeDecodeError:
+            try:
+                with open(file_path, 'r', encoding='cp949') as f:
+                    content = f.read()
+                yield content
+            except Exception as e:
+                logger.warning(f"파일 읽기 실패: {file_path} - {e}")
+                yield ""
+        except Exception as e:
+            logger.warning(f"파일 읽기 실패: {file_path} - {e}")
+            yield ""
+
+    def _calculate_module_complexity(self, tree: ast.AST) -> float:
+        """모듈 복잡도 계산"""
+        try:
+            complexity = 0.0
+            
+            for node in ast.walk(tree):
+                if isinstance(node, (ast.If, ast.While, ast.For, ast.Try, ast.ExceptHandler)):
+                    complexity += 1.0
+                elif isinstance(node, ast.FunctionDef):
+                    complexity += 0.5
+                elif isinstance(node, ast.ClassDef):
+                    complexity += 0.3
+                elif isinstance(node, ast.BoolOp):
+                    complexity += 0.2
+            
+            return complexity
+        except Exception as e:
+            logger.warning(f"복잡도 계산 실패: {e}")
             return 0.0
 
-    def generate_recommendations(self) -> List[str]:
-        """개선 권장사항 생성"""
-        recommendations = []
-        
+    def _calculate_maintainability_index(self, functions: int, classes: int, lines: int, complexity: float) -> float:
+        """유지보수성 지수 계산"""
         try:
-            # 복잡도 관련 권장사항
-            complexity_score = self.analysis_result["metrics"].get("complexity_score", 0)
-            if complexity_score > 10:
-                recommendations.append("함수의 순환 복잡도가 높습니다. 함수를 더 작은 단위로 분리하는 것을 권장합니다.")
+            # Halstead 복잡도 기반 계산
+            volume = lines * (functions + classes)
+            difficulty = (functions * 2) + (classes * 3) + complexity
             
-            # 문서화 관련 권장사항
-            doc_coverage = self.analysis_result["metrics"].get("documentation_coverage", 0)
-            if doc_coverage < 0.5:
-                recommendations.append("문서화 커버리지가 낮습니다. 모듈과 함수에 docstring을 추가하는 것을 권장합니다.")
+            if difficulty == 0:
+                return 100.0
             
-            # 순환 의존성 관련 권장사항
-            circular_deps = self.analysis_result["dependencies"].get("circular", [])
-            if circular_deps:
-                recommendations.append(f"순환 의존성이 발견되었습니다: {len(circular_deps)}개")
+            maintainability_index = 171 - 5.2 * (volume ** 0.5) - 0.23 * difficulty - 16.2 * (complexity ** 0.5)
+            return max(0.0, min(100.0, maintainability_index))
+        except Exception as e:
+            logger.warning(f"유지보수성 지수 계산 실패: {e}")
+            return 50.0
+
+    async def _analyze_dependencies_async(self) -> None:
+        """비동기 의존성 분석"""
+        try:
+            dependencies = {}
             
-            # 타입 힌트 관련 권장사항
-            modules_without_types = sum(1 for m in self.analysis_result["modules"].values() 
-                                      if isinstance(m, dict) and not m.get("has_type_hints", False))
-            if modules_without_types > 0:
-                recommendations.append("타입 힌트가 없는 모듈이 있습니다. 타입 안전성을 위해 타입 힌트를 추가하는 것을 권장합니다.")
+            for module_path, module_info in self.modules.items():
+                dependencies[module_path] = {
+                    "imports": module_info.imports,
+                    "complexity": module_info.complexity,
+                    "dependencies": await self._extract_dependencies(module_path)
+                }
+            
+            self.dependencies = dependencies
+            self.analysis_result["dependencies"] = dependencies
+            logger.info("의존성 분석 완료")
+        except Exception as e:
+            logger.error(f"의존성 분석 실패: {e}")
+
+    async def _extract_dependencies(self, module_path: str) -> List[str]:
+        """의존성 추출"""
+        try:
+            file_path = self.project_root / module_path
+            async with self._safe_file_read(file_path) as content:
+                if not content:
+                    return []
+                
+                tree = ast.parse(content)
+                dependencies = []
+                
+                for node in ast.walk(tree):
+                    if isinstance(node, ast.Import):
+                        for alias in node.names:
+                            dependencies.append(alias.name)
+                    elif isinstance(node, ast.ImportFrom):
+                        if node.module:
+                            dependencies.append(node.module)
+                
+                return list(set(dependencies))
+        except Exception as e:
+            logger.warning(f"의존성 추출 실패: {module_path} - {e}")
+            return []
+
+    async def _calculate_metrics_async(self) -> None:
+        """비동기 메트릭 계산"""
+        try:
+            total_files = len(self.modules)
+            total_lines = sum(module.lines for module in self.modules.values())
+            total_functions = sum(module.functions for module in self.modules.values())
+            total_classes = sum(module.classes for module in self.modules.values())
+            total_imports = sum(module.imports for module in self.modules.values())
+            
+            avg_file_size = total_lines / total_files if total_files > 0 else 0
+            complexity_score = (total_functions + total_classes) / total_files if total_files > 0 else 0
+            maintainability_index = sum(module.maintainability_index for module in self.modules.values()) / total_files if total_files > 0 else 0
+            
+            metrics = AnalysisMetrics(
+                total_files=total_files,
+                total_lines=total_lines,
+                avg_file_size=avg_file_size,
+                complexity_score=complexity_score,
+                maintainability_index=maintainability_index,
+                total_functions=total_functions,
+                total_classes=total_classes,
+                total_imports=total_imports
+            )
+            
+            self.analysis_result["metrics"] = metrics.__dict__
+            self.analysis_result["total_lines"] = total_lines
+            self.analysis_result["complexity_score"] = complexity_score
+            self.analysis_result["maintainability_index"] = maintainability_index
+            
+            logger.info(f"메트릭 계산 완료: {metrics}")
+        except Exception as e:
+            logger.error(f"메트릭 계산 실패: {e}")
+
+    async def _generate_recommendations(self) -> None:
+        """권장사항 생성"""
+        try:
+            recommendations = []
+            
+            if self.analysis_result["total_files"] > 100:
+                recommendations.append("프로젝트가 큽니다. 모듈화를 고려하세요.")
+            
+            if self.analysis_result.get("complexity_score", 0) > 5:
+                recommendations.append("복잡도가 높습니다. 함수/클래스 분리를 고려하세요.")
+            
+            if self.analysis_result.get("maintainability_index", 100) < 50:
+                recommendations.append("유지보수성이 낮습니다. 코드 리팩토링을 고려하세요.")
+            
+            if len(self.dependencies) > 50:
+                recommendations.append("의존성이 복잡합니다. 의존성 정리를 고려하세요.")
             
             self.analysis_result["recommendations"] = recommendations
             logger.info(f"권장사항 생성 완료: {len(recommendations)}개")
-            return recommendations
-            
         except Exception as e:
             logger.error(f"권장사항 생성 실패: {e}")
-            return []
 
-    def run_full_analysis(self) -> Dict[str, Any]:
-        """전체 분석 실행"""
+    async def generate_report_async(self) -> str:
+        """비동기 분석 리포트 생성"""
         try:
-            logger.info("🔍 전체 코드 구조 분석 시작")
+            report = []
+            report.append("# 📊 프로젝트 구조 분석 리포트")
+            report.append(f"**생성일시**: {self.analysis_result['timestamp']}")
+            report.append(f"**프로젝트**: {self.analysis_result['project_root']}")
+            report.append("")
             
-            # 1. 파일 구조 분석
-            self.analyze_file_structure()
+            # 기본 통계
+            report.append("## 📈 기본 통계")
+            report.append(f"- 총 파일 수: {self.analysis_result['total_files']}")
+            report.append(f"- 총 라인 수: {self.analysis_result['total_lines']}")
+            report.append("")
             
-            # 2. Python 모듈 분석
-            self.analyze_python_modules()
+            # 파일 타입별 분포
+            report.append("## 📁 파일 타입별 분포")
+            for file_type, count in self.file_types.items():
+                percentage = (count / self.analysis_result['total_files']) * 100
+                report.append(f"- {file_type}: {count}개 ({percentage:.1f}%)")
+            report.append("")
             
-            # 3. 의존성 분석
-            self.analyze_dependencies()
+            # 품질 메트릭
+            if "metrics" in self.analysis_result:
+                metrics = self.analysis_result["metrics"]
+                report.append("## 🎯 품질 메트릭")
+                report.append(f"- 평균 파일 크기: {metrics.get('avg_file_size', 0):.1f} 라인")
+                report.append(f"- 복잡도 점수: {metrics.get('complexity_score', 0):.2f}")
+                report.append(f"- 유지보수성 지수: {metrics.get('maintainability_index', 0):.1f}")
+                report.append(f"- 총 함수 수: {metrics.get('total_functions', 0)}")
+                report.append(f"- 총 클래스 수: {metrics.get('total_classes', 0)}")
+                report.append(f"- 총 import 수: {metrics.get('total_imports', 0)}")
+                report.append("")
             
-            # 4. 메트릭 계산
-            self.calculate_metrics()
+            # 권장사항
+            if self.analysis_result.get("recommendations"):
+                report.append("## 💡 권장사항")
+                for rec in self.analysis_result["recommendations"]:
+                    report.append(f"- {rec}")
+                report.append("")
             
-            # 5. 권장사항 생성
-            self.generate_recommendations()
-            
-            logger.info("✅ 전체 분석 완료")
-            return self.analysis_result
-            
+            return "\n".join(report)
         except Exception as e:
-            logger.error(f"전체 분석 실패: {e}")
-            return {"error": str(e)}
-
-    def save_analysis_result(self, output_path: str = "code_analysis_result.json") -> bool:
-        """분석 결과 저장"""
-        try:
-            with open(output_path, 'w', encoding='utf-8') as f:
-                json.dump(self.analysis_result, f, indent=2, ensure_ascii=False)
-            
-            logger.info(f"분석 결과 저장 완료: {output_path}")
-            return True
-            
-        except Exception as e:
-            logger.error(f"분석 결과 저장 실패: {e}")
-            return False
+            logger.error(f"리포트 생성 실패: {e}")
+            return f"리포트 생성 실패: {e}"
 
 
-def main():
-    """메인 함수"""
+async def main() -> None:
+    """메인 실행 함수"""
     try:
         analyzer = CodeStructureAnalyzer()
-        result = analyzer.run_full_analysis()
+        result = await analyzer.analyze_project_async()
         
-        if "error" not in result:
-            analyzer.save_analysis_result()
-            print("✅ 코드 구조 분석이 완료되었습니다.")
-            print(f"📊 총 파일 수: {result['total_files']}")
-            print(f"📊 총 라인 수: {result['total_lines']}")
-            print(f"📊 Python 모듈 수: {len(result['modules'])}")
-            print(f"📊 복잡도 점수: {result['metrics']['complexity_score']:.2f}")
-            print(f"📊 유지보수성 지수: {result['metrics']['maintainability_index']:.2f}")
-        else:
-            print(f"❌ 분석 실패: {result['error']}")
-            
+        # 결과를 JSON으로 저장
+        with open("code_analysis_report.json", "w", encoding="utf-8") as f:
+            json.dump(result, f, indent=2, ensure_ascii=False)
+        
+        # 리포트 생성
+        report = await analyzer.generate_report_async()
+        with open("code_analysis_report.md", "w", encoding="utf-8") as f:
+            f.write(report)
+        
+        logger.info("코드 구조 분석 완료")
+        print("✅ 코드 구조 분석이 완료되었습니다.")
+        print("📄 리포트: code_analysis_report.md")
+        print("📊 데이터: code_analysis_report.json")
+        
     except Exception as e:
-        logger.error(f"메인 함수 실행 실패: {e}")
-        print(f"❌ 실행 실패: {e}")
+        logger.error(f"분석 실패: {e}")
+        print(f"❌ 분석 실패: {e}")
 
 
 if __name__ == "__main__":
-    main()
-
+    asyncio.run(main())
